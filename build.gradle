@@ -85,14 +85,10 @@ println('Version: ' + VERSION +
         ' JVM: ' + System.getProperty('java.vm.version') + '(' + System.getProperty('java.vendor') + ')' +
         ' Arch: ' + System.getProperty('os.arch'))
 
-changelog {
-    fromTag MIN_TAG_FOR_CHANGELOG
-}
 
 def extraTxts = [
     rootProject.file('CREDITS.txt'),
     rootProject.file('LICENSE.txt'),
-    rootProject.tasks.createChangelog.outputFile
 ]
 
 task downloadVersionManifest(type: Download) {
@@ -148,6 +144,10 @@ subprojects {
         maven {
             name = 'minecraft'
             url = 'https://libraries.minecraft.net/'
+        }
+        maven {
+            name = 'spigot'
+            url 'https://hub.spigotmc.org/nexus/content/groups/public/'
         }
     }
 
@@ -287,12 +287,22 @@ def sharedDeps = {
     installer 'org.openjdk.nashorn:nashorn-core:15.3'
     installer "net.minecraftforge:JarJar:${JARJAR_VERSION}"
 
-    /*
-    installer 'org.lwjgl:lwjgl:3.2.2'
-    installer 'org.lwjgl:lwjgl-glfw:3.2.2'
-    installer 'org.lwjgl:lwjgl-opengl:3.2.2'
-    installer 'org.lwjgl:lwjgl-stb:3.2.2'
-    */
+    // Bukkit
+    installer 'org.apache.maven:maven-resolver-provider:3.8.5'
+    installer 'org.apache.maven.resolver:maven-resolver-connector-basic:1.7.3'
+    installer 'org.apache.maven.resolver:maven-resolver-transport-http:1.7.3'
+    compileOnly 'org.jetbrains:annotations-java5:23.0.0'
+
+    // CraftBukkit
+    installer 'org.fusesource.jansi:jansi:1.18'
+    installer 'jline:jline:2.12.1'
+    installer 'com.googlecode.json-simple:json-simple:1.1.1'
+    installer 'org.xerial:sqlite-jdbc:3.36.0.3'
+    installer 'mysql:mysql-connector-java:8.0.27'
+    installer 'org.apache.logging.log4j:log4j-iostreams:2.17.1'
+    installer 'net.md-5:SpecialSource:1.10.0'
+    installer 'org.yaml:snakeyaml:1.30'
+
 }
 
 def sharedFmlonlyForge = { Project prj ->
@@ -1706,16 +1716,4 @@ task setup() {  //These must be strings so that we can do lazy resolution. Else 
     if (symlinkValid)
         dependsOn ':fmlonly:extractMapped'
     dependsOn ':forge:extractMapped'
-}
-
-//Also output FMLOnly when building a version.
-if (System.env.TEAMCITY_VERSION) {
-    //Only setup the CI environment if and only if the environment variables are set.
-    tasks.configureTeamCity {
-        doLast {
-            println "##teamcity[buildNumber '${project(':forge').version}']"
-            println "##teamcity[setParameter name='env.PUBLISHED_JAVA_ARTIFACT_VERSION' value='${project(':forge').version}']"
-            println "##teamcity[setParameter name='env.PUBLISHED_JAVA_FML_ARTIFACT_VERSION' value='${project(':fmlonly').version}']"
-        }
-    }
 }
