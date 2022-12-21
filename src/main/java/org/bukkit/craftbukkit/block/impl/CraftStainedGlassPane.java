@@ -16,7 +16,7 @@ public final class CraftStainedGlassPane extends org.bukkit.craftbukkit.block.da
     // org.bukkit.craftbukkit.block.data.CraftMultipleFacing
 
     private static final net.minecraft.world.level.block.state.properties.BooleanProperty[] FACES = new net.minecraft.world.level.block.state.properties.BooleanProperty[]{
-        getBoolean(net.minecraft.world.level.block.BlockStainedGlassPane.class, "north", true), getBoolean(net.minecraft.world.level.block.BlockStainedGlassPane.class, "east", true), getBoolean(net.minecraft.world.level.block.BlockStainedGlassPane.class, "south", true), getBoolean(net.minecraft.world.level.block.BlockStainedGlassPane.class, "west", true), getBoolean(net.minecraft.world.level.block.BlockStainedGlassPane.class, "up", true), getBoolean(net.minecraft.world.level.block.BlockStainedGlassPane.class, "down", true)
+        getBoolean(net.minecraft.world.level.block.StainedGlassPaneBlock.class, "north", true), getBoolean(net.minecraft.world.level.block.StainedGlassPaneBlock.class, "east", true), getBoolean(net.minecraft.world.level.block.StainedGlassPaneBlock.class, "south", true), getBoolean(net.minecraft.world.level.block.StainedGlassPaneBlock.class, "west", true), getBoolean(net.minecraft.world.level.block.StainedGlassPaneBlock.class, "up", true), getBoolean(net.minecraft.world.level.block.StainedGlassPaneBlock.class, "down", true)
     };
 
     @Override
@@ -65,7 +65,7 @@ public final class CraftStainedGlassPane extends org.bukkit.craftbukkit.block.da
 
     // org.bukkit.craftbukkit.block.data.CraftWaterlogged
 
-    private static final net.minecraft.world.level.block.state.properties.BooleanProperty WATERLOGGED = getBoolean(net.minecraft.world.level.block.BlockStainedGlassPane.class, "waterlogged");
+    private static final net.minecraft.world.level.block.state.properties.BooleanProperty WATERLOGGED = getBoolean(net.minecraft.world.level.block.StainedGlassPaneBlock.class, "waterlogged");
 
     @Override
     public boolean isWaterlogged() {

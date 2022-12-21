@@ -1,14 +1,14 @@
 package org.bukkit.craftbukkit.potion;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Maps;
+import net.minecraft.world.effect.MobEffectInstance;
+import org.bukkit.potion.*;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Maps;
-import net.minecraft.world.effect.MobEffectInstance;
-import net.minecraft.world.item.alchemy.Potion;
-import org.bukkit.potion.*;
 
 public class CraftPotionBrewer implements PotionBrewer {
     private static final Map<PotionType, Collection<PotionEffect>> cache = Maps.newHashMap();
@@ -18,7 +18,7 @@ public class CraftPotionBrewer implements PotionBrewer {
         if (cache.containsKey(damage))
             return cache.get(damage);
 
-        List<MobEffectInstance> mcEffects = Potion.byName(CraftPotionUtil.fromBukkit(new PotionData(damage, extended, upgraded))).getEffects();
+        List<MobEffectInstance> mcEffects = net.minecraft.world.item.alchemy.Potion.byName(CraftPotionUtil.fromBukkit(new PotionData(damage, extended, upgraded))).getEffects();
 
         ImmutableList.Builder<PotionEffect> builder = new ImmutableList.Builder<PotionEffect>();
         for (MobEffectInstance effect : mcEffects) {

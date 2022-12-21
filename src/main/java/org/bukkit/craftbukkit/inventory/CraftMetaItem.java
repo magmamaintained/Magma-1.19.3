@@ -38,13 +38,12 @@ import java.util.logging.Logger;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import net.minecraft.nbt.Tag;
-import net.minecraft.nbt.NBTCompressedStreamTools;
+import net.minecraft.nbt.NbtIo;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.StringTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.world.entity.EnumItemSlot;
-import net.minecraft.world.item.ItemBlock;
+import net.minecraft.world.item.BlockItem;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.EnumUtils;
 import org.bukkit.Material;
@@ -445,7 +444,7 @@ class CraftMetaItem implements ItemMeta, Damageable, Repairable, BlockDataMeta {
 
                 EquipmentSlot slot = null;
                 try {
-                    slot = CraftEquipmentSlot.getSlot(EnumItemSlot.byName(slotName.toLowerCase(Locale.ROOT)));
+                    slot = CraftEquipmentSlot.getSlot(net.minecraft.world.entity.EquipmentSlot.byName(slotName.toLowerCase(Locale.ROOT)));
                 } catch (IllegalArgumentException ex) {
                     // SPIGOT-4551 - Slot is invalid, should really match nothing but this is undefined behaviour anyway
                 }
@@ -517,7 +516,7 @@ class CraftMetaItem implements ItemMeta, Damageable, Repairable, BlockDataMeta {
         if (internal != null) {
             ByteArrayInputStream buf = new ByteArrayInputStream(Base64.getDecoder().decode(internal));
             try {
-                internalTag = NBTCompressedStreamTools.readCompressed(buf);
+                internalTag = NbtIo.readCompressed(buf);
                 deserializeInternal(internalTag, map);
                 Set<String> keys = internalTag.getAllKeys();
                 for (String key : keys) {
@@ -713,7 +712,7 @@ class CraftMetaItem implements ItemMeta, Damageable, Repairable, BlockDataMeta {
 
             sub.putString(ATTRIBUTES_IDENTIFIER.NBT, name); // Attribute Name
             if (entry.getValue().getSlot() != null) {
-                EnumItemSlot slot = CraftEquipmentSlot.getNMS(entry.getValue().getSlot());
+                net.minecraft.world.entity.EquipmentSlot slot = CraftEquipmentSlot.getNMS(entry.getValue().getSlot());
                 if (slot != null) {
                     sub.putString(ATTRIBUTES_SLOT.NBT, slot.getName());
                 }
@@ -913,7 +912,7 @@ class CraftMetaItem implements ItemMeta, Damageable, Repairable, BlockDataMeta {
 
     @Override
     public BlockData getBlockData(Material material) {
-        return CraftBlockData.fromData(ItemBlock.getBlockState(CraftMagicNumbers.getBlock(material).defaultBlockState(), blockData));
+        return CraftBlockData.fromData(BlockItem.getBlockState(CraftMagicNumbers.getBlock(material).defaultBlockState(), blockData));
     }
 
     @Override
@@ -1265,7 +1264,7 @@ class CraftMetaItem implements ItemMeta, Damageable, Repairable, BlockDataMeta {
             }
             try {
                 ByteArrayOutputStream buf = new ByteArrayOutputStream();
-                NBTCompressedStreamTools.writeCompressed(internal, buf);
+                NbtIo.writeCompressed(internal, buf);
                 builder.put("internal", Base64.getEncoder().encodeToString(buf.toByteArray()));
             } catch (IOException ex) {
                 Logger.getLogger(CraftMetaItem.class.getName()).log(Level.SEVERE, null, ex);

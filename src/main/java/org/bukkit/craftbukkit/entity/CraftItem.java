@@ -3,6 +3,7 @@ package org.bukkit.craftbukkit.entity;
 import java.util.UUID;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.EntityItem;
+import net.minecraft.world.entity.item.ItemEntity;
 import org.bukkit.craftbukkit.CraftServer;
 import org.bukkit.craftbukkit.inventory.CraftItemStack;
 import org.bukkit.entity.EntityType;
@@ -10,14 +11,14 @@ import org.bukkit.entity.Item;
 import org.bukkit.inventory.ItemStack;
 
 public class CraftItem extends CraftEntity implements Item {
-    private final EntityItem item;
+    private final ItemEntity item;
 
-    public CraftItem(CraftServer server, Entity entity, EntityItem item) {
+    public CraftItem(CraftServer server, Entity entity, ItemEntity item) {
         super(server, entity);
         this.item = item;
     }
 
-    public CraftItem(CraftServer server, EntityItem entity) {
+    public CraftItem(CraftServer server, ItemEntity entity) {
         this(server, entity, entity);
     }
 
@@ -60,7 +61,7 @@ public class CraftItem extends CraftEntity implements Item {
     public void setTicksLived(int value) {
         super.setTicksLived(value);
 
-        // Second field for EntityItem (don't set if lifetime is unlimited)
+        // Second field for net.minecraft.world.entity.item.ItemEntity (don't set if lifetime is unlimited)
         if (!isUnlimitedLifetime()) {
             item.age = value;
         }

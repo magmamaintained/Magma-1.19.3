@@ -6,40 +6,43 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.EntityBlock;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.dimension.DimensionType;
 import net.minecraft.world.level.material.FluidState;
 import org.bukkit.block.BlockState;
+import org.bukkit.craftbukkit.block.CraftBlock;
+import org.bukkit.craftbukkit.block.CraftBlockEntityState;
 import org.bukkit.craftbukkit.block.CraftBlockState;
 
 public class BlockStateListPopulator extends DummyGeneratorAccess {
     private final LevelAccessor world;
     private final Map<BlockPos, net.minecraft.world.level.block.state.BlockState> dataMap = new HashMap<>();
     private final Map<BlockPos, net.minecraft.world.level.block.entity.BlockEntity> entityMap = new HashMap<>();
-    private final LinkedHashMap<BlockPos, CraftBlockState> list;
+    private final LinkedHashMap<net.minecraft.core.BlockPos, CraftBlockState> list;
 
     public BlockStateListPopulator(LevelAccessor world) {
         this(world, new LinkedHashMap<>());
     }
 
-    private BlockStateListPopulator(LevelAccessor world, LinkedHashMap<BlockPos, CraftBlockState> list) {
+    private BlockStateListPopulator(LevelAccessor world, LinkedHashMap<net.minecraft.core.BlockPos, CraftBlockState> list) {
         this.world = world;
         this.list = list;
     }
 
     @Override
-    public net.minecraft.world.level.block.state.BlockState getBlockState(BlockPos bp) {
+    public net.minecraft.world.level.block.state.BlockState getBlockState(net.minecraft.core.BlockPos bp) {
         net.minecraft.world.level.block.state.BlockState blockData = dataMap.get(bp);
         return (blockData != null) ? blockData : world.getBlockState(bp);
     }
 
     @Override
-    public FluidState getFluidState(BlockPos bp) {
+    public FluidState getFluidState(net.minecraft.core.BlockPos bp) {
         net.minecraft.world.level.block.state.BlockState blockData = dataMap.get(bp);
         return (blockData != null) ? blockData.getFluidState() : world.getFluidState(bp);
     }
 
     @Override
-    public net.minecraft.world.level.block.entity.BlockEntity getBlockEntity(BlockPos blockposition) {
+    public BlockEntity getBlockEntity(BlockPos blockposition) {
         // The contains is important to check for null values
         if (entityMap.containsKey(blockposition)) {
             return entityMap.get(blockposition);
@@ -49,7 +52,7 @@ public class BlockStateListPopulator extends DummyGeneratorAccess {
     }
 
     @Override
-    public boolean setBlock(BlockPos position, net.minecraft.world.level.block.state.BlockState data, int flag) {
+    public boolean setBlock(net.minecraft.core.BlockPos position, net.minecraft.world.level.block.state.BlockState data, int flag) {
         position = position.immutable();
         // remove first to keep insertion order
         list.remove(position);
@@ -89,7 +92,7 @@ public class BlockStateListPopulator extends DummyGeneratorAccess {
         }
     }
 
-    public Set<BlockPos> getBlocks() {
+    public Set<net.minecraft.core.BlockPos> getBlocks() {
         return list.keySet();
     }
 

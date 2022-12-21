@@ -16,7 +16,7 @@ public final class CraftIronBars extends org.bukkit.craftbukkit.block.data.Craft
     // org.bukkit.craftbukkit.block.data.CraftMultipleFacing
 
     private static final net.minecraft.world.level.block.state.properties.BooleanProperty[] FACES = new net.minecraft.world.level.block.state.properties.BooleanProperty[]{
-        getBoolean(net.minecraft.world.level.block.BlockIronBars.class, "north", true), getBoolean(net.minecraft.world.level.block.BlockIronBars.class, "east", true), getBoolean(net.minecraft.world.level.block.BlockIronBars.class, "south", true), getBoolean(net.minecraft.world.level.block.BlockIronBars.class, "west", true), getBoolean(net.minecraft.world.level.block.BlockIronBars.class, "up", true), getBoolean(net.minecraft.world.level.block.BlockIronBars.class, "down", true)
+        getBoolean(net.minecraft.world.level.block.IronBarsBlock.class, "north", true), getBoolean(net.minecraft.world.level.block.IronBarsBlock.class, "east", true), getBoolean(net.minecraft.world.level.block.IronBarsBlock.class, "south", true), getBoolean(net.minecraft.world.level.block.IronBarsBlock.class, "west", true), getBoolean(net.minecraft.world.level.block.IronBarsBlock.class, "up", true), getBoolean(net.minecraft.world.level.block.IronBarsBlock.class, "down", true)
     };
 
     @Override
@@ -65,7 +65,7 @@ public final class CraftIronBars extends org.bukkit.craftbukkit.block.data.Craft
 
     // org.bukkit.craftbukkit.block.data.CraftWaterlogged
 
-    private static final net.minecraft.world.level.block.state.properties.BooleanProperty WATERLOGGED = getBoolean(net.minecraft.world.level.block.BlockIronBars.class, "waterlogged");
+    private static final net.minecraft.world.level.block.state.properties.BooleanProperty WATERLOGGED = getBoolean(net.minecraft.world.level.block.IronBarsBlock.class, "waterlogged");
 
     @Override
     public boolean isWaterlogged() {

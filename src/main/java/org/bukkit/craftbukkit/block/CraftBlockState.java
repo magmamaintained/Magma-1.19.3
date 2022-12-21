@@ -1,18 +1,14 @@
 package org.bukkit.craftbukkit.block;
 
 import com.google.common.base.Preconditions;
-import java.lang.ref.WeakReference;
-import java.util.List;
-import javax.annotation.Nullable;
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.GeneratorAccess;
+import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.state.BlockState;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
-import org.bukkit.block.BlockState;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.craftbukkit.block.data.CraftBlockData;
@@ -22,13 +18,16 @@ import org.bukkit.material.MaterialData;
 import org.bukkit.metadata.MetadataValue;
 import org.bukkit.plugin.Plugin;
 
-public class CraftBlockState implements BlockState {
+import java.lang.ref.WeakReference;
+import java.util.List;
+
+public class CraftBlockState implements org.bukkit.block.BlockState {
 
     protected final CraftWorld world;
     private final BlockPos position;
-    protected BlockState data;
+    protected net.minecraft.world.level.block.state.BlockState data;
     protected int flag;
-    private WeakReference<GeneratorAccess> weakWorld;
+    private WeakReference<LevelAccessor> weakWorld;
 
     protected CraftBlockState(final Block block) {
         this(block.getWorld(), ((CraftBlock) block).getPosition(), ((CraftBlock) block).getNMS());
@@ -49,7 +48,7 @@ public class CraftBlockState implements BlockState {
         data = blockData;
     }
 
-    public void setWorldHandle(GeneratorAccess generatorAccess) {
+    public void setWorldHandle(LevelAccessor generatorAccess) {
         if (generatorAccess instanceof net.minecraft.world.level.Level) {
             this.weakWorld = null;
         } else {
@@ -59,12 +58,12 @@ public class CraftBlockState implements BlockState {
 
     // Returns null if weakWorld is not available and the BlockState is not placed.
     // If this returns a World instead of only a GeneratorAccess, this implies that this BlockState is placed.
-    public GeneratorAccess getWorldHandle() {
+    public LevelAccessor getWorldHandle() {
         if (weakWorld == null) {
             return this.isPlaced() ? world.getHandle() : null;
         }
 
-        GeneratorAccess access = weakWorld.get();
+        LevelAccessor access = weakWorld.get();
         if (access == null) {
             weakWorld = null;
             return this.isPlaced() ? world.getHandle() : null;
@@ -74,7 +73,7 @@ public class CraftBlockState implements BlockState {
     }
 
     protected final boolean isWorldGeneration() {
-        GeneratorAccess generatorAccess = this.getWorldHandle();
+        LevelAccessor generatorAccess = this.getWorldHandle();
         return generatorAccess != null && !(generatorAccess instanceof net.minecraft.world.level.Level);
     }
 
@@ -204,7 +203,7 @@ public class CraftBlockState implements BlockState {
         if (!isPlaced()) {
             return true;
         }
-        GeneratorAccess access = getWorldHandle();
+        LevelAccessor access = getWorldHandle();
         CraftBlock block = getBlock();
 
         if (block.getType() != getType()) {

@@ -1,6 +1,5 @@
 package org.bukkit.craftbukkit.scoreboard;
 
-import java.util.Set;
 import com.google.common.collect.ImmutableSet;
 import net.minecraft.world.scores.PlayerTeam;
 import org.apache.commons.lang3.Validate;
@@ -10,6 +9,8 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.craftbukkit.util.CraftChatMessage;
 import org.bukkit.scoreboard.NameTagVisibility;
 import org.bukkit.scoreboard.Team;
+
+import java.util.Set;
 
 final class CraftTeam extends CraftScoreboardComponent implements Team {
     private final PlayerTeam team;

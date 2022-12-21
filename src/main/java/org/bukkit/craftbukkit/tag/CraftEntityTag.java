@@ -3,8 +3,10 @@ package org.bukkit.craftbukkit.tag;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
+
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.tags.TagKey;
+import net.minecraft.core.registries.Registries;
 import org.bukkit.Registry;
 import org.bukkit.craftbukkit.util.CraftNamespacedKey;
 import org.bukkit.entity.EntityType;
@@ -17,7 +19,7 @@ public class CraftEntityTag extends CraftTag<net.minecraft.world.entity.EntityTy
 
     @Override
     public boolean isTagged(EntityType entity) {
-        return registry.getHolderOrThrow(ResourceKey.create(net.minecraft.core.Registry.ENTITY_TYPE_REGISTRY, CraftNamespacedKey.toMinecraft(entity.getKey()))).is(tag);
+        return registry.getHolderOrThrow(ResourceKey.create(Registries.ENTITY_TYPE, CraftNamespacedKey.toMinecraft(entity.getKey()))).is(tag);
     }
 
     @Override

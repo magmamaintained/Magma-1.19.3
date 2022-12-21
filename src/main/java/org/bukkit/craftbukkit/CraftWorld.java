@@ -1,10 +1,5 @@
 package org.bukkit.craftbukkit;
 
-import java.io.File;
-import java.util.*;
-import java.util.concurrent.ExecutionException;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Predicates;
 import com.google.common.collect.ImmutableList;
@@ -16,30 +11,25 @@ import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderSet;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
-import net.minecraft.network.protocol.game.ClientboundCustomSoundPacket;
-import net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacket;
-import net.minecraft.network.protocol.game.ClientboundLevelEventPacket;
-import net.minecraft.network.protocol.game.ClientboundSoundEntityPacket;
+import net.minecraft.network.protocol.game.*;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.*;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.SortedArraySet;
 import net.minecraft.util.Unit;
 import net.minecraft.world.entity.item.FallingBlockEntity;
 import net.minecraft.world.entity.item.ItemEntity;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.entity.projectile.AbstractArrow;
-import net.minecraft.world.entity.projectile.Arrow;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.ClipContext;
-import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.GameRules;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.ChunkStatus;
 import net.minecraft.world.level.chunk.ImposterProtoChunk;
-import net.minecraft.world.level.storage.LevelResource;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
@@ -83,6 +73,12 @@ import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionType;
 import org.bukkit.util.Vector;
 import org.bukkit.util.*;
+
+import java.io.File;
+import java.util.*;
+import java.util.concurrent.ExecutionException;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 public class CraftWorld extends CraftRegionAccessor implements World {
     public static final int CUSTOM_DIMENSION_OFFSET = 10;
@@ -168,7 +164,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
 
     @Override
     public boolean isChunkLoaded(int x, int z) {
-        return world.getChunkSource().isChunkLoaded(x, z);
+        return world.getChunkSource().hasChunk(x, z);
     }
 
     @Override
@@ -236,7 +232,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
             return false;
         }
 
-        final long chunkKey = ChunkPos.pair(x, z);
+        final long chunkKey = ChunkCoordIntPair.pair(x, z);
         world.getChunkProvider().unloadQueue.remove(chunkKey);
 
         net.minecraft.server.Chunk chunk = world.getChunkProvider().generateChunk(x, z);
@@ -604,7 +600,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
 
     @Override
     public boolean createExplosion(double x, double y, double z, float power, boolean setFire, boolean breakBlocks, Entity source) {
-        return !world.explode(source == null ? null : ((CraftEntity) source).getHandle(), x, y, z, power, setFire, breakBlocks ? Explosion.BlockInteraction.BREAK : Explosion.BlockInteraction.NONE).wasCanceled;
+        return !world.explode(source == null ? null : ((CraftEntity) source).getHandle(), x, y, z, power, setFire, breakBlocks ? Level.ExplosionInteraction.MOB : net.minecraft.world.level.Level.ExplosionInteraction.NONE).wasCanceled;
     }
 
     @Override
@@ -1234,7 +1230,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
 
     @Override
     public File getWorldFolder() {
-        return world.convertable.getLevelPath(LevelResource.ROOT).toFile().getParentFile();
+        return world.convertable.getDimensionPath(this.world.dimension()).toFile();
     }
 
     @Override
@@ -1264,7 +1260,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
 
     @Override
     public boolean canGenerateStructures() {
-        return world.serverLevelData.worldGenSettings().generateStructures();
+        return world.serverLevelData.worldGenOptions().generateStructures();
     }
 
     @Override
@@ -1506,7 +1502,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
         double y = loc.getY();
         double z = loc.getZ();
 
-        ClientboundCustomSoundPacket packet = new ClientboundCustomSoundPacket(new ResourceLocation(sound), SoundSource.valueOf(category.name()), new Vec3(x, y, z), volume, pitch);
+        ClientboundSoundPacket packet = new ClientboundSoundPacket(Holder.direct(SoundEvent.createVariableRangeEvent(new ResourceLocation(sound))), net.minecraft.sounds.SoundSource.valueOf(category.name()), x, y, z, volume, pitch, getHandle().getRandom().nextLong());
         world.getServer().getPlayerList().broadcast(null, x, y, z, volume > 1.0F ? 16.0F * volume : 16.0D, this.world.dimension(), packet);
     }
 
@@ -1519,7 +1515,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
     public void playSound(Entity entity, Sound sound, org.bukkit.SoundCategory category, float volume, float pitch) {
         if (!(entity instanceof CraftEntity craftEntity) || entity.getWorld() != this || sound == null || category == null) return;
 
-        ClientboundSoundEntityPacket packet = new ClientboundSoundEntityPacket(CraftSound.getSoundEffect(sound), net.minecraft.sounds.SoundSource.valueOf(category.name()), craftEntity.getHandle(), volume, pitch, getHandle().getRandom().nextLong());
+        ClientboundSoundEntityPacket packet = new ClientboundSoundEntityPacket(BuiltInRegistries.SOUND_EVENT.wrapAsHolder(CraftSound.getSoundEffect(sound)), net.minecraft.sounds.SoundSource.valueOf(category.name()), craftEntity.getHandle(), volume, pitch, getHandle().getRandom().nextLong());
         ChunkMap.TrackedEntity entityTracker = getHandle().getChunkSource().chunkMap.entityMap.get(entity.getEntityId());
         if (entityTracker != null) {
             entityTracker.broadcastAndSend(packet);
@@ -1713,23 +1709,14 @@ public class CraftWorld extends CraftRegionAccessor implements World {
         if (data != null && !particle.getDataType().isInstance(data)) {
             throw new IllegalArgumentException("data should be " + particle.getDataType() + " got " + data.getClass());
         }
-        // Magma todo
-//        getHandle().sendParticles(
-//                null, // Sender
-//                CraftParticle.toNMS(particle, data), // Particle
-//                x, y, z, // Position
-//                count,  // Count
-//                offsetX, offsetY, offsetZ, // Random offset
-//                extra, // Speed?
-//                force
-//        );
-
         getHandle().sendParticles(
+                null, // Sender
                 CraftParticle.toNMS(particle, data), // Particle
                 x, y, z, // Position
                 count,  // Count
                 offsetX, offsetY, offsetZ, // Random offset
-                extra
+                extra, // Speed?
+                force
         );
 
     }

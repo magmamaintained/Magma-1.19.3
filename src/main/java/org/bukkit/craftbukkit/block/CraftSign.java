@@ -2,8 +2,7 @@ package org.bukkit.craftbukkit.block;
 
 import com.google.common.base.Preconditions;
 import net.minecraft.network.chat.Component;
-import net.minecraft.world.item.EnumColor;
-import net.minecraft.world.level.block.entity.TileEntitySign;
+import net.minecraft.world.level.block.entity.SignBlockEntity;
 import org.bukkit.DyeColor;
 import org.bukkit.World;
 import org.bukkit.block.Sign;
@@ -11,13 +10,13 @@ import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.craftbukkit.util.CraftChatMessage;
 import org.bukkit.entity.Player;
 
-public class CraftSign extends CraftBlockEntityState<TileEntitySign> implements Sign {
+public class CraftSign<T extends SignBlockEntity> extends CraftBlockEntityState<T> implements Sign {
 
     // Lazily initialized only if requested:
     private String[] originalLines = null;
     private String[] lines = null;
 
-    public CraftSign(World world, TileEntitySign tileEntity) {
+    public CraftSign(World world, T tileEntity) {
         super(world, tileEntity);
     }
 
@@ -25,7 +24,7 @@ public class CraftSign extends CraftBlockEntityState<TileEntitySign> implements 
     public String[] getLines() {
         if (lines == null) {
             // Lazy initialization:
-            TileEntitySign sign = this.getSnapshot();
+            SignBlockEntity sign = this.getSnapshot();
             lines = new String[sign.messages.length];
             System.arraycopy(revertComponents(sign.messages), 0, lines, 0, lines.length);
             originalLines = new String[lines.length];
@@ -71,11 +70,11 @@ public class CraftSign extends CraftBlockEntityState<TileEntitySign> implements 
 
     @Override
     public void setColor(DyeColor color) {
-        getSnapshot().setColor(EnumColor.byId(color.getWoolData()));
+        getSnapshot().setColor(net.minecraft.world.item.DyeColor.byId(color.getWoolData()));
     }
 
     @Override
-    public void applyTo(TileEntitySign sign) {
+    public void applyTo(T sign) {
         super.applyTo(sign);
 
         if (lines != null) {
@@ -94,7 +93,7 @@ public class CraftSign extends CraftBlockEntityState<TileEntitySign> implements 
         Preconditions.checkArgument(sign.isPlaced(), "Sign must be placed");
         Preconditions.checkArgument(sign.getWorld() == player.getWorld(), "Sign must be in same world as Player");
 
-        TileEntitySign handle = ((CraftSign) sign).getTileEntity();
+        SignBlockEntity handle = ((CraftSign<?>) sign).getTileEntity();
         handle.isEditable = true;
 
         ((CraftPlayer) player).getHandle().openTextEdit(handle);

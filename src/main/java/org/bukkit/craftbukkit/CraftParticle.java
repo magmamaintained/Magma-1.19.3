@@ -3,16 +3,9 @@ package org.bukkit.craftbukkit;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
-import com.mojang.math.Vector3f;
-import com.mojang.math.Vector3fa;
-import java.util.HashMap;
-import java.util.Map;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.IRegistry;
 import net.minecraft.core.particles.*;
-import net.minecraft.core.particles.ParticleParamBlock;
-import net.minecraft.core.particles.ParticleParamItem;
-import net.minecraft.core.particles.ParticleParamRedstone;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.gameevent.BlockPositionSource;
@@ -29,6 +22,10 @@ import org.bukkit.craftbukkit.inventory.CraftItemStack;
 import org.bukkit.craftbukkit.util.CraftMagicNumbers;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.MaterialData;
+import org.joml.Vector3f;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public enum CraftParticle {
 
@@ -167,7 +164,7 @@ public enum CraftParticle {
             canonical = aliases.get(particle);
         }
 
-        net.minecraft.core.particles.ParticleType nms = net.minecraft.core.Registry.PARTICLE_TYPE.get(particles.get(canonical));
+        net.minecraft.core.particles.ParticleType nms = BuiltInRegistries.PARTICLE_TYPE.get(particles.get(canonical));
         Preconditions.checkArgument(nms != null, "No NMS particle %s", particle);
 
         if (particle.getDataType().equals(Void.class)) {
@@ -228,6 +225,6 @@ public enum CraftParticle {
     }
 
     public static Particle toBukkit(net.minecraft.core.particles.ParticleType nms) {
-        return particles.inverse().get(net.minecraft.core.Registry.PARTICLE_TYPE.getKey(nms));
+        return particles.inverse().get(BuiltInRegistries.PARTICLE_TYPE.getKey(nms));
     }
 }

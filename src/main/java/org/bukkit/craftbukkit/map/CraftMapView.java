@@ -1,10 +1,7 @@
 package org.bukkit.craftbukkit.map;
 
-import java.util.*;
-import java.util.logging.Level;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.saveddata.maps.MapItemSavedData;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -12,6 +9,9 @@ import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.map.MapRenderer;
 import org.bukkit.map.MapView;
+
+import java.util.*;
+import java.util.logging.Level;
 
 public final class CraftMapView implements MapView {
 
@@ -56,8 +56,8 @@ public final class CraftMapView implements MapView {
 
     @Override
     public World getWorld() {
-        ResourceKey<net.minecraft.world.level.Level> dimension = worldMap.dimension;
-        ServerLevel world = MinecraftServer.getServer().getLevel(dimension);
+        ResourceKey<net.minecraft.world.level.World> dimension = worldMap.dimension;
+        WorldServer world = MinecraftServer.getServer().getLevel(dimension);
 
         return (world == null) ? null : world.getWorld();
     }
@@ -69,22 +69,22 @@ public final class CraftMapView implements MapView {
 
     @Override
     public int getCenterX() {
-        return worldMap.x;
+        return worldMap.centerX;
     }
 
     @Override
     public int getCenterZ() {
-        return worldMap.z;
+        return worldMap.centerZ;
     }
 
     @Override
     public void setCenterX(int x) {
-        worldMap.x = x;
+        worldMap.centerX = x;
     }
 
     @Override
     public void setCenterZ(int z) {
-        worldMap.z = z;
+        worldMap.centerZ = z;
     }
 
     @Override

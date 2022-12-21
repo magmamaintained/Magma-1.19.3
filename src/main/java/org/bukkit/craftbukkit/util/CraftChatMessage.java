@@ -1,17 +1,16 @@
 package org.bukkit.craftbukkit.util;
 
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableMap.Builder;
+import com.google.gson.JsonParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableMap.Builder;
-import com.google.gson.JsonParseException;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.*;
-import net.minecraft.network.chat.ChatClickable.EnumClickAction;
 import net.minecraft.network.chat.contents.LiteralContents;
 import net.minecraft.network.chat.contents.TranslatableContents;
 import org.bukkit.ChatColor;
@@ -45,7 +44,7 @@ public final class CraftChatMessage {
         private static final Style RESET = Style.EMPTY.withBold(false).withItalic(false).withUnderlined(false).withStrikethrough(false).withObfuscated(false);
 
         private final List<Component> list = new ArrayList<Component>();
-        private MutableComponent currentChatComponent = MutableComponent.empty();
+        private MutableComponent currentChatComponent = Component.empty();
         private Style modifier = Style.EMPTY;
         private final Component[] output;
         private int currentIndex;
@@ -76,7 +75,7 @@ public final class CraftChatMessage {
                 switch (groupId) {
                 case 1:
                     char c = match.toLowerCase(java.util.Locale.ENGLISH).charAt(1);
-                        ChatFormatting format = formatMap.get(c);
+                    ChatFormatting format = formatMap.get(c);
 
                     if (c == 'x') {
                         hex = new StringBuilder("#");
@@ -366,7 +365,7 @@ public final class CraftChatMessage {
                     extras.add(prev);
 
                     MutableComponent link = Component.literal(matcher.group());
-                    Style linkModi = modifier.withClickEvent(new ChatClickable(EnumClickAction.OPEN_URL, match));
+                    Style linkModi = modifier.withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, match));
                     link.setStyle(linkModi);
                     extras.add(link);
 

@@ -1,10 +1,5 @@
 package org.bukkit.craftbukkit;
 
-import java.io.File;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
 import com.mojang.authlib.GameProfile;
 import net.minecraft.core.GlobalPos;
 import net.minecraft.nbt.CompoundTag;
@@ -22,6 +17,12 @@ import org.bukkit.entity.Player;
 import org.bukkit.metadata.MetadataValue;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.profile.PlayerProfile;
+
+import java.io.File;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 @SerializableAs("Player")
 public class CraftOfflinePlayer implements OfflinePlayer, ConfigurationSerializable {

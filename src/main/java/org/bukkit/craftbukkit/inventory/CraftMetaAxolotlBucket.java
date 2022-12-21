@@ -2,7 +2,6 @@ package org.bukkit.craftbukkit.inventory;
 
 import com.google.common.collect.ImmutableMap;
 import java.util.Map;
-import net.minecraft.nbt.Tag;
 import net.minecraft.nbt.CompoundTag;
 import org.bukkit.Material;
 import org.bukkit.configuration.serialization.DelegateDeserialization;
@@ -62,7 +61,7 @@ public class CraftMetaAxolotlBucket extends CraftMetaItem implements AxolotlBuck
     }
 
     @Override
-    void serializeInternal(Map<String, Tag> internalTags) {
+    void serializeInternal(Map<String, net.minecraft.nbt.Tag> internalTags) {
         if (entityTag != null && !entityTag.isEmpty()) {
             internalTags.put(ENTITY_TAG.NBT, entityTag);
         }
@@ -83,12 +82,7 @@ public class CraftMetaAxolotlBucket extends CraftMetaItem implements AxolotlBuck
 
     @Override
     boolean applicableTo(Material type) {
-        switch (type) {
-            case AXOLOTL_BUCKET:
-                return true;
-            default:
-                return false;
-        }
+        return type == Material.AXOLOTL_BUCKET;
     }
 
     @Override

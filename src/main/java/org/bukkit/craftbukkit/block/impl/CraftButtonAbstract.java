@@ -3,19 +3,19 @@
  */
 package org.bukkit.craftbukkit.block.impl;
 
-public final class CraftStoneButton extends org.bukkit.craftbukkit.block.data.CraftBlockData implements org.bukkit.block.data.type.Switch, org.bukkit.block.data.Directional, org.bukkit.block.data.FaceAttachable, org.bukkit.block.data.Powerable {
+public final class CraftButtonAbstract extends org.bukkit.craftbukkit.block.data.CraftBlockData implements org.bukkit.block.data.type.Switch, org.bukkit.block.data.Directional, org.bukkit.block.data.FaceAttachable, org.bukkit.block.data.Powerable {
 
-    public CraftStoneButton() {
+    public CraftButtonAbstract() {
         super();
     }
 
-    public CraftStoneButton(net.minecraft.world.level.block.state.BlockState state) {
+    public CraftButtonAbstract(net.minecraft.world.level.block.state.BlockState state) {
         super(state);
     }
 
     // org.bukkit.craftbukkit.block.data.type.CraftSwitch
 
-    private static final net.minecraft.world.level.block.state.properties.EnumProperty<?> FACE = getEnum(net.minecraft.world.level.block.BlockStoneButton.class, "face");
+    private static final net.minecraft.world.level.block.state.properties.EnumProperty<?> FACE = getEnum(net.minecraft.world.level.block.ButtonBlock.class, "face");
 
     @Override
     public org.bukkit.block.data.type.Switch.Face getFace() {
@@ -29,7 +29,7 @@ public final class CraftStoneButton extends org.bukkit.craftbukkit.block.data.Cr
 
     // org.bukkit.craftbukkit.block.data.CraftDirectional
 
-    private static final net.minecraft.world.level.block.state.properties.EnumProperty<?> FACING = getEnum(net.minecraft.world.level.block.BlockStoneButton.class, "facing");
+    private static final net.minecraft.world.level.block.state.properties.EnumProperty<?> FACING = getEnum(net.minecraft.world.level.block.ButtonBlock.class, "facing");
 
     @Override
     public org.bukkit.block.BlockFace getFacing() {
@@ -48,7 +48,7 @@ public final class CraftStoneButton extends org.bukkit.craftbukkit.block.data.Cr
 
     // org.bukkit.craftbukkit.block.data.CraftFaceAttachable
 
-    private static final net.minecraft.world.level.block.state.properties.EnumProperty<?> ATTACH_FACE = getEnum(net.minecraft.world.level.block.BlockStoneButton.class, "face");
+    private static final net.minecraft.world.level.block.state.properties.EnumProperty<?> ATTACH_FACE = getEnum(net.minecraft.world.level.block.ButtonBlock.class, "face");
 
     @Override
     public org.bukkit.block.data.FaceAttachable.AttachedFace getAttachedFace() {
@@ -62,7 +62,7 @@ public final class CraftStoneButton extends org.bukkit.craftbukkit.block.data.Cr
 
     // org.bukkit.craftbukkit.block.data.CraftPowerable
 
-    private static final net.minecraft.world.level.block.state.properties.BooleanProperty POWERED = getBoolean(net.minecraft.world.level.block.BlockStoneButton.class, "powered");
+    private static final net.minecraft.world.level.block.state.properties.BooleanProperty POWERED = getBoolean(net.minecraft.world.level.block.ButtonBlock.class, "powered");
 
     @Override
     public boolean isPowered() {

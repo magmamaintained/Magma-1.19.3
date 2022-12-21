@@ -6,7 +6,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LightningStrike;
 
 public class CraftLightningStrike extends CraftEntity implements LightningStrike {
-    public CraftLightningStrike(final CraftServer server, final EntityLightning entity) {
+    public CraftLightningStrike(final CraftServer server, final net.minecraft.world.entity.LightningBolt entity) {
         super(server, entity);
     }
 
@@ -16,8 +16,8 @@ public class CraftLightningStrike extends CraftEntity implements LightningStrike
     }
 
     @Override
-    public EntityLightning getHandle() {
-        return (EntityLightning) entity;
+    public net.minecraft.world.entity.LightningBolt getHandle() {
+        return (net.minecraft.world.entity.LightningBolt) entity;
     }
 
     @Override

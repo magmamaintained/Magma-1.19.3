@@ -1,23 +1,30 @@
 package org.bukkit.craftbukkit.block;
 
 import com.google.common.base.Preconditions;
-import java.util.Optional;
-import net.minecraft.world.entity.EntityTypes;
-import net.minecraft.world.level.block.entity.TileEntityMobSpawner;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.level.SpawnData;
+import net.minecraft.world.level.block.entity.SpawnerBlockEntity;
 import org.bukkit.World;
 import org.bukkit.block.CreatureSpawner;
 import org.bukkit.entity.EntityType;
 
-public class CraftCreatureSpawner extends CraftBlockEntityState<TileEntityMobSpawner> implements CreatureSpawner {
+import java.util.Optional;
 
-    public CraftCreatureSpawner(World world, TileEntityMobSpawner tileEntity) {
+public class CraftCreatureSpawner extends CraftBlockEntityState<SpawnerBlockEntity> implements CreatureSpawner {
+
+    public CraftCreatureSpawner(World world, SpawnerBlockEntity tileEntity) {
         super(world, tileEntity);
     }
 
     @Override
     public EntityType getSpawnedType() {
-        Optional<EntityTypes<?>> type = EntityTypes.by(this.getSnapshot().getSpawner().nextSpawnData.getEntityToSpawn());
-        return (type.isEmpty()) ? EntityType.PIG : EntityType.fromName(EntityTypes.getKey(type.get()).getPath());
+        SpawnData spawnData = this.getSnapshot().getSpawner().nextSpawnData;
+        if (spawnData == null) {
+            return EntityType.PIG; // TODO: Change API contract to nullable?
+        }
+
+        Optional<net.minecraft.world.entity.EntityType<?>> type = net.minecraft.world.entity.EntityType.by(spawnData.getEntityToSpawn());
+        return (type.isEmpty()) ? EntityType.PIG : EntityType.fromName(net.minecraft.world.entity.EntityType.getKey(type.get()).getPath());
     }
 
     @Override
@@ -26,13 +33,19 @@ public class CraftCreatureSpawner extends CraftBlockEntityState<TileEntityMobSpa
             throw new IllegalArgumentException("Can't spawn EntityType " + entityType + " from mobspawners!");
         }
 
-        this.getSnapshot().getSpawner().setEntityId(EntityTypes.byString(entityType.getName()).get());
+        RandomSource rand = (this.isPlaced()) ? this.getWorldHandle().getRandom() : RandomSource.create();
+        this.getSnapshot().setEntityId(net.minecraft.world.entity.EntityType.byString(entityType.getName()).get(), rand);
     }
 
     @Override
     public String getCreatureTypeName() {
-        Optional<EntityTypes<?>> type = EntityTypes.by(this.getSnapshot().getSpawner().nextSpawnData.getEntityToSpawn());
-        return (type.isEmpty()) ? "" : EntityTypes.getKey(type.get()).getPath();
+        SpawnData spawnData = this.getSnapshot().getSpawner().nextSpawnData;
+        if (spawnData == null) {
+            return ""; // TODO: Change API contract to nullable?
+        }
+
+        Optional<net.minecraft.world.entity.EntityType<?>> type = net.minecraft.world.entity.EntityType.by(spawnData.getEntityToSpawn());
+        return (type.isEmpty()) ? "" : net.minecraft.world.entity.EntityType.getKey(type.get()).getPath();
     }
 
     @Override

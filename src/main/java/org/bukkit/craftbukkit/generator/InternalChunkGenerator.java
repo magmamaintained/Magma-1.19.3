@@ -1,15 +1,16 @@
 package org.bukkit.craftbukkit.generator;
 
-import java.util.Optional;
-import net.minecraft.core.HolderSet;
-import net.minecraft.core.IRegistry;
-import net.minecraft.world.level.biome.WorldChunkManager;
-import net.minecraft.world.level.levelgen.structure.StructureSet;
+import net.minecraft.core.Holder;
+import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.biome.BiomeGenerationSettings;
+import net.minecraft.world.level.biome.BiomeSource;
+
+import java.util.function.Function;
 
 // Do not implement functions to this class, add to NormalChunkGenerator
 public abstract class InternalChunkGenerator extends net.minecraft.world.level.chunk.ChunkGenerator {
 
-    public InternalChunkGenerator(IRegistry<StructureSet> iregistry, Optional<HolderSet<StructureSet>> optional, WorldChunkManager worldchunkmanager) {
-        super(iregistry, optional, worldchunkmanager);
+    public InternalChunkGenerator(BiomeSource worldchunkmanager, Function<Holder<Biome>, BiomeGenerationSettings> function) {
+        super(worldchunkmanager, function);
     }
 }

@@ -9,31 +9,23 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import net.minecraft.SharedConstants;
-import net.minecraft.core.IRegistry;
-import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.Tag;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.Bootstrap;
-import net.minecraft.server.DispenserRegistry;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.datafix.DataFixers;
-import net.minecraft.util.datafix.DataFixers;
 import net.minecraft.util.datafix.fixes.BlockStateData;
-import net.minecraft.util.datafix.fixes.DataConverterFlattenData;
-import net.minecraft.util.datafix.fixes.DataConverterMaterialId;
-import net.minecraft.util.datafix.fixes.References;
 import net.minecraft.util.datafix.fixes.ItemIdFix;
 import net.minecraft.util.datafix.fixes.References;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.state.BlockStateList;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
-import net.minecraft.world.level.block.state.properties.Property;
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.util.CraftMagicNumbers;
 import org.bukkit.entity.EntityType;
@@ -340,7 +332,7 @@ public final class CraftLegacy {
                     }
 
                     String name = blockTag.get("Name").asString("");
-                    Block block = Registry.BLOCK.get(new ResourceLocation(name));
+                    Block block = BuiltInRegistries.BLOCK.get(new ResourceLocation(name));
                     if (block == null) {
                         continue;
                     }
@@ -351,7 +343,7 @@ public final class CraftLegacy {
                     if (propMap.isPresent()) {
                         CompoundTag properties = propMap.get();
                         for (String dataKey : properties.getAllKeys()) {
-                            Property state = states.getProperty(dataKey);
+                            net.minecraft.world.level.block.state.properties.Property state = states.getProperty(dataKey);
 
                             if (state == null) {
                                 if (whitelistedStates.contains(dataKey)) {
@@ -418,7 +410,7 @@ public final class CraftLegacy {
                 }
 
                 // Preconditions.checkState(newId.contains("minecraft:"), "Unknown new material for " + matData);
-                Item newMaterial = Registry.ITEM.get(new ResourceLocation(newId));
+                Item newMaterial = BuiltInRegistries.ITEM.get(new ResourceLocation(newId));
 
                 if (newMaterial == Items.AIR) {
                     continue;

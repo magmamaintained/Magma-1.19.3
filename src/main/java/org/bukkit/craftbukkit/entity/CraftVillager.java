@@ -1,14 +1,12 @@
 package org.bukkit.craftbukkit.entity;
 
 import com.google.common.base.Preconditions;
-import java.util.Locale;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.IRegistry;
-import net.minecraft.world.entity.monster.EntityZombie;
-import net.minecraft.world.entity.monster.EntityZombieVillager;
-import net.minecraft.world.entity.npc.EntityVillager;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.world.entity.monster.Zombie;
+import net.minecraft.world.entity.monster.ZombieVillager;
 import net.minecraft.world.entity.npc.VillagerProfession;
-import net.minecraft.world.level.block.BlockBed;
+import net.minecraft.world.level.block.BedBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import org.apache.commons.lang3.Validate;
 import org.bukkit.Location;
@@ -16,18 +14,19 @@ import org.bukkit.craftbukkit.CraftServer;
 import org.bukkit.craftbukkit.util.CraftNamespacedKey;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Villager;
-import org.bukkit.entity.ZombieVillager;
 import org.bukkit.event.entity.CreatureSpawnEvent;
+
+import java.util.Locale;
 
 public class CraftVillager extends CraftAbstractVillager implements Villager {
 
-    public CraftVillager(CraftServer server, EntityVillager entity) {
+    public CraftVillager(CraftServer server, net.minecraft.world.entity.npc.Villager entity) {
         super(server, entity);
     }
 
     @Override
-    public EntityVillager getHandle() {
-        return (EntityVillager) entity;
+    public net.minecraft.world.entity.npc.Villager getHandle() {
+        return (net.minecraft.world.entity.npc.Villager) entity;
     }
 
     @Override
@@ -60,13 +59,13 @@ public class CraftVillager extends CraftAbstractVillager implements Villager {
 
     @Override
     public Type getVillagerType() {
-        return Type.valueOf(IRegistry.VILLAGER_TYPE.getKey(getHandle().getVillagerData().getType()).getPath().toUpperCase(Locale.ROOT));
+        return Type.valueOf(BuiltInRegistries.VILLAGER_TYPE.getKey(getHandle().getVillagerData().getType()).getPath().toUpperCase(Locale.ROOT));
     }
 
     @Override
     public void setVillagerType(Type type) {
         Validate.notNull(type);
-        getHandle().setVillagerData(getHandle().getVillagerData().setType(IRegistry.VILLAGER_TYPE.get(CraftNamespacedKey.toMinecraft(type.getKey()))));
+        getHandle().setVillagerData(getHandle().getVillagerData().setType(BuiltInRegistries.VILLAGER_TYPE.get(CraftNamespacedKey.toMinecraft(type.getKey()))));
     }
 
     @Override
@@ -102,7 +101,7 @@ public class CraftVillager extends CraftAbstractVillager implements Villager {
 
         BlockPos position = new BlockPos(location.getBlockX(), location.getBlockY(), location.getBlockZ());
         BlockState iblockdata = getHandle().level.getBlockState(position);
-        if (!(iblockdata.getBlock() instanceof BlockBed)) {
+        if (!(iblockdata.getBlock() instanceof BedBlock)) {
             return false;
         }
 
@@ -124,16 +123,16 @@ public class CraftVillager extends CraftAbstractVillager implements Villager {
     }
 
     @Override
-    public ZombieVillager zombify() {
-        EntityZombieVillager entityzombievillager = EntityZombie.zombifyVillager(getHandle().level.getMinecraftWorld(), getHandle(), getHandle().blockPosition(), isSilent(), CreatureSpawnEvent.SpawnReason.CUSTOM);
-        return (entityzombievillager != null) ? (ZombieVillager) entityzombievillager.getBukkitEntity() : null;
+    public org.bukkit.entity.ZombieVillager zombify() {
+        ZombieVillager entityzombievillager = Zombie.zombifyVillager(getHandle().level.getMinecraftWorld(), getHandle(), getHandle().blockPosition(), isSilent(), CreatureSpawnEvent.SpawnReason.CUSTOM);
+        return (entityzombievillager != null) ? (org.bukkit.entity.ZombieVillager) entityzombievillager.getBukkitEntity() : null;
     }
 
     public static Profession nmsToBukkitProfession(VillagerProfession nms) {
-        return Profession.valueOf(IRegistry.VILLAGER_PROFESSION.getKey(nms).getPath().toUpperCase(Locale.ROOT));
+        return Profession.valueOf(BuiltInRegistries.VILLAGER_PROFESSION.getKey(nms).getPath().toUpperCase(Locale.ROOT));
     }
 
     public static VillagerProfession bukkitToNmsProfession(Profession bukkit) {
-        return IRegistry.VILLAGER_PROFESSION.get(CraftNamespacedKey.toMinecraft(bukkit.getKey()));
+        return BuiltInRegistries.VILLAGER_PROFESSION.get(CraftNamespacedKey.toMinecraft(bukkit.getKey()));
     }
 }
