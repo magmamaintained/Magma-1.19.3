@@ -13,15 +13,24 @@ import java.util.function.Consumer;
 import com.mojang.authlib.GameProfile;
 
 import com.mojang.brigadier.CommandDispatcher;
+
+import net.minecraft.advancements.Advancement;
+import net.minecraft.advancements.AdvancementProgress;
 import net.minecraft.commands.CommandBuildContext;
+import net.minecraft.core.Holder;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.ReloadableServerResources;
+import net.minecraft.server.level.ChunkHolder;
 import net.minecraft.server.players.PlayerList;
 import net.minecraft.util.RandomSource;
+import net.minecraft.util.random.WeightedRandomList;
 import net.minecraft.world.Container;
+import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.entity.projectile.ThrownEnderpearl;
+import net.minecraft.world.level.biome.MobSpawnSettings;
 import net.minecraft.world.level.chunk.LevelChunk;
+import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import net.minecraft.world.level.portal.PortalShape;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.item.TooltipFlag;
@@ -93,6 +102,9 @@ import net.minecraftforge.event.entity.living.LivingPackSizeEvent;
 import net.minecraftforge.event.entity.living.LivingSpawnEvent;
 import net.minecraftforge.event.entity.living.LivingSpawnEvent.AllowDespawn;
 import net.minecraftforge.event.entity.living.ZombieEvent.SummonAidEvent;
+import net.minecraftforge.event.entity.player.AdvancementEvent.AdvancementEarnEvent;
+import net.minecraftforge.event.entity.player.AdvancementEvent.AdvancementProgressEvent;
+import net.minecraftforge.event.entity.player.AdvancementEvent.AdvancementProgressEvent.ProgressType;
 import net.minecraftforge.event.entity.player.ArrowLooseEvent;
 import net.minecraftforge.event.entity.player.ArrowNockEvent;
 import net.minecraftforge.event.entity.player.BonemealEvent;
@@ -115,6 +127,7 @@ import net.minecraftforge.event.level.BlockEvent.CreateFluidSourceEvent;
 import net.minecraftforge.event.level.BlockEvent.EntityMultiPlaceEvent;
 import net.minecraftforge.event.level.BlockEvent.EntityPlaceEvent;
 import net.minecraftforge.event.level.BlockEvent.NeighborNotifyEvent;
+import net.minecraftforge.event.level.ChunkTicketLevelUpdatedEvent;
 import net.minecraftforge.event.level.ChunkWatchEvent;
 import net.minecraftforge.event.level.ExplosionEvent;
 import net.minecraftforge.event.level.PistonEvent;
@@ -124,6 +137,8 @@ import net.minecraftforge.event.level.LevelEvent;
 import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.eventbus.api.Event.Result;
 import net.minecraftforge.fml.LogicalSide;
+
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -347,7 +362,7 @@ public class ForgeEventFactory
         return null;
     }
 
-    public static PlayLevelSoundEvent.AtEntity onPlaySoundAtEntity(Entity entity, SoundEvent name, SoundSource category, float volume, float pitch)
+    public static PlayLevelSoundEvent.AtEntity onPlaySoundAtEntity(Entity entity, Holder<SoundEvent> name, SoundSource category, float volume, float pitch)
     {
         PlayLevelSoundEvent.AtEntity event = new PlayLevelSoundEvent.AtEntity(entity, name, category, volume, pitch);
         MinecraftForge.EVENT_BUS.post(event);
@@ -355,7 +370,7 @@ public class ForgeEventFactory
     }
 
 
-    public static PlayLevelSoundEvent.AtPosition onPlaySoundAtPosition(Level level, double x, double y, double z, SoundEvent name, SoundSource category, float volume, float pitch)
+    public static PlayLevelSoundEvent.AtPosition onPlaySoundAtPosition(Level level, double x, double y, double z, Holder<SoundEvent> name, SoundSource category, float volume, float pitch)
     {
         PlayLevelSoundEvent.AtPosition event = new PlayLevelSoundEvent.AtPosition(level, new Vec3(x, y, z), name, category, volume, pitch);
         MinecraftForge.EVENT_BUS.post(event);
@@ -564,7 +579,7 @@ public class ForgeEventFactory
         return event.getTable();
     }
 
-    public static boolean canCreateFluidSource(LevelReader level, BlockPos pos, BlockState state, boolean def)
+    public static boolean canCreateFluidSource(Level level, BlockPos pos, BlockState state, boolean def)
     {
         CreateFluidSourceEvent evt = new CreateFluidSourceEvent(level, pos, state);
         MinecraftForge.EVENT_BUS.post(evt);
@@ -591,8 +606,11 @@ public class ForgeEventFactory
         return !MinecraftForge.EVENT_BUS.post(new LivingDestroyBlockEvent(entity, pos, state));
     }
 
-    public static boolean getMobGriefingEvent(Level level, Entity entity)
+    public static boolean getMobGriefingEvent(Level level, @Nullable Entity entity)
     {
+        if (entity == null)
+            return level.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING);
+
         EntityMobGriefingEvent event = new EntityMobGriefingEvent(entity);
         MinecraftForge.EVENT_BUS.post(event);
 
@@ -600,11 +618,23 @@ public class ForgeEventFactory
         return result == Result.DEFAULT ? level.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING) : result == Result.ALLOW;
     }
 
+    @Deprecated(forRemoval = true, since = "1.19.2")
     public static boolean saplingGrowTree(LevelAccessor level, RandomSource randomSource, BlockPos pos)
     {
-        SaplingGrowTreeEvent event = new SaplingGrowTreeEvent(level, randomSource, pos);
+        return !blockGrowFeature(level, randomSource, pos, null).getResult().equals(Result.DENY);
+    }
+
+    public static SaplingGrowTreeEvent blockGrowFeature(LevelAccessor level, RandomSource randomSource, BlockPos pos, @Nullable Holder<ConfiguredFeature<?, ?>> holder)
+    {
+        SaplingGrowTreeEvent event = new SaplingGrowTreeEvent(level, randomSource, pos, holder);
         MinecraftForge.EVENT_BUS.post(event);
-        return event.getResult() != Result.DENY;
+        return event;
+    }
+
+    public static void fireChunkTicketLevelUpdated(ServerLevel level, long chunkPos, int oldTicketLevel, int newTicketLevel, @Nullable ChunkHolder chunkHolder)
+    {
+        if (oldTicketLevel != newTicketLevel)
+            MinecraftForge.EVENT_BUS.post(new ChunkTicketLevelUpdatedEvent(level, chunkPos, oldTicketLevel, newTicketLevel, chunkHolder));
     }
 
     public static void fireChunkWatch(ServerPlayer entity, LevelChunk chunk, ServerLevel level)
@@ -692,9 +722,20 @@ public class ForgeEventFactory
         return event;
     }
 
+    /**
+     * @deprecated Use {@linkplain #onEnderPearlLand(ServerPlayer, double, double, double, ThrownEnderpearl, float, HitResult) the hit result-sensitive version}.
+     */
+    @ApiStatus.Internal
+    @Deprecated(forRemoval = true, since = "1.19.2")
     public static EntityTeleportEvent.EnderPearl onEnderPearlLand(ServerPlayer entity, double targetX, double targetY, double targetZ, ThrownEnderpearl pearlEntity, float attackDamage)
     {
-        EntityTeleportEvent.EnderPearl event = new EntityTeleportEvent.EnderPearl(entity, targetX, targetY, targetZ, pearlEntity, attackDamage);
+        return onEnderPearlLand(entity, targetX, targetY, targetZ, pearlEntity, attackDamage, null);
+    }
+
+    @ApiStatus.Internal // TODO - 1.20: remove the nullable
+    public static EntityTeleportEvent.EnderPearl onEnderPearlLand(ServerPlayer entity, double targetX, double targetY, double targetZ, ThrownEnderpearl pearlEntity, float attackDamage, @Nullable HitResult hitResult)
+    {
+        EntityTeleportEvent.EnderPearl event = new EntityTeleportEvent.EnderPearl(entity, targetX, targetY, targetZ, pearlEntity, attackDamage, hitResult);
         MinecraftForge.EVENT_BUS.post(event);
         return event;
     }
@@ -800,5 +841,25 @@ public class ForgeEventFactory
     public static void onPostServerTick(BooleanSupplier haveTime, MinecraftServer server)
     {
         MinecraftForge.EVENT_BUS.post(new TickEvent.ServerTickEvent(TickEvent.Phase.END, haveTime, server));
+    }
+
+    public static WeightedRandomList<MobSpawnSettings.SpawnerData> getPotentialSpawns(LevelAccessor level, MobCategory category, BlockPos pos, WeightedRandomList<MobSpawnSettings.SpawnerData> oldList)
+    {
+        LevelEvent.PotentialSpawns event = new LevelEvent.PotentialSpawns(level, category, pos, oldList);
+        if (MinecraftForge.EVENT_BUS.post(event))
+            return WeightedRandomList.create();
+        return WeightedRandomList.create(event.getSpawnerDataList());
+    }
+
+    @ApiStatus.Internal
+    public static void onAdvancementEarnedEvent(Player player, Advancement earned)
+    {
+        MinecraftForge.EVENT_BUS.post(new AdvancementEarnEvent(player, earned));
+    }
+
+    @ApiStatus.Internal
+    public static void onAdvancementProgressedEvent(Player player, Advancement progressed, AdvancementProgress advancementProgress, String criterion, ProgressType progressType)
+    {
+        MinecraftForge.EVENT_BUS.post(new AdvancementProgressEvent(player, progressed, advancementProgress, criterion, progressType));
     }
 }

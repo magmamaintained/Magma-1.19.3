@@ -7,14 +7,26 @@ package net.minecraftforge.common;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Deque;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
-import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 import com.google.common.base.Strings;
-import com.google.common.base.Suppliers;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
@@ -24,50 +36,72 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
-import com.mojang.serialization.Codec;
 import com.mojang.serialization.Lifecycle;
 
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.ResourceLocationException;
 import net.minecraft.advancements.Advancement;
-import net.minecraft.core.*;
-import net.minecraft.network.chat.*;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.Commands;
+import net.minecraft.commands.SharedSuggestionProvider;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Holder;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.HolderSet;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.network.chat.ChatDecorator;
+import net.minecraft.network.chat.ClickEvent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.TextColor;
+import net.minecraft.network.chat.contents.LiteralContents;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.packs.PackType;
+import net.minecraft.server.packs.metadata.pack.PackMetadataSection;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.TagEntry;
 import net.minecraft.tags.TagKey;
+import net.minecraft.util.CrudeIncrementalIntIdentityHashBiMap;
+import net.minecraft.util.GsonHelper;
+import net.minecraft.util.Mth;
 import net.minecraft.util.datafix.fixes.StructuresBecomeConfiguredFix;
+import net.minecraft.world.Difficulty;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.effect.MobEffect;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.ExperienceOrb;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.MobSpawnType;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.DefaultAttributes;
-import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.monster.EnderMan;
+import net.minecraft.world.entity.SlotAccess;
+import net.minecraft.world.inventory.ClickAction;
+import net.minecraft.world.inventory.ContainerLevelAccess;
+import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.*;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.level.material.Fluids;
+import net.minecraft.world.level.storage.LevelStorageSource;
 import net.minecraft.world.level.storage.WorldData;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.storage.loot.LootTables;
-import net.minecraft.util.*;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.Mob;
-import net.minecraft.world.entity.MobSpawnType;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AnvilMenu;
 import net.minecraft.world.Container;
 import net.minecraft.world.item.context.UseOnContext;
@@ -80,14 +114,12 @@ import net.minecraft.world.item.alchemy.Potion;
 import net.minecraft.world.item.alchemy.PotionUtils;
 import net.minecraft.stats.Stats;
 import net.minecraft.world.phys.Vec3;
-import net.minecraft.world.*;
 import net.minecraft.world.level.BaseSpawner;
 import net.minecraft.world.level.block.entity.FurnaceBlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.BlockHitResult;
-import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.BiomeSpecialEffects;
 import net.minecraft.world.level.biome.BiomeGenerationSettings;
@@ -101,7 +133,10 @@ import net.minecraftforge.common.util.MavenVersionStringHelper;
 import net.minecraftforge.event.AnvilUpdateEvent;
 import net.minecraftforge.event.DifficultyChangeEvent;
 import net.minecraftforge.event.ForgeEventFactory;
+import net.minecraftforge.event.GrindstoneEvent;
 import net.minecraftforge.event.ItemAttributeModifierEvent;
+import net.minecraftforge.event.ItemStackedOnOtherEvent;
+import net.minecraftforge.event.ModMismatchEvent;
 import net.minecraftforge.event.ServerChatEvent;
 import net.minecraftforge.event.RegisterStructureConversionsEvent;
 import net.minecraftforge.event.VanillaGameEvent;
@@ -112,16 +147,19 @@ import net.minecraftforge.event.entity.EntityTravelToDimensionEvent;
 import net.minecraftforge.event.entity.item.ItemTossEvent;
 import net.minecraftforge.event.entity.living.EnderManAngerEvent;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
+import net.minecraftforge.event.entity.living.LivingChangeTargetEvent;
 import net.minecraftforge.event.entity.living.LivingDamageEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingDropsEvent;
 import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingJumpEvent;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingTickEvent;
+import net.minecraftforge.event.entity.living.LivingChangeTargetEvent.ILivingTargetType;
 import net.minecraftforge.event.entity.living.LivingFallEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.event.entity.living.LivingKnockBackEvent;
 import net.minecraftforge.event.entity.living.LivingSetAttackTargetEvent;
+import net.minecraftforge.event.entity.living.LivingUseTotemEvent;
 import net.minecraftforge.event.entity.living.LootingLevelEvent;
 import net.minecraftforge.event.entity.living.ShieldBlockEvent;
 import net.minecraftforge.event.entity.player.AdvancementEvent;
@@ -135,7 +173,6 @@ import net.minecraftforge.event.level.BlockEvent;
 import net.minecraftforge.event.level.NoteBlockEvent;
 import net.minecraftforge.eventbus.api.Event.Result;
 import net.minecraftforge.fluids.FluidType;
-import net.minecraftforge.fml.ModContainer;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.ModLoader;
 import net.minecraftforge.resource.ResourcePackLoader;
@@ -143,6 +180,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.ForgeRegistry;
 import net.minecraftforge.registries.GameData;
 import net.minecraftforge.registries.RegistryManager;
+import net.minecraftforge.server.permission.PermissionAPI;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -157,8 +195,10 @@ import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.state.pattern.BlockInWorld;
-import net.minecraft.world.level.dimension.LevelStem;
 import net.minecraft.world.level.material.Fluid;
+import org.apache.maven.artifact.versioning.ArtifactVersion;
+import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -186,63 +226,9 @@ public class ForgeHooks
         return player.hasCorrectToolForDrops(state);
     }
 
-    /**
-     * Called when a player uses 'pick block', calls new Entity and Block hooks.
-     */
-    @SuppressWarnings("resource")
-    public static boolean onPickBlock(HitResult target, Player player, Level level)
+    public static boolean onItemStackedOn(ItemStack carriedItem, ItemStack stackedOnItem, Slot slot, ClickAction action, Player player, SlotAccess carriedSlotAccess)
     {
-        ItemStack result = ItemStack.EMPTY;
-        boolean isCreative = player.getAbilities().instabuild;
-        BlockEntity te = null;
-
-        if (target.getType() == HitResult.Type.BLOCK)
-        {
-            BlockPos pos = ((BlockHitResult)target).getBlockPos();
-            BlockState state = level.getBlockState(pos);
-
-            if (state.isAir())
-                return false;
-
-            if (isCreative && Screen.hasControlDown() && state.hasBlockEntity())
-                te = level.getBlockEntity(pos);
-
-            result = state.getCloneItemStack(target, level, pos, player);
-
-            if (result.isEmpty())
-                LOGGER.warn("Picking on: [{}] {} gave null item", target.getType(), ForgeRegistries.BLOCKS.getKey(state.getBlock()));
-        }
-        else if (target.getType() == HitResult.Type.ENTITY)
-        {
-            Entity entity = ((EntityHitResult)target).getEntity();
-            result = entity.getPickedResult(target);
-
-            if (result.isEmpty())
-                LOGGER.warn("Picking on: [{}] {} gave null item", target.getType(), ForgeRegistries.ENTITY_TYPES.getKey(entity.getType()));
-        }
-
-        if (result.isEmpty())
-            return false;
-
-        if (te != null)
-            Minecraft.getInstance().addCustomNbtData(result, te);
-
-        if (isCreative)
-        {
-            player.getInventory().setPickedItem(result);
-            Minecraft.getInstance().gameMode.handleCreativeModeItemAdd(player.getItemInHand(InteractionHand.MAIN_HAND), 36 + player.getInventory().selected);
-            return true;
-        }
-        int slot = player.getInventory().findSlotMatchingItem(result);
-        if (slot != -1)
-        {
-            if (Inventory.isHotbarSlot(slot))
-                player.getInventory().selected = slot;
-            else
-                Minecraft.getInstance().gameMode.handlePickItem(slot);
-            return true;
-        }
-        return false;
+        return MinecraftForge.EVENT_BUS.post(new ItemStackedOnOtherEvent(carriedItem, stackedOnItem, slot, action, player, carriedSlotAccess));
     }
 
     public static void onDifficultyChange(Difficulty difficulty, Difficulty oldDifficulty)
@@ -253,9 +239,26 @@ public class ForgeHooks
     //Optifine Helper Functions u.u, these are here specifically for Optifine
     //Note: When using Optifine, these methods are invoked using reflection, which
     //incurs a major performance penalty.
+    // TODO: Remove in 1.20
+    @Deprecated(since = "1.19.2", forRemoval = true)
     public static void onLivingSetAttackTarget(LivingEntity entity, LivingEntity target)
     {
         MinecraftForge.EVENT_BUS.post(new LivingSetAttackTargetEvent(entity, target));
+    }
+
+    // TODO: Remove in 1.20
+    @Deprecated(since = "1.19.2", forRemoval = true)
+    public static void onLivingSetAttackTarget(LivingEntity entity, LivingEntity target, ILivingTargetType targetType)
+    {
+        MinecraftForge.EVENT_BUS.post(new LivingSetAttackTargetEvent(entity, target, targetType));
+    }
+
+    public static LivingChangeTargetEvent onLivingChangeTarget(LivingEntity entity, LivingEntity originalTarget, ILivingTargetType targetType)
+    {
+        LivingChangeTargetEvent event = new LivingChangeTargetEvent(entity, originalTarget, targetType);
+        MinecraftForge.EVENT_BUS.post(event);
+
+        return event;
     }
 
     public static boolean onLivingTick(LivingEntity entity)
@@ -278,6 +281,11 @@ public class ForgeHooks
         LivingKnockBackEvent event = new LivingKnockBackEvent(target, strength, ratioX, ratioZ);
         MinecraftForge.EVENT_BUS.post(event);
         return event;
+    }
+
+    public static boolean onLivingUseTotem(LivingEntity entity, DamageSource damageSource, ItemStack totem, InteractionHand hand)
+    {
+        return !MinecraftForge.EVENT_BUS.post(new LivingUseTotemEvent(entity, damageSource, totem, hand));
     }
 
     public static float onLivingHurt(LivingEntity entity, DamageSource src, float amount)
@@ -394,17 +402,28 @@ public class ForgeHooks
         return !MinecraftForge.EVENT_BUS.post(new VanillaGameEvent(level, vanillaEvent, pos, context));
     }
 
-    @Nullable
-    public static Component onServerChatEvent(@Nullable ServerPlayer player, String raw, Component comp)
+    private static String getRawText(Component message)
     {
-        ServerChatEvent event = new ServerChatEvent(player, raw, comp);
-        if (MinecraftForge.EVENT_BUS.post(event))
-        {
-            return null;
-        }
-        return event.getComponent();
+        return message.getContents() instanceof LiteralContents literalContents ? literalContents.text() : "";
     }
 
+    @Nullable
+    public static Component onServerChatSubmittedEvent(ServerPlayer player, String plain, Component decorated)
+    {
+        ServerChatEvent event = new ServerChatEvent(player, plain, decorated);
+        return MinecraftForge.EVENT_BUS.post(event) ? null : event.getMessage();
+    }
+
+    @NotNull
+    public static ChatDecorator getServerChatSubmittedDecorator()
+    {
+        return (sender, message) -> CompletableFuture.supplyAsync(() -> {
+            if (sender == null)
+                return message; // Vanilla should never get here with the patches we use, but let's be safe with dumb mods
+
+            return onServerChatSubmittedEvent(sender, getRawText(message), message);
+        });
+    }
 
     static final Pattern URL_PATTERN = Pattern.compile(
             //         schema                          ipv4            OR        namespace                 port     path         ends
@@ -499,7 +518,7 @@ public class ForgeHooks
 
             if (!entityPlayer.mayBuild())
             {
-                if (itemstack.isEmpty() || !itemstack.hasAdventureModeBreakTagForBlock(level.registryAccess().registryOrThrow(Registry.BLOCK_REGISTRY), new BlockInWorld(level, pos, false)))
+                if (itemstack.isEmpty() || !itemstack.hasAdventureModeBreakTagForBlock(level.registryAccess().registryOrThrow(Registries.BLOCK), new BlockInWorld(level, pos, false)))
                     preCancelEvent = true;
             }
         }
@@ -542,7 +561,7 @@ public class ForgeHooks
         Level level = context.getLevel();
 
         Player player = context.getPlayer();
-        if (player != null && !player.getAbilities().mayBuild && !itemstack.hasAdventureModePlaceTagForBlock(level.registryAccess().registryOrThrow(Registry.BLOCK_REGISTRY), new BlockInWorld(level, context.getClickedPos(), false)))
+        if (player != null && !player.getAbilities().mayBuild && !itemstack.hasAdventureModePlaceTagForBlock(level.registryAccess().registryOrThrow(Registries.BLOCK), new BlockInWorld(level, context.getClickedPos(), false)))
             return InteractionResult.PASS;
 
         // handle all placement events here
@@ -643,6 +662,41 @@ public class ForgeHooks
         AnvilRepairEvent e = new AnvilRepairEvent(player, left, right, output);
         MinecraftForge.EVENT_BUS.post(e);
         return e.getBreakChance();
+    }
+
+    public static int onGrindstoneChange(@NotNull ItemStack top, @NotNull ItemStack bottom, Container outputSlot, int xp)
+    {
+        GrindstoneEvent.OnplaceItem e = new GrindstoneEvent.OnplaceItem(top, bottom, xp);
+        if (MinecraftForge.EVENT_BUS.post(e))
+        {
+            outputSlot.setItem(0, ItemStack.EMPTY);
+            return -1;
+        }
+        if (e.getOutput().isEmpty()) return Integer.MIN_VALUE;
+
+        outputSlot.setItem(0, e.getOutput());
+        return e.getXp();
+    }
+
+    public static boolean onGrindstoneTake(Container inputSlots, ContainerLevelAccess access, Function<Level, Integer> xpFunction)
+    {
+        access.execute((l,p) -> {
+            int xp = xpFunction.apply(l);
+            GrindstoneEvent.OnTakeItem e = new GrindstoneEvent.OnTakeItem(inputSlots.getItem(0), inputSlots.getItem(1), xp);
+            if (MinecraftForge.EVENT_BUS.post(e))
+            {
+                return;
+            }
+            if (l instanceof ServerLevel)
+            {
+                ExperienceOrb.award((ServerLevel)l, Vec3.atCenterOf(p), e.getXp());
+            }
+            l.levelEvent(1042, p, 0);
+            inputSlots.setItem(0, e.getNewTopItem());
+            inputSlots.setItem(1, e.getNewBottomItem());
+            inputSlots.setChanged();
+        });
+        return true;
     }
 
     private static ThreadLocal<Player> craftingPlayer = new ThreadLocal<Player>();
@@ -827,6 +881,11 @@ public class ForgeHooks
                 };
     }
 
+    public static Collection<CreativeModeTab> onCheckCreativeTabs(CreativeModeTab... vanillaTabs) {
+        final List<CreativeModeTab> tabs = new ArrayList<>(Arrays.asList(vanillaTabs));
+        return tabs;
+    }
+
     @FunctionalInterface
     public interface BiomeCallbackFunction
     {
@@ -942,6 +1001,10 @@ public class ForgeHooks
         return null;
     }
 
+    /**
+     * @deprecated See {@link ForgeEventFactory#onAdvancementEarnedEvent} and {@link ForgeEventFactory#onAdvancementProgressedEvent}
+     */
+    @Deprecated(forRemoval = true, since = "1.19.2")
     public static void onAdvancement(ServerPlayer player, Advancement advancement)
     {
         MinecraftForge.EVENT_BUS.post(new AdvancementEvent(player, advancement));
@@ -1185,8 +1248,6 @@ public class ForgeHooks
     private static final Set<String> VANILLA_DIMS = Sets.newHashSet("minecraft:overworld", "minecraft:the_nether", "minecraft:the_end");
     private static final String DIMENSIONS_KEY = "dimensions";
     private static final String SEED_KEY = "seed";
-    //No to static init!
-    private static final Supplier<Codec<Registry<LevelStem>>> CODEC = Suppliers.memoize(() -> RegistryCodecs.dataPackAwareCodec(Registry.LEVEL_STEM_REGISTRY, Lifecycle.stable(), LevelStem.CODEC).xmap(LevelStem::sortMap, Function.identity()));
 
     private static final Map<EntityType<? extends LivingEntity>, AttributeSupplier> FORGE_ATTRIBUTES = new HashMap<>();
     /**  FOR INTERNAL USE ONLY, DO NOT CALL DIRECTLY */
@@ -1250,12 +1311,28 @@ public class ForgeHooks
         levelTag.put("fml", fmlData);
     }
 
-    public static void readAdditionalLevelSaveData(CompoundTag rootTag)
+    /**
+     * @deprecated To be removed in 1.20.
+     * Use {@link #readAdditionalLevelSaveData(CompoundTag, LevelStorageSource.LevelDirectory)} instead.
+     */
+    @Deprecated(forRemoval = true, since = "1.19.2")
+    public static void readAdditionalLevelSaveData(CompoundTag rootTag) {
+        readAdditionalLevelSaveData(rootTag, null);
+    }
+
+    /**
+     * @param rootTag Level data file contents.
+     * @param levelDirectory Level currently being loaded. TODO 1.20 - Remove nullable annotation
+     */
+    @ApiStatus.Internal
+    public static void readAdditionalLevelSaveData(CompoundTag rootTag, @Nullable LevelStorageSource.LevelDirectory levelDirectory)
     {
         CompoundTag tag = rootTag.getCompound("fml");
         if (tag.contains("LoadingModList"))
         {
             ListTag modList = tag.getList("LoadingModList", net.minecraft.nbt.Tag.TAG_COMPOUND);
+            Map<String, ArtifactVersion> mismatchedVersions = new HashMap<>(modList.size());
+            Map<String, ArtifactVersion> missingVersions = new HashMap<>(modList.size());
             for (int i = 0; i < modList.size(); i++)
             {
                 CompoundTag mod = modList.getCompound(i);
@@ -1264,17 +1341,72 @@ public class ForgeHooks
                 {
                     continue;
                 }
+
                 String modVersion = mod.getString("ModVersion");
-                Optional<? extends ModContainer> container = ModList.get().getModContainerById(modId);
-                if (container.isEmpty())
+                final var previousVersion = new DefaultArtifactVersion(modVersion);
+                ModList.get().getModContainerById(modId).ifPresentOrElse(container ->
                 {
-                    LOGGER.error(WORLDPERSISTENCE,"This world was saved with mod {} which appears to be missing, things may not work well", modId);
-                    continue;
-                }
-                if (!Objects.equals(modVersion, MavenVersionStringHelper.artifactVersionToString(container.get().getModInfo().getVersion())))
+                    final var loadingVersion = container.getModInfo().getVersion();
+                    if (!loadingVersion.equals(previousVersion))
+                    {
+                        // Enqueue mismatched versions for bulk event
+                        mismatchedVersions.put(modId, previousVersion);
+                    }
+                }, () -> missingVersions.put(modId, previousVersion));
+            }
+
+            final var mismatchEvent = new ModMismatchEvent(levelDirectory, mismatchedVersions, missingVersions);
+            ModLoader.get().postEvent(mismatchEvent);
+
+            StringBuilder resolved = new StringBuilder("The following mods have version differences that were marked resolved:");
+            StringBuilder unresolved = new StringBuilder("The following mods have version differences that were not resolved:");
+
+            // For mods that were marked resolved, log the version resolution and the mod that resolved the mismatch
+            mismatchEvent.getResolved().forEachOrdered((res) ->
+            {
+                final var modid = res.modid();
+                final var diff = res.versionDifference();
+                if (res.wasSelfResolved())
                 {
-                    LOGGER.warn(WORLDPERSISTENCE,"This world was saved with mod {} version {} and it is now at version {}, things may not work well", modId, modVersion, MavenVersionStringHelper.artifactVersionToString(container.get().getModInfo().getVersion()));
+                    resolved.append(System.lineSeparator())
+                            .append(diff.isMissing()
+                                    ? "%s (version %s -> MISSING, self-resolved)".formatted(modid, diff.oldVersion())
+                                    : "%s (version %s -> %s, self-resolved)".formatted(modid, diff.oldVersion(), diff.newVersion())
+                            );
                 }
+                else
+                {
+                    final var resolver = res.resolver().getModId();
+                    resolved.append(System.lineSeparator())
+                            .append(diff.isMissing()
+                                    ? "%s (version %s -> MISSING, resolved by %s)".formatted(modid, diff.oldVersion(), resolver)
+                                    : "%s (version %s -> %s, resolved by %s)".formatted(modid, diff.oldVersion(), diff.newVersion(), resolver)
+                            );
+                }
+            });
+
+            // For mods that did not specify handling, show a warning to users that errors may occur
+            mismatchEvent.getUnresolved().forEachOrdered((unres) ->
+            {
+                final var modid = unres.modid();
+                final var diff = unres.versionDifference();
+                unresolved.append(System.lineSeparator())
+                        .append(diff.isMissing()
+                                ? "%s (version %s -> MISSING)".formatted(modid, diff.oldVersion())
+                                : "%s (version %s -> %s)".formatted(modid, diff.oldVersion(), diff.newVersion())
+                        );
+            });
+
+            if (mismatchEvent.anyResolved())
+            {
+                resolved.append(System.lineSeparator()).append("Things may not work well.");
+                LOGGER.debug(WORLDPERSISTENCE, resolved.toString());
+            }
+
+            if (mismatchEvent.anyUnresolved())
+            {
+                unresolved.append(System.lineSeparator()).append("Things may not work well.");
+                LOGGER.warn(WORLDPERSISTENCE, unresolved.toString());
             }
         }
 
@@ -1392,7 +1524,7 @@ public class ForgeHooks
 
         for (PackType packType : PackType.values())
         {
-            String key = "forge:" + packType.bridgeType.name().toLowerCase(Locale.ROOT) + "_pack_format";
+            String key = makePackFormatKey(packType);
             if (json.has(key))
             {
                 map.put(packType, GsonHelper.getAsInt(json, key));
@@ -1400,6 +1532,24 @@ public class ForgeHooks
         }
 
         return map.buildOrThrow();
+    }
+
+    public static void writeTypedPackFormats(JsonObject json, PackMetadataSection section)
+    {
+        int packFormat = section.getPackFormat();
+        for (PackType packType : PackType.values())
+        {
+            int format = section.getPackFormat(packType);
+            if (format != packFormat)
+            {
+                json.addProperty(makePackFormatKey(packType), format);
+            }
+        }
+    }
+
+    private static String makePackFormatKey(PackType packType)
+    {
+        return "forge:" + packType.bridgeType.name().toLowerCase(Locale.ROOT) + "_pack_format";
     }
 
     /**
@@ -1425,5 +1575,29 @@ public class ForgeHooks
     public static String prefixNamespace(ResourceLocation registryKey)
     {
         return registryKey.getNamespace().equals("minecraft") ? registryKey.getPath() : registryKey.getNamespace() +  "/"  + registryKey.getPath();
+    }
+
+    public static boolean canUseEntitySelectors(SharedSuggestionProvider provider)
+    {
+        if (provider.hasPermission(Commands.LEVEL_GAMEMASTERS))
+        {
+            return true;
+        }
+        else if (provider instanceof CommandSourceStack source && source.source instanceof ServerPlayer player)
+        {
+            return PermissionAPI.getPermission(player, ForgeMod.USE_SELECTORS_PERMISSION);
+        }
+        return false;
+    }
+
+    @ApiStatus.Internal
+    public static <T> HolderLookup.RegistryLookup<T> wrapRegistryLookup(final HolderLookup.RegistryLookup<T> lookup)
+    {
+        return new HolderLookup.RegistryLookup.Delegate<>()
+        {
+            @Override protected RegistryLookup<T> parent() { return lookup; }
+            @Override public Stream<HolderSet.Named<T>> listTags() { return Stream.empty(); }
+            @Override public Optional<HolderSet.Named<T>> get(TagKey<T> key) { return Optional.of(HolderSet.emptyNamed(lookup, key)); }
+        };
     }
 }

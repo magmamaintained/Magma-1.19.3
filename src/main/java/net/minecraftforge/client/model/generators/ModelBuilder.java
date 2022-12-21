@@ -32,9 +32,9 @@ import net.minecraft.client.renderer.texture.MissingTextureAtlasSprite;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
-import com.mojang.math.Vector3f;
 import net.minecraftforge.common.data.ExistingFileHelper;
 import org.jetbrains.annotations.Nullable;
+import org.joml.Vector3f;
 
 /**
  * General purpose model builder, contains all the commonalities between item
@@ -285,11 +285,11 @@ public class ModelBuilder<T extends ModelBuilder<T>> extends ModelFile {
 
                 if (part.rotation != null) {
                     JsonObject rotation = new JsonObject();
-                    rotation.add("origin", serializeVector3f(part.rotation.origin));
-                    rotation.addProperty("axis", part.rotation.axis.getSerializedName());
-                    rotation.addProperty("angle", part.rotation.angle);
-                    if (part.rotation.rescale) {
-                        rotation.addProperty("rescale", part.rotation.rescale);
+                    rotation.add("origin", serializeVector3f(part.rotation.origin()));
+                    rotation.addProperty("axis", part.rotation.axis().getSerializedName());
+                    rotation.addProperty("angle", part.rotation.angle());
+                    if (part.rotation.rescale()) {
+                        rotation.addProperty("rescale", part.rotation.rescale());
                     }
                     partObj.add("rotation", rotation);
                 }
@@ -316,6 +316,12 @@ public class ModelBuilder<T extends ModelBuilder<T>> extends ModelFile {
                     }
                     if (face.tintIndex != -1) {
                         faceObj.addProperty("tintindex", face.tintIndex);
+                    }
+                    if (face.emissivity > 0) {
+                        faceObj.addProperty("emissivity", face.emissivity);
+                    }
+                    if (!face.hasAmbientOcclusion) {
+                        faceObj.addProperty("ambientocclusion", face.hasAmbientOcclusion);
                     }
                     faces.add(dir.getSerializedName(), faceObj);
                 }
@@ -513,6 +519,8 @@ public class ModelBuilder<T extends ModelBuilder<T>> extends ModelFile {
             private String texture = MissingTextureAtlasSprite.getLocation().toString();
             private float[] uvs;
             private FaceRotation rotation = FaceRotation.ZERO;
+            private int emissivity = 0;
+            private boolean hasAmbientOcclusion = true;
 
             FaceBuilder(Direction dir) {
                 // param unused for functional match
@@ -559,11 +567,42 @@ public class ModelBuilder<T extends ModelBuilder<T>> extends ModelFile {
                 return this;
             }
 
+            /**
+             * Set the emissivity of the face (0-15).
+             *
+             * @param emissivity the emissivity
+             * @return this builder
+             */
+            public FaceBuilder emissivity(int emissivity) {
+                this.emissivity = emissivity;
+                return this;
+            }
+
+            /**
+             * Make the face emissive (emissivity = 15).
+             *
+             * @return this builder
+             */
+            public FaceBuilder emissive() {
+                return emissivity(15);
+            }
+
+            /**
+             * Set the ambient occlusion of the face.
+             *
+             * @param ao the ambient occlusion
+             * @return this builder
+             */
+            public FaceBuilder ao(boolean ao) {
+                this.hasAmbientOcclusion = ao;
+                return this;
+            }
+
             BlockElementFace build() {
                 if (this.texture == null) {
                     throw new IllegalStateException("A model face must have a texture");
                 }
-                return new BlockElementFace(cullface, tintindex, texture, new BlockFaceUV(uvs, rotation.rotation));
+                return new BlockElementFace(cullface, tintindex, texture, new BlockFaceUV(uvs, rotation.rotation), emissivity, hasAmbientOcclusion);
             }
 
             public ElementBuilder end() { return ElementBuilder.this; }
@@ -656,10 +695,10 @@ public class ModelBuilder<T extends ModelBuilder<T>> extends ModelFile {
 
         public class TransformVecBuilder {
 
-            private Vector3f rotation = ItemTransform.Deserializer.DEFAULT_ROTATION.copy();
-            private Vector3f translation = ItemTransform.Deserializer.DEFAULT_TRANSLATION.copy();
-            private Vector3f scale = ItemTransform.Deserializer.DEFAULT_SCALE.copy();
-            private Vector3f rightRotation = ItemTransform.Deserializer.DEFAULT_ROTATION.copy();
+            private Vector3f rotation = new Vector3f(ItemTransform.Deserializer.DEFAULT_ROTATION);
+            private Vector3f translation = new Vector3f(ItemTransform.Deserializer.DEFAULT_TRANSLATION);
+            private Vector3f scale = new Vector3f(ItemTransform.Deserializer.DEFAULT_SCALE);
+            private Vector3f rightRotation = new Vector3f(ItemTransform.Deserializer.DEFAULT_ROTATION);
 
             TransformVecBuilder(TransformType type) {
                 // param unused for functional match
