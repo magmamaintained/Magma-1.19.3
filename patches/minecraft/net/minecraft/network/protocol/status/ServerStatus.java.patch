@@ -1,16 +1,17 @@
 --- a/net/minecraft/network/protocol/status/ServerStatus.java
 +++ b/net/minecraft/network/protocol/status/ServerStatus.java
-@@ -27,6 +_,16 @@
+@@ -27,6 +_,17 @@
     @Nullable
     private String f_134903_;
-    private boolean f_238077_;
+    private boolean f_242955_;
 +   private transient net.minecraftforge.network.ServerStatusPing forgeData;
 +
++   @Nullable
 +   public net.minecraftforge.network.ServerStatusPing getForgeData() {
 +      return this.forgeData;
 +   }
 +
-+   public void setForgeData(net.minecraftforge.network.ServerStatusPing data){
++   public void setForgeData(net.minecraftforge.network.ServerStatusPing data) {
 +      this.forgeData = data;
 +      invalidateJson();
 +   }
@@ -46,8 +47,15 @@
     }
  
     @Nullable
-@@ -72,6 +_,39 @@
-       return this.f_238077_;
+@@ -66,12 +_,46 @@
+ 
+    public void m_242958_(boolean p_242968_) {
+       this.f_242955_ = p_242968_;
++      invalidateJson();
+    }
+ 
+    public boolean m_242963_() {
+       return this.f_242955_;
     }
  
 +   private java.util.concurrent.Semaphore mutex = new java.util.concurrent.Semaphore(1);
@@ -87,7 +95,7 @@
        private final int f_134917_;
        private final int f_134918_;
 @@ -170,6 +_,10 @@
-             serverstatus.m_238078_(GsonHelper.m_13912_(jsonobject, "previewsChat"));
+             serverstatus.m_242958_(GsonHelper.m_13912_(jsonobject, "enforcesSecureChat"));
           }
  
 +         if (jsonobject.has("forgeData")) {
@@ -103,7 +111,7 @@
              jsonobject.addProperty("favicon", p_134951_.m_134916_());
 +         }
 +
-+         if(p_134951_.getForgeData() != null){
++         if (p_134951_.getForgeData() != null) {
 +            jsonobject.add("forgeData", net.minecraftforge.network.ServerStatusPing.Serializer.serialize(p_134951_.getForgeData()));
           }
  

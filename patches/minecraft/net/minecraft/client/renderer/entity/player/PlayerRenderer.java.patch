@@ -10,7 +10,7 @@
     }
  
     public Vec3 m_7860_(AbstractClientPlayer p_117785_, float p_117786_) {
-@@ -126,7 +_,7 @@
+@@ -126,10 +_,13 @@
              if (useanim == UseAnim.TOOT_HORN) {
                 return HumanoidModel.ArmPose.TOOT_HORN;
              }
@@ -19,6 +19,12 @@
              return HumanoidModel.ArmPose.CROSSBOW_HOLD;
           }
  
++         HumanoidModel.ArmPose forgeArmPose = net.minecraftforge.client.extensions.common.IClientItemExtensions.of(itemstack).getArmPose(p_117795_, p_117796_, itemstack);
++         if (forgeArmPose != null) return forgeArmPose;
++
+          return HumanoidModel.ArmPose.ITEM;
+       }
+    }
 @@ -161,10 +_,12 @@
     }
  
@@ -39,5 +45,5 @@
 -         float f3 = p_117802_.m_20069_() ? -90.0F - p_117802_.m_146909_() : -90.0F;
 +         float f3 = p_117802_.m_20069_() || p_117802_.isInFluidType((fluidType, height) -> p_117802_.canSwimInFluidType(fluidType)) ? -90.0F - p_117802_.m_146909_() : -90.0F;
           float f4 = Mth.m_14179_(f, 0.0F, f3);
-          p_117803_.m_85845_(Vector3f.f_122223_.m_122240_(f4));
+          p_117803_.m_252781_(Axis.f_252529_.m_252977_(f4));
           if (p_117802_.m_6067_()) {

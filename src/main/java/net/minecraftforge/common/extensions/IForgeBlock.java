@@ -6,6 +6,7 @@
 package net.minecraftforge.common.extensions;
 
 import java.util.Optional;
+import java.util.function.BiConsumer;
 
 import net.minecraft.client.Camera;
 import net.minecraft.util.RandomSource;
@@ -23,7 +24,9 @@ import net.minecraft.world.entity.projectile.WitherSkull;
 import net.minecraft.world.item.*;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.block.*;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.levelgen.feature.configurations.TreeConfiguration;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.MaterialColor;
 import net.minecraft.world.level.pathfinder.BlockPathTypes;
@@ -35,6 +38,8 @@ import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraftforge.client.ForgeHooksClient;
+import net.minecraftforge.client.model.data.ModelData;
+import net.minecraftforge.client.model.data.ModelDataManager;
 import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.common.IPlantable;
 
@@ -200,7 +205,7 @@ public interface IForgeBlock
     {
         if (isBed(state, levelReader, pos, entity) && levelReader instanceof Level level && BedBlock.canSetSpawn(level))
         {
-            return BedBlock.findStandUpPosition(type, levelReader, pos, orientation);
+            return BedBlock.findStandUpPosition(type, levelReader, pos, state.getValue(BedBlock.FACING), orientation);
         }
         return Optional.empty();
     }
@@ -325,6 +330,30 @@ public interface IForgeBlock
     * @return True to allow the plant to be planted/stay.
     */
     boolean canSustainPlant(BlockState state, BlockGetter level, BlockPos pos, Direction facing, IPlantable plantable);
+
+    /**
+     * Called when a tree grows on top of this block and tries to set it to dirt by the trunk placer.
+     * An override that returns true is responsible for using the place function to
+     * set blocks in the world properly during generation. A modded grass block might override this method
+     * to ensure it turns into the corresponding modded dirt instead of regular dirt when a tree grows on it.
+     * For modded grass blocks, returning true from this method is NOT a substitute for adding your block
+     * to the #minecraft:dirt tag, rather for changing the behaviour to something other than setting to dirt.
+     *
+     * NOTE: This happens DURING world generation, the generation may be incomplete when this is called.
+     * Use the placeFunction when modifying the level.
+     *
+     * @param state The current state
+     * @param level The current level
+     * @param placeFunction Function to set blocks in the level for the tree, use this instead of the level directly
+     * @param randomSource The random source
+     * @param pos Position of the block to be set to dirt
+     * @param config Configuration of the trunk placer. Consider azalea trees, which should place rooted dirt instead of regular dirt.
+     * @return True to ignore vanilla behaviour
+     */
+    default boolean onTreeGrow(BlockState state, LevelReader level, BiConsumer<BlockPos, BlockState> placeFunction, RandomSource randomSource, BlockPos pos, TreeConfiguration config)
+    {
+        return false;
+    }
 
    /**
     * Checks if this soil is fertile, typically this means that growth rates
@@ -893,5 +922,33 @@ public interface IForgeBlock
     default MaterialColor getMapColor(BlockState state, BlockGetter level, BlockPos pos, MaterialColor defaultColor)
     {
         return defaultColor;
+    }
+
+    /**
+     * Returns the {@link BlockState} that this block reports to look like on the given side, for querying by other mods.
+     * Note: Overriding this does not change how this block renders. That must still be handled in the block's model.
+     * <p>
+     * Common implementors would be covers and facades, or any other mimic blocks that proxy another block's model.
+     * Common consumers would be models with connected textures that wish to seamlessly connect to mimic blocks.
+     * <p>
+     * <b>Note that this method may be called on the server, or on any of the client's meshing threads.</b><br/>
+     * As such, if you need any data from your {@link BlockEntity}, you should put it in {@link ModelData} to guarantee
+     * safe concurrent access to it on the client.<br/>
+     * Calling {@link BlockGetter#getModelDataManager()} will return {@code null} if in a server context, where it is
+     * safe to query your {@link BlockEntity} directly. Otherwise, {@link ModelDataManager#getAt(BlockPos)} will return
+     * the {@link ModelData} for the queried block, or {@code null} if none is present.
+     *
+     * @param state      The state of this block
+     * @param level      The level this block is in
+     * @param pos        The block's position in the level
+     * @param side       The side of the block that is being queried
+     * @param queryState The state of the block that is querying the appearance, or {@code null} if not applicable
+     * @param queryPos   The position of the block that is querying the appearance, or {@code null} if not applicable
+     * @return The appearance of this block on the given side. By default, the current state
+     * @see IForgeBlockState#getAppearance(BlockAndTintGetter, BlockPos, Direction, BlockState, BlockPos)
+     */
+    default BlockState getAppearance(BlockState state, BlockAndTintGetter level, BlockPos pos, Direction side, @Nullable BlockState queryState, @Nullable BlockPos queryPos)
+    {
+        return state;
     }
 }

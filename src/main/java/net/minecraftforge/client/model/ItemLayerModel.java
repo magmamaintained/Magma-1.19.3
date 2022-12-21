@@ -21,7 +21,7 @@ import net.minecraft.client.renderer.block.model.ItemOverrides;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.Material;
-import net.minecraft.client.resources.model.ModelBakery;
+import net.minecraft.client.resources.model.ModelBaker;
 import net.minecraft.client.resources.model.ModelState;
 import net.minecraft.client.resources.model.UnbakedModel;
 import net.minecraft.resources.ResourceLocation;
@@ -50,9 +50,6 @@ public class ItemLayerModel implements IUnbakedGeometry<ItemLayerModel>
 {
     private static final Logger LOGGER = LogManager.getLogger();
 
-    // Transformer to set quads to max brightness
-    private static final IQuadTransformer MAX_LIGHTMAP_TRANSFORMER = IQuadTransformer.applyingLightmap(0x00F000F0);
-
     @Nullable
     private ImmutableList<Material> textures;
     private final IntSet emissiveLayers;
@@ -74,10 +71,18 @@ public class ItemLayerModel implements IUnbakedGeometry<ItemLayerModel>
     }
 
     @Override
-    public BakedModel bake(IGeometryBakingContext context, ModelBakery bakery, Function<Material, TextureAtlasSprite> spriteGetter, ModelState modelState, ItemOverrides overrides, ResourceLocation modelLocation)
+    public BakedModel bake(IGeometryBakingContext context, ModelBaker baker, Function<Material, TextureAtlasSprite> spriteGetter, ModelState modelState, ItemOverrides overrides, ResourceLocation modelLocation)
     {
-        if (textures == null)
-            throw new IllegalStateException("Textures have not been initialized. Either pass them in through the constructor or call getMaterials(...) first.");
+        if (textures == null) {
+            ImmutableList.Builder<Material> builder = ImmutableList.builder();
+            if (context.hasMaterial("particle"))
+                builder.add(context.getMaterial("particle"));
+            for (int i = 0; context.hasMaterial("layer" + i); i++)
+            {
+                builder.add(context.getMaterial("layer" + i));
+            }
+            textures = builder.build();
+        }
 
         if (deprecatedLoader)
             LOGGER.warn("Model \"" + modelLocation + "\" is using the deprecated loader \"forge:item-layers\" instead of \"forge:item_layers\". This loader will be removed in 1.20.");
@@ -96,31 +101,15 @@ public class ItemLayerModel implements IUnbakedGeometry<ItemLayerModel>
         for (int i = 0; i < textures.size(); i++)
         {
             TextureAtlasSprite sprite = spriteGetter.apply(textures.get(i));
-            var unbaked = UnbakedGeometryHelper.createUnbakedItemElements(i, sprite);
+            var unbaked = UnbakedGeometryHelper.createUnbakedItemElements(i, sprite.contents());
             var quads = UnbakedGeometryHelper.bakeElements(unbaked, $ -> sprite, modelState, modelLocation);
-            if (emissiveLayers.contains(i)) MAX_LIGHTMAP_TRANSFORMER.processInPlace(quads);
+            if (emissiveLayers.contains(i)) QuadTransformers.settingMaxEmissivity().processInPlace(quads);
             var renderTypeName = renderTypeNames.get(i);
             var renderTypes = renderTypeName != null ? context.getRenderType(renderTypeName) : null;
             builder.addQuads(renderTypes != null ? renderTypes : normalRenderTypes, quads);
         }
 
         return builder.build();
-    }
-
-    @Override
-    public Collection<Material> getMaterials(IGeometryBakingContext context, Function<ResourceLocation, UnbakedModel> modelGetter, Set<Pair<String, String>> missingTextureErrors)
-    {
-        if (textures != null)
-            return textures;
-
-        ImmutableList.Builder<Material> builder = ImmutableList.builder();
-        if (context.hasMaterial("particle"))
-            builder.add(context.getMaterial("particle"));
-        for (int i = 0; context.hasMaterial("layer" + i); i++)
-        {
-            builder.add(context.getMaterial("layer" + i));
-        }
-        return textures = builder.build();
     }
 
     public static final class Loader implements IGeometryLoader<ItemLayerModel>

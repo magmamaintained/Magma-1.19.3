@@ -1,6 +1,6 @@
 --- a/net/minecraft/client/renderer/block/ModelBlockRenderer.java
 +++ b/net/minecraft/client/renderer/block/ModelBlockRenderer.java
-@@ -40,72 +_,85 @@
+@@ -40,72 +_,88 @@
        this.f_110995_ = p_110999_;
     }
  
@@ -12,10 +12,13 @@
 +      tesselateBlock(p_234380_, p_234381_, p_234382_, p_234383_, p_234384_, p_234385_, p_234386_, p_234387_, p_234388_, p_234389_, net.minecraftforge.client.model.data.ModelData.EMPTY, null);
 +   }
 +   public void tesselateBlock(BlockAndTintGetter p_111048_, BakedModel p_111049_, BlockState p_111050_, BlockPos p_111051_, PoseStack p_111052_, VertexConsumer p_111053_, boolean p_111054_, RandomSource p_111055_, long p_111056_, int p_111057_, net.minecraftforge.client.model.data.ModelData modelData, net.minecraft.client.renderer.RenderType renderType) {
++      tesselateBlock(p_111048_, p_111049_, p_111050_, p_111051_, p_111052_, p_111053_, p_111054_, p_111055_, p_111056_, p_111057_, modelData, renderType, true);
++   }
++   public void tesselateBlock(BlockAndTintGetter p_111048_, BakedModel p_111049_, BlockState p_111050_, BlockPos p_111051_, PoseStack p_111052_, VertexConsumer p_111053_, boolean p_111054_, RandomSource p_111055_, long p_111056_, int p_111057_, net.minecraftforge.client.model.data.ModelData modelData, net.minecraft.client.renderer.RenderType renderType, boolean queryModelSpecificData) { // TODO 1.20: Move to the signature above
 +      boolean flag = Minecraft.m_91086_() && p_111050_.getLightEmission(p_111048_, p_111051_) == 0 && p_111049_.useAmbientOcclusion(p_111050_, renderType);
 +      Vec3 vec3 = p_111050_.m_60824_(p_111048_, p_111051_);
 +      p_111052_.m_85837_(vec3.f_82479_, vec3.f_82480_, vec3.f_82481_);
-+      modelData = p_111049_.getModelData(p_111048_, p_111051_, p_111050_, modelData);
++      if (queryModelSpecificData) modelData = p_111049_.getModelData(p_111048_, p_111051_, p_111050_, modelData); // TODO 1.20: Remove this line entirely
  
        try {
           if (flag) {
@@ -111,6 +114,14 @@
        }
  
     }
+@@ -113,6 +_,7 @@
+    private void m_111012_(BlockAndTintGetter p_111013_, BlockState p_111014_, BlockPos p_111015_, PoseStack p_111016_, VertexConsumer p_111017_, List<BakedQuad> p_111018_, float[] p_111019_, BitSet p_111020_, ModelBlockRenderer.AmbientOcclusionFace p_111021_, int p_111022_) {
+       for(BakedQuad bakedquad : p_111018_) {
+          this.m_111039_(p_111013_, p_111014_, p_111015_, bakedquad.m_111303_(), bakedquad.m_111306_(), p_111019_, p_111020_);
++         if (!net.minecraftforge.client.ForgeHooksClient.calculateFaceWithoutAO(p_111013_, p_111014_, p_111015_, bakedquad, p_111020_.get(0), p_111021_.f_111149_, p_111021_.f_111150_))
+          p_111021_.m_111167_(p_111013_, p_111014_, p_111015_, bakedquad.m_111306_(), p_111019_, p_111020_, bakedquad.m_111307_());
+          this.m_111023_(p_111013_, p_111014_, p_111015_, p_111017_, p_111016_.m_85850_(), bakedquad, p_111021_.f_111149_[0], p_111021_.f_111149_[1], p_111021_.f_111149_[2], p_111021_.f_111149_[3], p_111021_.f_111150_[0], p_111021_.f_111150_[1], p_111021_.f_111150_[2], p_111021_.f_111150_[3], p_111022_);
+       }
 @@ -217,17 +_,21 @@
  
     }

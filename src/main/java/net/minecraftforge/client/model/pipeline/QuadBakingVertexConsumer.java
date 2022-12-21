@@ -5,6 +5,7 @@
 
 package net.minecraftforge.client.model.pipeline;
 
+import com.google.common.base.Preconditions;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.blaze3d.vertex.VertexFormatElement;
@@ -37,13 +38,14 @@ public class QuadBakingVertexConsumer implements VertexConsumer
 
     private final Consumer<BakedQuad> quadConsumer;
 
-    private int vertexIndex = 0;
+    int vertexIndex = 0;
     private int[] quadData = new int[QUAD_DATA_SIZE];
 
     private int tintIndex;
     private Direction direction = Direction.DOWN;
     private TextureAtlasSprite sprite = UnitTextureAtlasSprite.INSTANCE;
     private boolean shade;
+    private boolean hasAmbientOcclusion;
 
     public QuadBakingVertexConsumer(Consumer<BakedQuad> quadConsumer)
     {
@@ -127,7 +129,7 @@ public class QuadBakingVertexConsumer implements VertexConsumer
         if (++vertexIndex != 4)
             return;
         // We have a full quad, pass it to the consumer and reset
-        quadConsumer.accept(new BakedQuad(quadData, tintIndex, direction, sprite, shade));
+        quadConsumer.accept(new BakedQuad(quadData, tintIndex, direction, sprite, shade, hasAmbientOcclusion));
         vertexIndex = 0;
         quadData = new int[QUAD_DATA_SIZE];
     }
@@ -160,5 +162,33 @@ public class QuadBakingVertexConsumer implements VertexConsumer
     public void setShade(boolean shade)
     {
         this.shade = shade;
+    }
+
+    public void setHasAmbientOcclusion(boolean hasAmbientOcclusion)
+    {
+        this.hasAmbientOcclusion = hasAmbientOcclusion;
+    }
+
+    public static class Buffered extends QuadBakingVertexConsumer
+    {
+        private final BakedQuad[] output;
+
+        public Buffered()
+        {
+            this(new BakedQuad[1]);
+        }
+
+        private Buffered(BakedQuad[] output)
+        {
+            super(q -> output[0] = q);
+            this.output = output;
+        }
+
+        public BakedQuad getQuad()
+        {
+            var quad = Preconditions.checkNotNull(output[0], "No quad has been emitted. Vertices in buffer: " + vertexIndex);
+            output[0] = null;
+            return quad;
+        }
     }
 }

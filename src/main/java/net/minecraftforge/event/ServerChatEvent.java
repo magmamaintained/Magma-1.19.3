@@ -5,63 +5,80 @@
 
 package net.minecraftforge.event;
 
+import java.util.Objects;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ServerboundChatPacket;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.network.chat.Component;
-import net.minecraft.server.network.ServerGamePacketListenerImpl;
-import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.Cancelable;
 import net.minecraftforge.eventbus.api.Event;
-import org.jetbrains.annotations.Nullable;
+import net.minecraftforge.fml.LogicalSide;
+import org.jetbrains.annotations.ApiStatus;
 
 /**
- * ServerChatEvent is fired whenever a C01PacketChatMessage is processed. <br>
- * This event is fired via {@link ForgeHooks#onServerChatEvent(ServerPlayer, String, Component)},
- * which is executed by the {@link ServerGamePacketListenerImpl#handleChat(ServerboundChatPacket)}<br>
- * <br>
- * {@link #username} contains the username of the player sending the chat message, unless fired from the server, where it is null.<br>
- * {@link #message} contains the message being sent.<br>
- * {@link #player} the instance of ServerPlayer for the player sending the chat message, or null when fired from the server.<br>
- * {@link #component} contains the instance of Component for the sent message.<br>
- * <br>
- * This event is {@link Cancelable}. <br>
- * If this event is canceled, the chat message is never distributed to all clients.<br>
- * <br>
- * This event does not have a result. {@link HasResult}<br>
- * <br>
- * This event is fired on the {@link MinecraftForge#EVENT_BUS}.
+ * This event is fired whenever a {@link ServerboundChatPacket} is received from a client
+ * who has submitted their chat message.
+ * <p>
+ * This event is {@linkplain Cancelable cancellable}, and does not {@linkplain HasResult have a result}.
+ * If the event is cancelled, the message will not be sent to clients.
+ * <p>
+ * This event is fired on the {@linkplain MinecraftForge#EVENT_BUS main Forge event bus},
+ * only on the {@linkplain LogicalSide#SERVER logical server}.
  **/
 @Cancelable
 public class ServerChatEvent extends Event
 {
-    private final String message;
-    @Nullable
-    private final String username;
-    @Nullable
     private final ServerPlayer player;
-    private Component component;
+    private final String username;
+    private final String rawText;
+    private Component message;
 
-    public ServerChatEvent(@Nullable ServerPlayer player, String message, Component component)
+    @ApiStatus.Internal
+    public ServerChatEvent(ServerPlayer player, String rawText, Component message)
     {
-        super();
-        this.message = message;
         this.player = player;
-        this.username = player != null ? player.getGameProfile().getName() : null;
-        this.component = component;
+        this.username = player.getGameProfile().getName();
+        this.rawText = rawText;
+        this.message = message;
     }
 
-    public void setComponent(Component e)
+    /**
+     * {@return the player who initiated the chat action}
+     */
+    public ServerPlayer getPlayer()
     {
-        this.component = e;
+        return this.player;
     }
 
-    public Component getComponent()
+    /**
+     * {@return the username of the player who initiated the chat action}
+     */
+    public String getUsername()
     {
-        return this.component;
+        return this.username;
     }
 
-    public String getMessage() { return this.message; }
-    public @Nullable String getUsername() { return this.username; }
-    public @Nullable ServerPlayer getPlayer() { return this.player; }
+    /**
+     * {@return the original raw text of the player chat message}
+     */
+    public String getRawText()
+    {
+        return this.rawText;
+    }
+
+    /**
+     * Set the message to be sent to the relevant clients.
+     */
+    public void setMessage(Component message)
+    {
+        this.message = Objects.requireNonNull(message);
+    }
+
+    /**
+     * {@return the message that will be sent to the relevant clients, if the event is not cancelled}
+     */
+    public Component getMessage()
+    {
+        return this.message;
+    }
 }
