@@ -1809,7 +1809,7 @@ public interface World extends RegionAccessor, WorldInfo, PluginMessageRecipient
      * <ul>
      * <li>A value of 1 will mean the server will attempt to spawn water ambient mobs in
      *     this world on every tick.
-     * <li>A value of 400 will mean the server will attempt to spawn weater ambient mobs
+     * <li>A value of 400 will mean the server will attempt to spawn water ambient mobs
      *     in this world every 400th tick.
      * <li>A value below 0 will be reset back to Minecraft's default.
      * </ul>
@@ -2175,7 +2175,7 @@ public interface World extends RegionAccessor, WorldInfo, PluginMessageRecipient
      * @param volume The volume of the sound
      * @param pitch The pitch of the sound
      */
-    void playSound(@NotNull Location location, @NotNull Sound sound, @NotNull SoundSource category, float volume, float pitch);
+    void playSound(@NotNull Location location, @NotNull Sound sound, @NotNull SoundCategory category, float volume, float pitch);
 
     /**
      * Play a Sound at the provided Location in the World.
@@ -2190,7 +2190,7 @@ public interface World extends RegionAccessor, WorldInfo, PluginMessageRecipient
      * @param volume the volume of the sound
      * @param pitch the pitch of the sound
      */
-    void playSound(@NotNull Location location, @NotNull String sound, @NotNull SoundSource category, float volume, float pitch);
+    void playSound(@NotNull Location location, @NotNull String sound, @NotNull SoundCategory category, float volume, float pitch);
 
     /**
      * Play a Sound at the location of the provided entity in the World.
@@ -2215,7 +2215,7 @@ public interface World extends RegionAccessor, WorldInfo, PluginMessageRecipient
      * @param volume The volume of the sound
      * @param pitch The pitch of the sound
      */
-    void playSound(@NotNull Entity entity, @NotNull Sound sound, @NotNull SoundSource category, float volume, float pitch);
+    void playSound(@NotNull Entity entity, @NotNull Sound sound, @NotNull SoundCategory category, float volume, float pitch);
 
     /**
      * Get an array containing the names of all the {@link GameRule}s.

@@ -1,14 +1,8 @@
 package org.bukkit.craftbukkit.structure;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Random;
-import java.util.stream.Collectors;
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.levelgen.structure.templatesystem.BlockRotProcessor;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlaceSettings;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
@@ -27,6 +21,12 @@ import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.structure.Palette;
 import org.bukkit.structure.Structure;
 import org.bukkit.util.BlockVector;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Random;
+import java.util.stream.Collectors;
 
 public class CraftStructure implements Structure {
 
@@ -58,7 +58,7 @@ public class CraftStructure implements Structure {
         RandomSource randomSource = new RandomSourceWrapper(random);
         StructurePlaceSettings definedstructureinfo = new StructurePlaceSettings()
                 .setMirror(net.minecraft.world.level.block.Mirror.valueOf(mirror.name()))
-                .setRotation(Rotation.valueOf(structureRotation.name()))
+                .setRotation(net.minecraft.world.level.block.Rotation.valueOf(structureRotation.name()))
                 .setIgnoreEntities(!includeEntities)
                 .addProcessor(new BlockRotProcessor(integrity))
                 .setRandom(randomSource);

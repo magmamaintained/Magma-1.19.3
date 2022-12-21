@@ -1,10 +1,5 @@
 package org.bukkit.craftbukkit.profile;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.util.*;
-import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Iterables;
 import com.mojang.authlib.GameProfile;
@@ -19,6 +14,12 @@ import org.bukkit.craftbukkit.CraftServer;
 import org.bukkit.craftbukkit.configuration.ConfigSerializationUtil;
 import org.bukkit.profile.PlayerProfile;
 import org.bukkit.profile.PlayerTextures;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 @SerializableAs("PlayerProfile")
 public final class CraftPlayerProfile implements PlayerProfile {

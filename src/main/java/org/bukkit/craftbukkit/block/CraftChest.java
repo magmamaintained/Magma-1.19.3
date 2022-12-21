@@ -1,9 +1,10 @@
 package org.bukkit.craftbukkit.block;
 
-import net.minecraft.world.ITileInventory;
-import net.minecraft.world.level.block.BlockChest;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.MenuProvider;
+import net.minecraft.world.level.block.ChestBlock;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.entity.TileEntityChest;
+import net.minecraft.world.level.block.entity.ChestBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -13,9 +14,9 @@ import org.bukkit.craftbukkit.inventory.CraftInventory;
 import org.bukkit.craftbukkit.inventory.CraftInventoryDoubleChest;
 import org.bukkit.inventory.Inventory;
 
-public class CraftChest extends CraftLootable<TileEntityChest> implements Chest {
+public class CraftChest extends CraftLootable<ChestBlockEntity> implements Chest {
 
-    public CraftChest(World world, TileEntityChest tileEntity) {
+    public CraftChest(World world, ChestBlockEntity tileEntity) {
         super(world, tileEntity);
     }
 
@@ -40,14 +41,14 @@ public class CraftChest extends CraftLootable<TileEntityChest> implements Chest 
             return inventory;
         }
 
-        // The logic here is basically identical to the logic in BlockChest.interact
+        // The logic here is basically identical to the logic in ChestBlock.interact
         CraftWorld world = (CraftWorld) this.getWorld();
 
-        BlockChest blockChest = (BlockChest) (this.getType() == Material.CHEST ? Blocks.CHEST : Blocks.TRAPPED_CHEST);
-        ITileInventory nms = blockChest.getMenuProvider(data, world.getHandle(), this.getPosition(), true);
+        ChestBlock blockChest = (ChestBlock) (this.getType() == Material.CHEST ? Blocks.CHEST : Blocks.TRAPPED_CHEST);
+        MenuProvider nms = blockChest.getMenuProvider(data, world.getHandle(), this.getPosition(), true);
 
-        if (nms instanceof BlockChest.DoubleInventory) {
-            inventory = new CraftInventoryDoubleChest((BlockChest.DoubleInventory) nms);
+        if (nms instanceof ChestBlock.DoubleInventory) {
+            inventory = new CraftInventoryDoubleChest((ChestBlock.DoubleInventory) nms);
         }
         return inventory;
     }

@@ -2,7 +2,6 @@ package org.bukkit.craftbukkit.tag;
 
 import java.util.Set;
 import java.util.stream.Collectors;
-import net.minecraft.core.Registry;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.block.Block;
 import org.bukkit.Material;
@@ -10,7 +9,7 @@ import org.bukkit.craftbukkit.util.CraftMagicNumbers;
 
 public class CraftBlockTag extends CraftTag<Block, Material> {
 
-    public CraftBlockTag(Registry<Block> registry, TagKey<Block> tag) {
+    public CraftBlockTag(net.minecraft.core.Registry<Block> registry, TagKey<Block> tag) {
         super(registry, tag);
     }
 

@@ -1,7 +1,7 @@
 package org.bukkit.craftbukkit.block;
 
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.world.level.block.entity.TileEntity;
 import org.bukkit.World;
 import org.bukkit.block.TileState;
 import org.bukkit.persistence.PersistentDataContainer;
@@ -36,30 +36,30 @@ public class CraftBlockEntityState<T extends BlockEntity> extends CraftBlockStat
         return snapshot;
     }
 
-    // copies the BlockEntity-specific data, retains the position
+    // copies the TileEntity-specific data, retains the position
     private void copyData(T from, T to) {
         CompoundTag nbtTagCompound = from.saveWithFullMetadata();
         to.load(nbtTagCompound);
     }
 
-    // gets the wrapped BlockEntity
+    // gets the wrapped TileEntity
     protected T getTileEntity() {
         return tileEntity;
     }
 
-    // gets the cloned BlockEntity which is used to store the captured data
+    // gets the cloned TileEntity which is used to store the captured data
     protected T getSnapshot() {
         return snapshot;
     }
 
-    // gets the current BlockEntity from the world at this position
+    // gets the current TileEntity from the world at this position
     protected BlockEntity getTileEntityFromWorld() {
         requirePlaced();
 
         return getWorldHandle().getBlockEntity(this.getPosition());
     }
 
-    // gets the NBT data of the BlockEntity represented by this block state
+    // gets the NBT data of the TileEntity represented by this block state
     public CompoundTag getSnapshotNBT() {
         // update snapshot
         applyTo(snapshot);
@@ -74,7 +74,7 @@ public class CraftBlockEntityState<T extends BlockEntity> extends CraftBlockStat
         }
     }
 
-    // applies the BlockEntity data of this block state to the given BlockEntity
+    // applies the TileEntity data of this block state to the given TileEntity
     protected void applyTo(T tileEntity) {
         if (tileEntity != null && tileEntity != snapshot) {
             copyData(snapshot, tileEntity);

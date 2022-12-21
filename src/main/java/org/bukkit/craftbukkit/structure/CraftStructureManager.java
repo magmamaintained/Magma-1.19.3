@@ -1,5 +1,15 @@
 package org.bukkit.craftbukkit.structure;
 
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtIo;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
+import org.apache.commons.lang3.Validate;
+import org.bukkit.NamespacedKey;
+import org.bukkit.craftbukkit.util.CraftNamespacedKey;
+import org.bukkit.structure.Structure;
+import org.bukkit.structure.StructureManager;
+
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -7,22 +17,12 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.NbtIo;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
-import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplateManager;
-import org.apache.commons.lang3.Validate;
-import org.bukkit.NamespacedKey;
-import org.bukkit.craftbukkit.util.CraftNamespacedKey;
-import org.bukkit.structure.Structure;
-import org.bukkit.structure.StructureManager;
 
 public class CraftStructureManager implements StructureManager {
 
-    private final StructureTemplateManager structureManager;
+    private final net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplateManager structureManager;
 
-    public CraftStructureManager(StructureTemplateManager structureManager) {
+    public CraftStructureManager(net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplateManager structureManager) {
         this.structureManager = structureManager;
     }
 
@@ -115,14 +115,14 @@ public class CraftStructureManager implements StructureManager {
         if (unregister) {
             structureManager.structureRepository.remove(key);
         }
-        Path path = structureManager.createAndValidatePathToStructure(key, ".nbt");
+        Path path = structureManager.getPathToGeneratedStructure(key, ".nbt");
         Files.deleteIfExists(path);
     }
 
     @Override
     public File getStructureFile(NamespacedKey structureKey) {
         ResourceLocation minecraftKey = createAndValidateMinecraftStructureKey(structureKey);
-        return structureManager.createAndValidatePathToStructure(minecraftKey, ".nbt").toFile();
+        return structureManager.getPathToGeneratedStructure(minecraftKey, ".nbt").toFile();
     }
 
     @Override

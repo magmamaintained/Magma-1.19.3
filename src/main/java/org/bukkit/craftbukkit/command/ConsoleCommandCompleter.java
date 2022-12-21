@@ -10,7 +10,6 @@ import org.bukkit.craftbukkit.util.Waitable;
 import org.bukkit.event.server.TabCompleteEvent;
 
 public class ConsoleCommandCompleter implements Completer {
-
     private final CraftServer server;
 
     public ConsoleCommandCompleter(CraftServer server) {

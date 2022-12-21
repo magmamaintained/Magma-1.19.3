@@ -2,14 +2,13 @@ package org.bukkit.craftbukkit.inventory;
 
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvent;
-import net.minecraft.sounds.SoundEffects;
-import net.minecraft.world.entity.player.Player;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.trading.IMerchant;
-import net.minecraft.world.item.trading.MerchantRecipe;
-import net.minecraft.world.item.trading.MerchantRecipeList;
-import net.minecraft.world.level.Level;
+import net.minecraft.world.item.trading.Merchant;
+import net.minecraft.world.item.trading.MerchantOffer;
+import net.minecraft.world.item.trading.MerchantOffers;
 import org.apache.commons.lang3.Validate;
+import org.bukkit.craftbukkit.util.CraftChatMessage;
 
 public class CraftMerchantCustom extends CraftMerchant {
 
@@ -28,17 +27,16 @@ public class CraftMerchantCustom extends CraftMerchant {
         return (MinecraftMerchant) super.getMerchant();
     }
 
-    public static class MinecraftMerchant implements IMerchant {
+    public static class MinecraftMerchant implements Merchant {
 
         private final Component title;
-        private final MerchantRecipeList trades = new MerchantRecipeList();
-        private Player tradingPlayer;
-        private World tradingWorld;
+        private final MerchantOffers trades = new MerchantOffers();
+        private net.minecraft.world.entity.player.Player tradingPlayer;
         protected CraftMerchant craftMerchant;
 
         public MinecraftMerchant(String title) {
             Validate.notNull(title, "Title cannot be null");
-            this.title = Component.literal(title);
+            this.title = CraftChatMessage.fromString(title)[0];
         }
 
         @Override
@@ -47,25 +45,22 @@ public class CraftMerchantCustom extends CraftMerchant {
         }
 
         @Override
-        public void setTradingPlayer(Player entityhuman) {
+        public void setTradingPlayer(net.minecraft.world.entity.player.Player entityhuman) {
             this.tradingPlayer = entityhuman;
-            if (entityhuman != null) {
-                this.tradingWorld = entityhuman.level;
-            }
         }
 
         @Override
-        public Player getTradingPlayer() {
+        public net.minecraft.world.entity.player.Player getTradingPlayer() {
             return this.tradingPlayer;
         }
 
         @Override
-        public MerchantRecipeList getOffers() {
+        public MerchantOffers getOffers() {
             return this.trades;
         }
 
         @Override
-        public void notifyTrade(MerchantRecipe merchantrecipe) {
+        public void notifyTrade(MerchantOffer merchantrecipe) {
             // increase recipe's uses
             merchantrecipe.increaseUses();
         }
@@ -94,11 +89,11 @@ public class CraftMerchantCustom extends CraftMerchant {
 
         @Override
         public SoundEvent getNotifyTradeSound() {
-            return SoundEffects.VILLAGER_YES;
+            return SoundEvents.VILLAGER_YES;
         }
 
         @Override
-        public void overrideOffers(MerchantRecipeList merchantrecipelist) {
+        public void overrideOffers(net.minecraft.world.item.trading.MerchantOffers merchantrecipelist) {
         }
 
         @Override

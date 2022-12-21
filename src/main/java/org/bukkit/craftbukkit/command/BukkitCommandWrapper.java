@@ -1,8 +1,5 @@
 package org.bukkit.craftbukkit.command;
 
-import java.util.List;
-import java.util.concurrent.CompletableFuture;
-import java.util.function.Predicate;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
@@ -15,7 +12,14 @@ import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import net.minecraft.commands.CommandSourceStack;
 import org.bukkit.command.Command;
+import org.bukkit.command.CommandException;
+import org.bukkit.command.CommandSender;
 import org.bukkit.craftbukkit.CraftServer;
+
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.Predicate;
+import java.util.logging.Level;
 
 public class BukkitCommandWrapper implements com.mojang.brigadier.Command<CommandSourceStack>, Predicate<CommandSourceStack>, SuggestionProvider<CommandSourceStack> {
 
@@ -30,7 +34,7 @@ public class BukkitCommandWrapper implements com.mojang.brigadier.Command<Comman
     public LiteralCommandNode<CommandSourceStack> register(CommandDispatcher<CommandSourceStack> dispatcher, String label) {
         return dispatcher.register(
                 LiteralArgumentBuilder.<CommandSourceStack>literal(label).requires(this).executes(this)
-                        .then(RequiredArgumentBuilder.<CommandSourceStack, String>argument("args", StringArgumentType.greedyString()).suggests(this).executes(this))
+                .then(RequiredArgumentBuilder.<CommandSourceStack, String>argument("args", StringArgumentType.greedyString()).suggests(this).executes(this))
         );
     }
 
@@ -41,7 +45,15 @@ public class BukkitCommandWrapper implements com.mojang.brigadier.Command<Comman
 
     @Override
     public int run(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
-        return server.dispatchCommand(context.getSource().getBukkitSender(), context.getInput()) ? 1 : 0;
+        CommandSender sender = context.getSource().getBukkitSender();
+
+        try {
+            return server.dispatchCommand(sender, context.getInput()) ? 1 : 0;
+        } catch (CommandException ex) {
+            sender.sendMessage(org.bukkit.ChatColor.RED + "An internal error occurred while attempting to perform this command");
+            server.getLogger().log(Level.SEVERE, null, ex);
+            return 0;
+        }
     }
 
     @Override

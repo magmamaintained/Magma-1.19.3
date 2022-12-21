@@ -5,7 +5,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -109,7 +108,7 @@ public final class CraftChunkData implements ChunkGenerator.ChunkData {
         return CraftBlockData.fromData(getTypeId(x, y, z));
     }
 
-    public void setRegion(int xMin, int yMin, int zMin, int xMax, int yMax, int zMax, BlockState type) {
+    public void setRegion(int xMin, int yMin, int zMin, int xMax, int yMax, int zMax, net.minecraft.world.level.block.state.BlockState type) {
         // Clamp to sane values.
         if (xMin > 0xf || yMin >= maxHeight || zMin > 0xf) {
             return;
@@ -144,7 +143,7 @@ public final class CraftChunkData implements ChunkGenerator.ChunkData {
         }
     }
 
-    public BlockState getTypeId(int x, int y, int z) {
+    public net.minecraft.world.level.block.state.BlockState getTypeId(int x, int y, int z) {
         if (x != (x & 0xf) || y < minHeight || y >= maxHeight || z != (z & 0xf)) {
             return Blocks.AIR.defaultBlockState();
         }
@@ -158,14 +157,14 @@ public final class CraftChunkData implements ChunkGenerator.ChunkData {
         return CraftMagicNumbers.toLegacyData(getTypeId(x, y, z));
     }
 
-    private void setBlock(int x, int y, int z, BlockState type) {
+    private void setBlock(int x, int y, int z, net.minecraft.world.level.block.state.BlockState type) {
         if (x != (x & 0xf) || y < minHeight || y >= maxHeight || z != (z & 0xf)) {
             return;
         }
 
         ChunkAccess access = getHandle();
         BlockPos blockPosition = new BlockPos(access.getPos().getMinBlockX() + x, y, access.getPos().getMinBlockZ() + z);
-        BlockState oldBlockData = access.setBlockState(blockPosition, type, false);
+        net.minecraft.world.level.block.state.BlockState oldBlockData = access.setBlockState(blockPosition, type, false);
 
         if (type.hasBlockEntity()) {
             BlockEntity tileEntity = ((EntityBlock) type.getBlock()).newBlockEntity(blockPosition, type);

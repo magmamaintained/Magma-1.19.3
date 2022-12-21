@@ -5,18 +5,17 @@ import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.level.block.entity.TileEntityBeehive;
-import net.minecraft.world.level.block.entity.TileEntityBeehive.ReleaseStatus;
+import net.minecraft.world.level.block.entity.BeehiveBlockEntity;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Beehive;
 import org.bukkit.craftbukkit.entity.CraftBee;
 import org.bukkit.entity.Bee;
 
-public class CraftBeehive extends CraftBlockEntityState<TileEntityBeehive> implements Beehive {
+public class CraftBeehive extends CraftBlockEntityState<BeehiveBlockEntity> implements Beehive {
 
-    public CraftBeehive(World world, TileEntityBeehive tileEntity) {
-        super(world, tileEntity);
+    public CraftBeehive(World world, final BeehiveBlockEntity te) {
+        super(world, te);
     }
 
     @Override
@@ -65,8 +64,8 @@ public class CraftBeehive extends CraftBlockEntityState<TileEntityBeehive> imple
         List<Bee> bees = new ArrayList<>();
 
         if (isPlaced()) {
-            TileEntityBeehive beehive = ((TileEntityBeehive) this.getTileEntityFromWorld());
-            for (Entity bee : beehive.releaseBees(this.getHandle(), ReleaseStatus.BEE_RELEASED, true)) {
+            BeehiveBlockEntity beehive = ((BeehiveBlockEntity) this.getTileEntityFromWorld());
+            for (Entity bee : beehive.releaseBees(this.getHandle(), BeehiveBlockEntity.BeeReleaseStatus.BEE_RELEASED, true)) {
                 bees.add((Bee) bee.getBukkitEntity());
             }
         }

@@ -1,11 +1,13 @@
 package org.bukkit.craftbukkit.generator;
 
+import com.google.common.base.Preconditions;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Random;
-import com.google.common.base.Preconditions;
+
+import java.util.function.Predicate;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.nbt.CompoundTag;
@@ -38,7 +40,7 @@ public class CraftLimitedRegion extends CraftRegionAccessor implements LimitedRe
     private final int buffer = 16;
     private final BoundingBox region;
     boolean entitiesLoaded = false;
-    // Minecraft saves the entities as CompoundTag during chunk generation. This causes that
+    // Minecraft saves the entities as NBTTagCompound during chunk generation. This causes that
     // changes made to the returned bukkit entity are not saved. To combat this we keep them and
     // save them when the population is finished.
     private final List<net.minecraft.world.entity.Entity> entities = new ArrayList<>();
@@ -66,7 +68,7 @@ public class CraftLimitedRegion extends CraftRegionAccessor implements LimitedRe
         WorldGenLevel handle = weakAccess.get();
 
         if (handle == null) {
-            throw new IllegalStateException("WorldGenLevel no longer present, are you using it in a different tick?");
+            throw new IllegalStateException("GeneratorAccessSeed no longer present, are you using it in a different tick?");
         }
 
         return handle;

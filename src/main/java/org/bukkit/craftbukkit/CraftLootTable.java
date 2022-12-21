@@ -1,17 +1,28 @@
 package org.bukkit.craftbukkit;
 
+import com.google.common.base.Preconditions;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Random;
+
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.WorldServer;
+import net.minecraft.world.Container;
+import net.minecraft.world.IInventory;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.EntityHuman;
 import net.minecraft.world.level.storage.loot.LootTable;
+import net.minecraft.world.level.storage.loot.LootTableInfo;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParam;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSet;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParameter;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParameterSet;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParameters;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.Vec3D;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
 import org.bukkit.craftbukkit.entity.CraftEntity;
@@ -39,6 +50,7 @@ public class CraftLootTable implements org.bukkit.loot.LootTable {
 
     @Override
     public Collection<ItemStack> populateLoot(Random random, LootContext context) {
+        Preconditions.checkArgument(context != null, "LootContext cannot be null");
         net.minecraft.world.level.storage.loot.LootContext nmsContext = convertContext(context, random);
         List<net.minecraft.world.item.ItemStack> nmsItems = handle.getRandomItems(nmsContext);
         Collection<ItemStack> bukkit = new ArrayList<>(nmsItems.size());
@@ -55,12 +67,14 @@ public class CraftLootTable implements org.bukkit.loot.LootTable {
 
     @Override
     public void fillInventory(Inventory inventory, Random random, LootContext context) {
+        Preconditions.checkArgument(inventory != null, "Inventory cannot be null");
+        Preconditions.checkArgument(context != null, "LootContext cannot be null");
         net.minecraft.world.level.storage.loot.LootContext nmsContext = convertContext(context, random);
         CraftInventory craftInventory = (CraftInventory) inventory;
         Container handle = craftInventory.getInventory();
 
         // TODO: When events are added, call event here w/ custom reason?
-        getHandle().fill(handle, nmsContext);
+        getHandle().fillInventory(handle, nmsContext, true);
     }
 
     @Override
@@ -69,7 +83,9 @@ public class CraftLootTable implements org.bukkit.loot.LootTable {
     }
 
     private net.minecraft.world.level.storage.loot.LootContext convertContext(LootContext context, Random random) {
+        Preconditions.checkArgument(context != null, "LootContext cannot be null");
         Location loc = context.getLocation();
+        Preconditions.checkArgument(loc.getWorld() != null, "LootContext.getLocation#getWorld cannot be null");
         ServerLevel handle = ((CraftWorld) loc.getWorld()).getHandle();
 
         net.minecraft.world.level.storage.loot.LootContext.Builder builder = new net.minecraft.world.level.storage.loot.LootContext.Builder(handle);
@@ -102,7 +118,7 @@ public class CraftLootTable implements org.bukkit.loot.LootTable {
             }
         }
 
-        // SPIGOT-5603 - Avoid IllegalArgumentException in net.minecraft.world.level.storage.loot.LootContext#build()
+        // SPIGOT-5603 - Avoid IllegalArgumentException in LootContext#build()
         LootContextParamSet.Builder nmsBuilder = new LootContextParamSet.Builder();
         for (LootContextParam<?> param : getHandle().getParamSet().getRequired()) {
             nmsBuilder.required(param);
