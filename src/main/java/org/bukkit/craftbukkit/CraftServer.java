@@ -186,7 +186,7 @@ public final class CraftServer implements Server {
     protected final DedicatedServer console;
     protected final DedicatedPlayerList playerList;
     private final Map<String, World> worlds = new LinkedHashMap<String, World>();
-    private final Map<Class<?>, Registry<?>> registries = new HashMap<>();
+    private final Map<Class<?>, org.bukkit.Registry<?>> registries = new HashMap<>();
     private YamlConfiguration configuration;
     private YamlConfiguration commandsConfiguration;
     private final Yaml yaml = new Yaml(new SafeConstructor());
@@ -2211,7 +2211,7 @@ public final class CraftServer implements Server {
 
     @Override
     public <T extends Keyed> org.bukkit.Registry<T> getRegistry(Class<T> aClass) {
-        return (org.bukkit.Registry<T>) registries.computeIfAbsent(aClass, key -> (Registry<?>) CraftRegistry.createRegistry(aClass, console.registryAccess()));
+        return (org.bukkit.Registry<T>) registries.computeIfAbsent(aClass, key -> CraftRegistry.createRegistry(aClass, console.registryAccess()));
     }
 
     @Deprecated

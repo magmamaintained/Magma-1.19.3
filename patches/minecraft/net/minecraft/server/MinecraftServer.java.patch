@@ -10,7 +10,7 @@
  import net.minecraft.CrashReport;
  import net.minecraft.ReportedException;
  import net.minecraft.SharedConstants;
-@@ -144,21 +_,20 @@
+@@ -144,21 +_,21 @@
  import net.minecraft.world.level.levelgen.PhantomSpawner;
  import net.minecraft.world.level.levelgen.WorldOptions;
  import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplateManager;
@@ -33,6 +33,7 @@
 +import org.bukkit.Bukkit;
 +import org.bukkit.craftbukkit.CraftServer;
 +import org.bukkit.craftbukkit.Main;
++import org.bukkit.craftbukkit.scoreboard.CraftScoreboardManager;
 +import org.bukkit.craftbukkit.util.CraftChatMessage;
 +import org.bukkit.craftbukkit.util.LazyPlayerSet;
 +import org.bukkit.event.player.AsyncPlayerChatPreviewEvent;
@@ -104,10 +105,13 @@
        if (!serverleveldata.m_6535_()) {
           try {
              m_177896_(serverlevel, serverleveldata, worldoptions.m_245100_(), flag);
-@@ -374,9 +_,14 @@
+@@ -374,9 +_,17 @@
              ServerLevel serverlevel1 = new ServerLevel(this, this.f_129738_, this.f_129744_, derivedleveldata, resourcekey1, entry.getValue(), p_129816_, flag, j, ImmutableList.of(), false);
              worldborder.m_61929_(new BorderChangeListener.DelegateBorderChangeListener(serverlevel1.m_6857_()));
              this.f_129762_.put(resourcekey1, serverlevel1);
++            if (this.server.scoreboardManager == null) {
++               this.server.scoreboardManager = new CraftScoreboardManager(this, serverlevel1.m_6188_());
++            }
 +            net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(new net.minecraftforge.event.level.LevelEvent.Load(f_129762_.get(resourcekey)));
           }
        }
@@ -501,3 +505,10 @@
     }
  
     public static record ReloadableResources(CloseableResourceManager f_206584_, ReloadableServerResources f_206585_) implements AutoCloseable {
+@@ -1756,4 +_,6 @@
+          };
+       }
+    }
++
++
+ }

@@ -91,6 +91,14 @@
        this.f_46442_ = p_220352_;
        this.f_204147_ = p_220354_;
 @@ -136,6 +_,7 @@
+       this.f_46420_ = new BiomeManager(this, p_220358_);
+       this.f_46424_ = p_220357_;
+       this.f_220350_ = new CollectingNeighborUpdater(this, p_220359_);
++
+    }
+ 
+    public boolean m_5776_() {
+@@ -193,17 +_,45 @@
        } else {
           LevelChunk levelchunk = this.m_46745_(p_46605_);
           Block block = p_46606_.m_60734_();

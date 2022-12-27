@@ -16,11 +16,12 @@
  import net.minecraft.world.level.storage.ServerLevelData;
  import net.minecraft.world.phys.AABB;
  import net.minecraft.world.phys.Vec3;
-@@ -150,6 +_,11 @@
+@@ -150,6 +_,12 @@
  import net.minecraft.world.phys.shapes.Shapes;
  import net.minecraft.world.phys.shapes.VoxelShape;
  import net.minecraft.world.ticks.LevelTicks;
 +import org.bukkit.World;
++import org.bukkit.craftbukkit.CraftWorld;
 +import org.bukkit.craftbukkit.event.CraftEventFactory;
 +import org.bukkit.craftbukkit.util.WorldUUID;
 +import org.bukkit.event.entity.CreatureSpawnEvent;
@@ -29,6 +30,15 @@
  
  public class ServerLevel extends Level implements WorldGenLevel {
 @@ -168,7 +_,7 @@
+    final List<ServerPlayer> f_8546_ = Lists.newArrayList();
+    private final ServerChunkCache f_8547_;
+    private final MinecraftServer f_8548_;
+-   public final ServerLevelData f_8549_;
++      public final ServerLevelData f_8549_;
+    final EntityTickList f_143243_ = new EntityTickList();
+    public final PersistentEntitySectionManager<Entity> f_143244_;
+    private final GameEventDispatcher f_243695_;
+@@ -187,13 +_,32 @@
     private final List<CustomSpawner> f_8558_;
     @Nullable
     private final EndDragonFight f_8559_;
@@ -62,11 +72,19 @@
        this.f_8561_ = p_215009_;
        this.f_8548_ = p_214999_;
        this.f_8558_ = p_215008_;
-@@ -231,6 +_,7 @@
+@@ -231,6 +_,15 @@
  
        this.f_143245_ = new SleepStatus();
        this.f_243695_ = new GameEventDispatcher(this);
 +      this.initCapabilities();
++
++      // CraftBukkit start
++      this.world = new CraftWorld((ServerLevel) this, generator, null, null); // Magma todo not null
++      m_6857_().world = this;
++      // CraftBukkit end
++
++      this.getCraftServer().addWorld(this.getWorld()); //Magma - add world to bukkit's world list
++
     }
  
     public void m_8606_(int p_8607_, int p_8608_, boolean p_8609_, boolean p_8610_) {
