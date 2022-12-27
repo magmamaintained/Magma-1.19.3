@@ -27,3 +27,9 @@
     public void m_188003_(BiomeResolver p_188004_, Climate.Sampler p_188005_, int p_188006_, int p_188007_) {
        PalettedContainer<Holder<Biome>> palettedcontainer = this.f_187995_.m_238334_();
        int i = QuartPos.m_175400_(this.m_63017_());
+@@ -199,4 +_,5 @@
+ 
+       this.f_187995_ = palettedcontainer;
+    }
++
+ }

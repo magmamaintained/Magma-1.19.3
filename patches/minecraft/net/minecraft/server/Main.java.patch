@@ -1,6 +1,14 @@
 --- a/net/minecraft/server/Main.java
 +++ b/net/minecraft/server/Main.java
-@@ -79,6 +_,15 @@
+@@ -12,6 +_,7 @@
+ import java.net.Proxy;
+ import java.nio.file.Path;
+ import java.nio.file.Paths;
++import java.util.Arrays;
+ import java.util.Optional;
+ import java.util.UUID;
+ import java.util.function.BooleanSupplier;
+@@ -79,6 +_,39 @@
        OptionSpec<String> optionspec12 = optionparser.accepts("serverId").withRequiredArg();
        OptionSpec<Void> optionspec13 = optionparser.accepts("jfrProfile");
        OptionSpec<String> optionspec14 = optionparser.nonOptions();
@@ -13,6 +21,30 @@
 +      } else {
 +          spawnPosOpt = null;
 +      }
++
++      optionparser.acceptsAll(Arrays.asList("b", "bukkit-settings"), "File for bukkit settings")
++              .withRequiredArg()
++              .ofType(File.class)
++              .defaultsTo(new File("bukkit.yml"))
++              .describedAs("Yml file");
++
++      optionparser.acceptsAll(Arrays.asList("S", "spigot-settings"), "File for spigot settings")
++              .withRequiredArg()
++              .ofType(File.class)
++              .defaultsTo(new File("spigot.yml"))
++              .describedAs("Yml file");
++
++      optionparser.acceptsAll(Arrays.asList("C", "commands-settings"), "File for command settings")
++              .withRequiredArg()
++              .ofType(File.class)
++              .defaultsTo(new File("commands.yml"))
++              .describedAs("Yml file");
++
++      optionparser.acceptsAll(Arrays.asList("P", "plugins"), "Plugin directory to use")
++              .withRequiredArg()
++              .ofType(File.class)
++              .defaultsTo(new File("plugins"))
++              .describedAs("Plugin directory");
  
        try {
           OptionSet optionset = optionparser.parse(p_129699_);
@@ -72,7 +104,7 @@
                       WorldDimensions.Complete worlddimensions$complete = worlddimensions.m_245300_(registry);
                       Lifecycle lifecycle = worlddimensions$complete.m_245945_().add(p_248079_.f_244104_().m_211816_());
                       return new WorldLoader.DataLoadOutput<>(new PrimaryLevelData(levelsettings, worldoptions, worlddimensions$complete.f_244634_(), lifecycle), worlddimensions$complete.m_245593_());
-@@ -180,22 +_,33 @@
+@@ -180,22 +_,34 @@
  
           WorldData worlddata = worldstem.f_206895_();
           levelstoragesource$levelstorageaccess.m_78287_(registryaccess$frozen, worlddata);
@@ -87,6 +119,7 @@
 +               dedicatedserver1 = new net.minecraft.gametest.framework.GameTestServer(p_129697_, levelstoragesource$levelstorageaccess, packrepository, worldstem, testBatches, spawnPos);
 +            } else {
 +               dedicatedserver1 = new DedicatedServer(p_129697_, levelstoragesource$levelstorageaccess, packrepository, worldstem, dedicatedserversettings, DataFixers.m_14512_(), services, LoggerChunkProgressListener::new);
++               dedicatedserver1.options = optionset; // Magma
 +            }
              dedicatedserver1.m_236740_(optionset.has(optionspec8) ? new GameProfile((UUID)null, optionset.valueOf(optionspec8)) : null);
              dedicatedserver1.m_129801_(optionset.valueOf(optionspec11));

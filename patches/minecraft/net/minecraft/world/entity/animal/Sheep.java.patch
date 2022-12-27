@@ -21,6 +21,14 @@
              this.m_5851_(SoundSource.PLAYERS);
              this.m_146852_(GameEvent.f_157781_, p_29853_);
 @@ -370,6 +_,7 @@
+ 
+    private static CraftingContainer m_29831_(DyeColor p_29832_, DyeColor p_29833_) {
+       CraftingContainer craftingcontainer = new CraftingContainer(new AbstractContainerMenu((MenuType)null, -1) {
++
+          public ItemStack m_7648_(Player p_218264_, int p_218265_) {
+             return ItemStack.f_41583_;
+          }
+@@ -377,6 +_,13 @@
           public boolean m_6875_(Player p_29888_) {
              return false;
           }
