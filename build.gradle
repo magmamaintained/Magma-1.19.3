@@ -307,10 +307,10 @@ def sharedDeps = {
     installer 'jline:jline:2.12.1'
     installer 'com.googlecode.json-simple:json-simple:1.1.1'
     installer 'org.xerial:sqlite-jdbc:3.36.0.3'
-    installer 'mysql:mysql-connector-java:8.0.27'
-    installer 'org.apache.logging.log4j:log4j-iostreams:2.17.1'
-    installer 'net.md-5:SpecialSource:1.10.0'
-    installer 'org.yaml:snakeyaml:1.30'
+    installer 'mysql:mysql-connector-java:8.0.29'
+    installer 'org.apache.logging.log4j:log4j-iostreams:2.19.0'
+    installer 'net.md-5:SpecialSource:1.11.0'
+    installer 'org.yaml:snakeyaml:1.33'
 }
 
 def sharedFmlonlyForge = { Project prj ->
@@ -1209,7 +1209,6 @@ project(':forge') {
     }
 
     genPatches {
-        finalizedBy checkAndFixPatches
         autoHeader true
         lineEnding = '\n'
     }

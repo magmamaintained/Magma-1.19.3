@@ -1,6 +1,13 @@
 --- a/net/minecraft/server/network/ServerGamePacketListenerImpl.java
 +++ b/net/minecraft/server/network/ServerGamePacketListenerImpl.java
-@@ -182,6 +_,12 @@
+@@ -177,11 +_,19 @@
+ import net.minecraft.world.phys.shapes.BooleanOp;
+ import net.minecraft.world.phys.shapes.Shapes;
+ import net.minecraft.world.phys.shapes.VoxelShape;
++import org.bukkit.Location;
++import org.bukkit.craftbukkit.entity.CraftPlayer;
+ import org.slf4j.Logger;
+ 
  public class ServerGamePacketListenerImpl implements ServerPlayerConnection, TickablePacketListener, ServerGamePacketListener {
     static final Logger f_9744_ = LogUtils.getLogger();
     private static final int f_143608_ = 15000;
@@ -13,6 +20,35 @@
     public static final double f_215198_ = Mth.m_144952_(6.0D);
     private static final int f_215199_ = -1;
     private static final int f_244471_ = 4096;
+@@ -238,6 +_,28 @@
+       p_9772_.m_8967_().m_7674_();
+       this.f_240889_ = p_9770_.m_214005_() ? SignedMessageChain.Decoder.f_252472_ : SignedMessageChain.Decoder.m_246683_(p_9772_.m_20148_());
+       this.f_241681_ = new FutureChain(p_9770_);
++      // CraftBukkit start - add fields and methods
++      this.cserver = p_9770_.server;
++   }
++
++   private final org.bukkit.craftbukkit.CraftServer cserver;
++   public boolean processedDisconnect;
++   private int lastTick = MinecraftServer.currentTick;
++   private int allowedPlayerTicks = 1;
++   private int lastDropTick = MinecraftServer.currentTick;
++   private int lastBookTick  = MinecraftServer.currentTick;
++   private int dropCount = 0;
++
++   // Get position of last block hit for BlockDamageLevel.STOPPED
++   private double lastPosX = Double.MAX_VALUE;
++   private double lastPosY = Double.MAX_VALUE;
++   private double lastPosZ = Double.MAX_VALUE;
++   private float lastPitch = Float.MAX_VALUE;
++   private float lastYaw = Float.MAX_VALUE;
++   private boolean justTeleported = false;
++
++   public CraftPlayer getCraftPlayer() {
++      return (this.f_9743_ == null) ? null : (CraftPlayer) this.f_9743_.getBukkitEntity();
+    }
+ 
+    public void m_9933_() {
 @@ -426,9 +_,11 @@
              }
  
@@ -106,3 +142,24 @@
     }
  
     public void m_7477_(ServerboundChangeDifficultyPacket p_9839_) {
+@@ -1718,6 +_,20 @@
+ 
+    public ServerPlayer m_142253_() {
+       return this.f_9743_;
++   }
++
++   // Magma - stub
++   public void disconnect(String s) {
++   }
++
++   public void chat(String msg, PlayerChatMessage system, boolean b) {
++   }
++
++   public void teleport(Location to) {
++   }
++
++   public boolean isDisconnected() {
++      return false;
+    }
+ 
+    @FunctionalInterface

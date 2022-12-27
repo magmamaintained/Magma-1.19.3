@@ -329,7 +329,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
         Preconditions.checkNotNull(plugin, "null plugin");
 
         DistanceManager chunkDistanceManager = this.world.getChunkSource().chunkMap.distanceManager;
-        return chunkDistanceManager.removeRegionTicketAtDistance(TicketType.PLUGIN_TICKET, new ChunkPos(x, z), 2, plugin); // keep in-line with force loading, remove at level 31
+        return chunkDistanceManager.removeTicketAtLevel(TicketType.PLUGIN_TICKET, new ChunkPos(x, z), 2, plugin); // keep in-line with force loading, remove at level 31
     }
 
     @Override
@@ -952,7 +952,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
 
     @Override
     public void setDifficulty(Difficulty difficulty) {
-        this.getHandle().serverLevelData.setDifficulty(net.minecraft.world.Difficulty.byId(difficulty.getValue()));
+        this.getHandle().getServer().getWorldData().setDifficulty(net.minecraft.world.Difficulty.byId(difficulty.getValue())); // Magma - serverLevelData -> getServer().getWorldData()
     }
 
     @Override
@@ -1260,7 +1260,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
 
     @Override
     public boolean canGenerateStructures() {
-        return world.serverLevelData.worldGenOptions().generateStructures();
+        return world.worldDataServer.worldGenOptions().generateStructures();
     }
 
     @Override
@@ -1270,7 +1270,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
 
     @Override
     public void setHardcore(boolean hardcore) {
-        world.serverLevelData.settings.hardcore = hardcore;
+        world.worldDataServer.settings.hardcore = hardcore;
     }
 
     @Override
@@ -1709,14 +1709,22 @@ public class CraftWorld extends CraftRegionAccessor implements World {
         if (data != null && !particle.getDataType().isInstance(data)) {
             throw new IllegalArgumentException("data should be " + particle.getDataType() + " got " + data.getClass());
         }
+        // Magma todo
+//        getHandle().sendParticles(
+//                null, // Sender
+//                CraftParticle.toNMS(particle, data), // Particle
+//                x, y, z, // Position
+//                count,  // Count
+//                offsetX, offsetY, offsetZ, // Random offset
+//                extra, // Speed?
+//                force
+//        );
         getHandle().sendParticles(
-                null, // Sender
                 CraftParticle.toNMS(particle, data), // Particle
                 x, y, z, // Position
                 count,  // Count
                 offsetX, offsetY, offsetZ, // Random offset
-                extra, // Speed?
-                force
+                extra
         );
 
     }

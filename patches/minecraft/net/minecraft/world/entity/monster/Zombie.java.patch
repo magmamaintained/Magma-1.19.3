@@ -1,5 +1,25 @@
 --- a/net/minecraft/world/entity/monster/Zombie.java
 +++ b/net/minecraft/world/entity/monster/Zombie.java
+@@ -64,6 +_,7 @@
+ import net.minecraft.world.level.ServerLevelAccessor;
+ import net.minecraft.world.level.block.Blocks;
+ import net.minecraft.world.level.block.state.BlockState;
++import org.bukkit.event.entity.CreatureSpawnEvent;
+ 
+ public class Zombie extends Monster {
+    private static final UUID f_34259_ = UUID.fromString("B9766B59-9566-4402-BC1F-2EE2A276D836");
+@@ -93,6 +_,11 @@
+       this(EntityType.f_20501_, p_34274_);
+    }
+ 
++   // Magma - stub
++   public static ZombieVillager zombifyVillager(ServerLevel minecraftWorld, Villager handle, BlockPos blockPosition, boolean silent, CreatureSpawnEvent.SpawnReason custom) {
++      return null;
++   }
++
+    protected void m_8099_() {
+       this.f_21345_.m_25352_(4, new Zombie.ZombieAttackTurtleEggGoal(this, 1.0D, 3));
+       this.f_21345_.m_25352_(8, new LookAtPlayerGoal(this, Player.class, 8.0F));
 @@ -192,7 +_,7 @@
        if (!this.f_19853_.f_46443_ && this.m_6084_() && !this.m_21525_()) {
           if (this.m_34329_()) {

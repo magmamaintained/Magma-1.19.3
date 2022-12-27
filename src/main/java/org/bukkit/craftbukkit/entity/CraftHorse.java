@@ -1,6 +1,6 @@
 package org.bukkit.craftbukkit.entity;
 
-import org.apache.commons.lang.Validate;
+import net.minecraft.world.entity.animal.horse.Markings;
 import org.apache.commons.lang3.Validate;
 import org.bukkit.craftbukkit.CraftServer;
 import org.bukkit.craftbukkit.inventory.CraftInventoryHorse;

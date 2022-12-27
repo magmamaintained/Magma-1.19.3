@@ -1,7 +1,7 @@
 package org.bukkit.craftbukkit.block;
 
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.world.level.block.entity.TileEntity;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import org.bukkit.World;
 import org.bukkit.block.TileState;
 import org.bukkit.persistence.PersistentDataContainer;

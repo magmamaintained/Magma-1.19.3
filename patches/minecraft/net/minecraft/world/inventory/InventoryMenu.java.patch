@@ -1,5 +1,25 @@
 --- a/net/minecraft/world/inventory/InventoryMenu.java
 +++ b/net/minecraft/world/inventory/InventoryMenu.java
+@@ -11,6 +_,8 @@
+ import net.minecraft.world.item.ItemStack;
+ import net.minecraft.world.item.crafting.Recipe;
+ import net.minecraft.world.item.enchantment.EnchantmentHelper;
++import org.bukkit.craftbukkit.inventory.CraftInventoryCrafting;
++import org.bukkit.craftbukkit.inventory.CraftInventoryView;
+ 
+ public class InventoryMenu extends RecipeBookMenu<CraftingContainer> {
+    public static final int f_150579_ = 0;
+@@ -36,6 +_,10 @@
+    private final ResultContainer f_39702_ = new ResultContainer();
+    public final boolean f_39698_;
+    private final Player f_39703_;
++   // CraftBukkit start
++   private CraftInventoryView bukkitEntity = null;
++   private Inventory player;
++   // CraftBukkit end
+ 
+    public InventoryMenu(Inventory p_39706_, boolean p_39707_, final Player p_39708_) {
+       super((MenuType<?>)null, 0);
 @@ -63,7 +_,7 @@
              }
  
@@ -9,3 +29,21 @@
              }
  
              public boolean m_8010_(Player p_39744_) {
+@@ -219,4 +_,17 @@
+    public boolean m_142157_(int p_150591_) {
+       return p_150591_ != this.m_6636_();
+    }
++
++   // CraftBukkit start
++   @Override
++   public CraftInventoryView getBukkitView() {
++      if (bukkitEntity != null) {
++         return bukkitEntity;
++      }
++
++      CraftInventoryCrafting inventory = new CraftInventoryCrafting(this.f_39701_, this.f_39702_);
++      bukkitEntity = new CraftInventoryView(this.player.f_35978_.getBukkitEntity(), inventory, this);
++      return bukkitEntity;
++   }
++   // CraftBukkit end
+ }

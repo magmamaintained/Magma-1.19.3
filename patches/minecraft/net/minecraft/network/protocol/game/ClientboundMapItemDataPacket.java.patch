@@ -1,0 +1,11 @@
+--- a/net/minecraft/network/protocol/game/ClientboundMapItemDataPacket.java
++++ b/net/minecraft/network/protocol/game/ClientboundMapItemDataPacket.java
+@@ -15,7 +_,7 @@
+    private final byte f_132416_;
+    private final boolean f_132418_;
+    @Nullable
+-   public final List<MapDecoration> f_132419_;
++   private final List<MapDecoration> f_132419_;
+    @Nullable
+    private final MapItemSavedData.MapPatch f_178968_;
+ 

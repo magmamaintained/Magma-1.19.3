@@ -9,14 +9,27 @@
     static final Logger f_62771_ = LogUtils.getLogger();
     private static final TickingBlockEntity f_156361_ = new TickingBlockEntity() {
        public void m_142224_() {
-@@ -96,6 +_,7 @@
+@@ -96,7 +_,19 @@
        this.f_62791_ = p_196861_;
        this.f_62784_ = p_196857_;
        this.f_187943_ = p_196858_;
+-   }
 +      this.capProvider.initInternal();
-    }
++      // CraftBukkit start
++      this.bukkitChunk = new org.bukkit.craftbukkit.CraftChunk(this);
++   }
++
++   public org.bukkit.Chunk bukkitChunk;
++   public org.bukkit.Chunk getBukkitChunk() {
++      return bukkitChunk;
++   }
++
++   public boolean mustNotSave;
++   public boolean needsDecoration;
++   // CraftBukkit end
  
     public LevelChunk(ServerLevel p_196850_, ProtoChunk p_196851_, @Nullable LevelChunk.PostLoadProcessor p_196852_) {
+       this(p_196850_, p_196851_.m_7697_(), p_196851_.m_7387_(), p_196851_.m_188181_(), p_196851_.m_188182_(), p_196851_.m_6319_(), p_196851_.m_7103_(), p_196852_, p_196851_.m_183407_());
 @@ -237,14 +_,14 @@
              boolean flag2 = blockstate.m_155947_();
              if (!this.f_62776_.f_46443_) {

@@ -1,7 +1,7 @@
 package org.bukkit.craftbukkit.entity;
 
+import net.minecraft.world.level.block.state.BlockState;
 import org.bukkit.Material;
-import org.bukkit.block.BlockState;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.craftbukkit.CraftServer;
 import org.bukkit.craftbukkit.block.data.CraftBlockData;

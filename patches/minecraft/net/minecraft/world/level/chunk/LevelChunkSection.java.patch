@@ -1,0 +1,29 @@
+--- a/net/minecraft/world/level/chunk/LevelChunkSection.java
++++ b/net/minecraft/world/level/chunk/LevelChunkSection.java
+@@ -24,9 +_,11 @@
+    private short f_62970_;
+    private short f_62971_;
+    private final PalettedContainer<BlockState> f_62972_;
+-   private PalettedContainerRO<Holder<Biome>> f_187995_;
++   // CraftBukkit start - read/write
++   private PalettedContainer<Holder<Biome>> f_187995_;
+ 
+-   public LevelChunkSection(int p_238255_, PalettedContainer<BlockState> p_238256_, PalettedContainerRO<Holder<Biome>> p_238257_) {
++   public LevelChunkSection(int p_238255_, PalettedContainer<BlockState> p_238256_, PalettedContainer<Holder<Biome>> p_238257_) {
++      // CraftBukkit end
+       this.f_62968_ = m_156458_(p_238255_);
+       this.f_62972_ = p_238256_;
+       this.f_187995_ = p_238257_;
+@@ -184,6 +_,12 @@
+       return this.f_187995_.m_63087_(p_204434_, p_204435_, p_204436_);
+    }
+ 
++   // CraftBukkit start
++   public void setBiome(int i, int j, int k, Holder<Biome> biome) {
++      this.f_187995_.m_156470_(i, j, k, biome);
++   }
++   // CraftBukkit end
++
+    public void m_188003_(BiomeResolver p_188004_, Climate.Sampler p_188005_, int p_188006_, int p_188007_) {
+       PalettedContainer<Holder<Biome>> palettedcontainer = this.f_187995_.m_238334_();
+       int i = QuartPos.m_175400_(this.m_63017_());

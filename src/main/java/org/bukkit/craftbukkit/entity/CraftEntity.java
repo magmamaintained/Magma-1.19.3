@@ -4,54 +4,42 @@ import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Predicates;
 import com.google.common.collect.Lists;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
-
 import net.minecraft.core.PositionImpl;
-import net.minecraft.nbt.Tag;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ChunkMap;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.*;
-import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.entity.animal.AbstractFish;
 import net.minecraft.world.entity.animal.AbstractGolem;
+import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.entity.animal.WaterAnimal;
 import net.minecraft.world.entity.animal.allay.Allay;
 import net.minecraft.world.entity.animal.axolotl.Axolotl;
 import net.minecraft.world.entity.animal.frog.Frog;
 import net.minecraft.world.entity.animal.frog.Tadpole;
 import net.minecraft.world.entity.animal.goat.Goat;
-import net.minecraft.world.entity.animal.horse.AbstractChestedHorse;
-import net.minecraft.world.entity.animal.horse.AbstractHorse;
+import net.minecraft.world.entity.boss.enderdragon.EndCrystal;
 import net.minecraft.world.entity.boss.enderdragon.EnderDragon;
 import net.minecraft.world.entity.decoration.GlowItemFrame;
-import net.minecraft.world.entity.monster.Ghast;
-import net.minecraft.world.entity.monster.SpellcasterIllager;
-import net.minecraft.world.entity.monster.Monster;
-import net.minecraft.world.entity.monster.Slime;
-import net.minecraft.world.entity.monster.Strider;
+import net.minecraft.world.entity.decoration.HangingEntity;
+import net.minecraft.world.entity.decoration.ItemFrame;
+import net.minecraft.world.entity.decoration.Painting;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.monster.*;
 import net.minecraft.world.entity.monster.piglin.Piglin;
 import net.minecraft.world.entity.monster.piglin.PiglinBrute;
 import net.minecraft.world.entity.monster.warden.Warden;
-import net.minecraft.world.entity.npc.Villager;
 import net.minecraft.world.entity.npc.AbstractVillager;
-import net.minecraft.world.entity.projectile.*;
-import net.minecraft.world.entity.vehicle.AbstractMinecart;
-import net.minecraft.world.entity.vehicle.AbstractMinecartContainer;
-import net.minecraft.world.entity.vehicle.Boat;
-import net.minecraft.world.entity.vehicle.ChestBoat;
-import net.minecraft.world.entity.vehicle.MinecartCommandBlock;
+import net.minecraft.world.entity.npc.Villager;
+import net.minecraft.world.entity.projectile.FireworkRocketEntity;
+import net.minecraft.world.entity.projectile.FishingHook;
+import net.minecraft.world.entity.vehicle.*;
 import net.minecraft.world.phys.AABB;
-import org.bukkit.EntityEffect;
-import org.bukkit.Location;
-import org.bukkit.Server;
-import org.bukkit.Sound;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.PistonMoveReaction;
 import org.bukkit.craftbukkit.CraftServer;
@@ -68,15 +56,15 @@ import org.bukkit.entity.SpawnCategory;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.metadata.MetadataValue;
-import org.bukkit.permissions.PermissibleBase;
-import org.bukkit.permissions.Permission;
-import org.bukkit.permissions.PermissionAttachment;
-import org.bukkit.permissions.PermissionAttachmentInfo;
-import org.bukkit.permissions.ServerOperator;
+import org.bukkit.permissions.*;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.NumberConversions;
 import org.bukkit.util.Vector;
+
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 
 public abstract class CraftEntity implements org.bukkit.entity.Entity {
     private static PermissibleBase perm;
@@ -267,33 +255,33 @@ public abstract class CraftEntity implements org.bukkit.entity.Entity {
             if (entity instanceof net.minecraft.world.entity.projectile.ThrownEgg) { return new CraftEgg(server, (net.minecraft.world.entity.projectile.ThrownEgg) entity); }
             else if (entity instanceof net.minecraft.world.entity.projectile.Snowball) { return new CraftSnowball(server, (net.minecraft.world.entity.projectile.Snowball) entity); }
             else if (entity instanceof net.minecraft.world.entity.projectile.ThrownPotion) { return new CraftThrownPotion(server, (net.minecraft.world.entity.projectile.ThrownPotion) entity); }
-            else if (entity instanceof EntityEnderPearl) { return new CraftEnderPearl(server, (EntityEnderPearl) entity); }
-            else if (entity instanceof EntityThrownExpBottle) { return new CraftThrownExpBottle(server, (EntityThrownExpBottle) entity); }
+            else if (entity instanceof net.minecraft.world.entity.projectile.ThrownEnderpearl) { return new CraftEnderPearl(server, (net.minecraft.world.entity.projectile.ThrownEnderpearl) entity); }
+            else if (entity instanceof net.minecraft.world.entity.projectile.ThrownExperienceBottle) { return new CraftThrownExpBottle(server, (net.minecraft.world.entity.projectile.ThrownExperienceBottle) entity); }
         }
-        else if (entity instanceof EntityFallingBlock) { return new CraftFallingBlock(server, (EntityFallingBlock) entity); }
-        else if (entity instanceof EntityFireball) {
-            if (entity instanceof EntitySmallFireball) { return new CraftSmallFireball(server, (EntitySmallFireball) entity); }
-            else if (entity instanceof EntityLargeFireball) { return new CraftLargeFireball(server, (EntityLargeFireball) entity); }
-            else if (entity instanceof EntityWitherSkull) { return new CraftWitherSkull(server, (EntityWitherSkull) entity); }
-            else if (entity instanceof EntityDragonFireball) { return new CraftDragonFireball(server, (EntityDragonFireball) entity); }
-            else { return new CraftFireball(server, (EntityFireball) entity); }
+        else if (entity instanceof  net.minecraft.world.entity.item.FallingBlockEntity) { return new CraftFallingBlock(server, (net.minecraft.world.entity.item.FallingBlockEntity) entity); }
+        else if (entity instanceof net.minecraft.world.entity.projectile.AbstractHurtingProjectile) {
+            if (entity instanceof net.minecraft.world.entity.projectile.SmallFireball) { return new CraftSmallFireball(server, (net.minecraft.world.entity.projectile.SmallFireball) entity); }
+            else if (entity instanceof net.minecraft.world.entity.projectile.LargeFireball) { return new CraftLargeFireball(server, (net.minecraft.world.entity.projectile.LargeFireball) entity); }
+            else if (entity instanceof net.minecraft.world.entity.projectile.WitherSkull) { return new CraftWitherSkull(server, (net.minecraft.world.entity.projectile.WitherSkull) entity); }
+            else if (entity instanceof net.minecraft.world.entity.projectile.DragonFireball) { return new CraftDragonFireball(server, (net.minecraft.world.entity.projectile.DragonFireball) entity); }
+            else { return new CraftFireball(server, (net.minecraft.world.entity.projectile.AbstractHurtingProjectile) entity); }
         }
-        else if (entity instanceof EntityEnderSignal) { return new CraftEnderSignal(server, (EntityEnderSignal) entity); }
-        else if (entity instanceof EntityEnderCrystal) { return new CraftEnderCrystal(server, (EntityEnderCrystal) entity); }
-        else if (entity instanceof EntityFishingHook) { return new CraftFishHook(server, (EntityFishingHook) entity); }
-        else if (entity instanceof EntityItem) { return new CraftItem(server, (EntityItem) entity); }
-        else if (entity instanceof EntityLightning) { return new CraftLightningStrike(server, (EntityLightning) entity); }
-        else if (entity instanceof EntityMinecartAbstract) {
-            if (entity instanceof EntityMinecartFurnace) { return new CraftMinecartFurnace(server, (EntityMinecartFurnace) entity); }
-            else if (entity instanceof EntityMinecartChest) { return new CraftMinecartChest(server, (EntityMinecartChest) entity); }
-            else if (entity instanceof EntityMinecartTNT) { return new CraftMinecartTNT(server, (EntityMinecartTNT) entity); }
-            else if (entity instanceof EntityMinecartHopper) { return new CraftMinecartHopper(server, (EntityMinecartHopper) entity); }
-            else if (entity instanceof EntityMinecartMobSpawner) { return new CraftMinecartMobSpawner(server, (EntityMinecartMobSpawner) entity); }
-            else if (entity instanceof EntityMinecartRideable) { return new CraftMinecartRideable(server, (EntityMinecartRideable) entity); }
-            else if (entity instanceof EntityMinecartCommandBlock) { return new CraftMinecartCommand(server, (EntityMinecartCommandBlock) entity); }
-        } else if (entity instanceof EntityHanging) {
-            if (entity instanceof EntityPainting) { return new CraftPainting(server, (EntityPainting) entity); }
-            else if (entity instanceof EntityItemFrame) {
+        else if (entity instanceof net.minecraft.world.entity.projectile.EyeOfEnder) { return new CraftEnderSignal(server, (net.minecraft.world.entity.projectile.EyeOfEnder) entity); }
+        else if (entity instanceof EndCrystal) { return new CraftEnderCrystal(server, (EndCrystal) entity); }
+        else if (entity instanceof FishingHook) { return new CraftFishHook(server, (FishingHook) entity); }
+        else if (entity instanceof ItemEntity) { return new CraftItem(server, (ItemEntity) entity); }
+        else if (entity instanceof LightningBolt) { return new CraftLightningStrike(server, (LightningBolt) entity); }
+        else if (entity instanceof AbstractMinecart) {
+            if (entity instanceof MinecartFurnace) { return new CraftMinecartFurnace(server, (MinecartFurnace) entity); }
+            else if (entity instanceof MinecartChest) { return new CraftMinecartChest(server, (MinecartChest) entity); }
+            else if (entity instanceof MinecartTNT) { return new CraftMinecartTNT(server, (MinecartTNT) entity); }
+            else if (entity instanceof MinecartHopper) { return new CraftMinecartHopper(server, (MinecartHopper) entity); }
+            else if (entity instanceof MinecartSpawner) { return new CraftMinecartMobSpawner(server, (MinecartSpawner) entity); }
+            else if (entity instanceof Minecart) { return new CraftMinecartRideable(server, (Minecart) entity); }
+            else if (entity instanceof MinecartCommandBlock) { return new CraftMinecartCommand(server, (MinecartCommandBlock) entity); }
+        } else if (entity instanceof HangingEntity) {
+            if (entity instanceof Painting) { return new CraftPainting(server, (Painting) entity); }
+            else if (entity instanceof ItemFrame) {
                 if (entity instanceof GlowItemFrame) { return new CraftGlowItemFrame(server, (GlowItemFrame) entity); }
                 else { return new CraftItemFrame(server, (net.minecraft.world.entity.decoration.ItemFrame) entity); }
             }

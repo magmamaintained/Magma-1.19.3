@@ -1,5 +1,16 @@
 --- a/net/minecraft/world/entity/animal/Rabbit.java
 +++ b/net/minecraft/world/entity/animal/Rabbit.java
+@@ -399,6 +_,10 @@
+       return new Vec3(0.0D, (double)(0.6F * this.m_20192_()), (double)(this.m_20205_() * 0.4F));
+    }
+ 
++   // Magma - stub
++   public void initializePathFinderGoals() {
++   }
++
+    static class EvilRabbitAttackGoal extends MeleeAttackGoal {
+       public EvilRabbitAttackGoal(Rabbit p_29738_) {
+          super(p_29738_, 1.4D, true);
 @@ -519,7 +_,7 @@
  
        public boolean m_8036_() {

@@ -19,8 +19,8 @@ public class CustomWorldChunkManager extends BiomeSource {
     private final BiomeProvider biomeProvider;
     private final net.minecraft.core.Registry<net.minecraft.world.level.biome.Biome> registry;
 
-    private static List<Holder<BiomeBase>> biomeListToBiomeBaseList(List<Biome> biomes, IRegistry<BiomeBase> registry) {
-        List<Holder<BiomeBase>> biomeBases = new ArrayList<>();
+    private static List<Holder<net.minecraft.world.level.biome.Biome>> biomeListToBiomeBaseList(List<Biome> biomes, net.minecraft.core.Registry<net.minecraft.world.level.biome.Biome> registry) {
+        List<Holder<net.minecraft.world.level.biome.Biome>> biomeBases = new ArrayList<>();
 
         for (Biome biome : biomes) {
             Preconditions.checkArgument(biome != Biome.CUSTOM, "Cannot use the biome %s", biome);

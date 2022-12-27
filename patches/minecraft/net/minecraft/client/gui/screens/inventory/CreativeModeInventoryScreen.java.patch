@@ -1,5 +1,13 @@
 --- a/net/minecraft/client/gui/screens/inventory/CreativeModeInventoryScreen.java
 +++ b/net/minecraft/client/gui/screens/inventory/CreativeModeInventoryScreen.java
+@@ -47,6 +_,7 @@
+ import net.minecraft.world.item.TooltipFlag;
+ import net.minecraftforge.api.distmarker.Dist;
+ import net.minecraftforge.api.distmarker.OnlyIn;
++import org.bukkit.inventory.InventoryView;
+ 
+ @OnlyIn(Dist.CLIENT)
+ public class CreativeModeInventoryScreen extends EffectRenderingInventoryScreen<CreativeModeInventoryScreen.ItemPickerMenu> {
 @@ -75,6 +_,8 @@
     private boolean f_98515_;
     private final Set<TagKey<Item>> f_98516_ = new HashSet<>();
@@ -278,6 +286,18 @@
     @OnlyIn(Dist.CLIENT)
     static class CustomCreativeSlot extends Slot {
        public CustomCreativeSlot(Container p_98633_, int p_98634_, int p_98635_, int p_98636_) {
+@@ -863,6 +_,11 @@
+          return this.f_98639_.size() > 45;
+       }
+ 
++      @Override
++      public InventoryView getBukkitView() {
++         return null;
++      }
++
+       public ItemStack m_7648_(Player p_98650_, int p_98651_) {
+          if (p_98651_ >= this.f_38839_.size() - 9 && p_98651_ < this.f_38839_.size()) {
+             Slot slot = this.f_38839_.get(p_98651_);
 @@ -947,6 +_,22 @@
  
        public boolean m_8010_(Player p_98665_) {

@@ -1,5 +1,22 @@
 --- a/net/minecraft/server/level/ServerChunkCache.java
 +++ b/net/minecraft/server/level/ServerChunkCache.java
+@@ -85,6 +_,16 @@
+       return this.f_8331_;
+    }
+ 
++   // CraftBukkit start - properly implement isChunkLoaded
++   public boolean isChunkLoaded(int chunkX, int chunkZ) {
++      ChunkHolder chunk = this.f_8325_.m_140174_(ChunkPos.m_45589_(chunkX, chunkZ));
++      if (chunk == null) {
++         return false;
++      }
++      return chunk.getFullChunkNow() != null;
++   }
++   // CraftBukkit end
++
+    @Nullable
+    private ChunkHolder m_8364_(long p_8365_) {
+       return this.f_8325_.m_140327_(p_8365_);
 @@ -162,6 +_,7 @@
           if (chunkholder == null) {
              return null;
@@ -8,6 +25,39 @@
              Either<ChunkAccess, ChunkHolder.ChunkLoadingFailure> either = chunkholder.m_140080_(ChunkStatus.f_62326_).getNow((Either<ChunkAccess, ChunkHolder.ChunkLoadingFailure>)null);
              if (either == null) {
                 return null;
+@@ -296,11 +_,32 @@
+    }
+ 
+    public void close() throws IOException {
++      // CraftBukkit start
++      close(true);
++   }
++
++   public void close(boolean save) throws IOException {
++      if (save) {
++         this.m_8419_(true);
++      }
++      // CraftBukkit end
+       this.m_8419_(true);
+       this.f_8331_.close();
+       this.f_8325_.close();
+    }
+ 
++   // CraftBukkit start - modelled on below
++   public void purgeUnload() {
++      this.f_8329_.m_46473_().m_6180_("purge");
++      this.f_8327_.m_140776_();
++      this.m_8489_();
++      this.f_8329_.m_46473_().m_6182_("unload");
++      this.f_8325_.m_140280_(() -> true);
++      this.f_8329_.m_46473_().m_7238_();
++      this.m_8488_();
++   }
++   // CraftBukkit end
++
+    public void m_201698_(BooleanSupplier p_201913_, boolean p_201914_) {
+       this.f_8329_.m_46473_().m_6180_("purge");
+       this.f_8327_.m_140776_();
 @@ -350,7 +_,7 @@
           for(ServerChunkCache.ChunkAndHolder serverchunkcache$chunkandholder : list) {
              LevelChunk levelchunk1 = serverchunkcache$chunkandholder.f_184028_;

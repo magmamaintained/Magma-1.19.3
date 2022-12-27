@@ -1,0 +1,11 @@
+--- a/net/minecraft/world/entity/ItemBasedSteering.java
++++ b/net/minecraft/world/entity/ItemBasedSteering.java
+@@ -54,4 +_,8 @@
+    public boolean m_20851_() {
+       return this.f_20837_.m_135370_(this.f_20839_);
+    }
++
++   // Magma - stub
++   public void setBoostTicks(int ticks) {
++   }
+ }

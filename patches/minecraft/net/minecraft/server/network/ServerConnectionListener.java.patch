@@ -33,3 +33,14 @@
                 int i = ServerConnectionListener.this.f_9702_.m_7032_();
                 Connection connection = (Connection)(i > 0 ? new RateKickingConnection(i) : new Connection(PacketFlow.SERVERBOUND));
                 ServerConnectionListener.this.f_9704_.add(connection);
+@@ -166,6 +_,10 @@
+ 
+    public List<Connection> m_184193_() {
+       return this.f_9704_;
++   }
++
++   // Magma - stub
++   public void acceptConnections() {
+    }
+ 
+    static class LatencySimulator extends ChannelInboundHandlerAdapter {

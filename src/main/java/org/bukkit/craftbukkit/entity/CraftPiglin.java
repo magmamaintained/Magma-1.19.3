@@ -1,10 +1,6 @@
 package org.bukkit.craftbukkit.entity;
 
 import com.google.common.base.Preconditions;
-import java.util.Collections;
-import java.util.Set;
-import java.util.stream.Collectors;
-import net.minecraft.world.entity.monster.piglin.EntityPiglin;
 import net.minecraft.world.item.Item;
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.CraftServer;
@@ -13,6 +9,10 @@ import org.bukkit.craftbukkit.util.CraftMagicNumbers;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Piglin;
 import org.bukkit.inventory.Inventory;
+
+import java.util.Collections;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class CraftPiglin extends CraftPiglinAbstract implements Piglin {
 

@@ -1,11 +1,48 @@
 --- a/net/minecraft/world/entity/Entity.java
 +++ b/net/minecraft/world/entity/Entity.java
-@@ -118,7 +_,7 @@
+@@ -31,6 +_,7 @@
+ import net.minecraft.commands.arguments.EntityAnchorArgument;
+ import net.minecraft.core.BlockPos;
+ import net.minecraft.core.Direction;
++import net.minecraft.core.PositionImpl;
+ import net.minecraft.core.SectionPos;
+ import net.minecraft.core.particles.BlockParticleOption;
+ import net.minecraft.core.particles.ParticleTypes;
+@@ -116,9 +_,36 @@
+ import net.minecraft.world.phys.shapes.VoxelShape;
+ import net.minecraft.world.scores.PlayerTeam;
  import net.minecraft.world.scores.Team;
++import org.bukkit.command.CommandSender;
++import org.bukkit.craftbukkit.entity.CraftEntity;
  import org.slf4j.Logger;
  
 -public abstract class Entity implements Nameable, EntityAccess, CommandSource {
 +public abstract class Entity extends net.minecraftforge.common.capabilities.CapabilityProvider<Entity> implements Nameable, EntityAccess, CommandSource, net.minecraftforge.common.extensions.IForgeEntity {
++
++   // CraftBukkit start
++   private static final int CURRENT_LEVEL = 2;
++   static boolean isLevelAtLeast(CompoundTag tag, int level) {
++      return tag.m_128441_("Bukkit.updateLevel") && tag.m_128451_("Bukkit.updateLevel") >= level;
++   }
++
++   private CraftEntity bukkitEntity;
++
++   public CraftEntity getBukkitEntity() {
++      if (bukkitEntity == null) {
++         bukkitEntity = CraftEntity.getEntity(f_19853_.getCraftServer(), this);
++      }
++      return bukkitEntity;
++   }
++
++   @Override
++   public CommandSender getBukkitSender(CommandSourceStack wrapper) {
++      return getBukkitEntity();
++   }
++   // CraftBukkit - SPIGOT-6907: re-implement LivingEntity#setMaximumAir()
++   public int getDefaultMaxAirSupply() {
++      return f_146818_;
++   }
++   // CraftBukkit end
     private static final Logger f_19849_ = LogUtils.getLogger();
     public static final String f_146815_ = "id";
     public static final String f_146816_ = "Passengers";
@@ -26,7 +63,7 @@
     public boolean f_19794_;
     protected final RandomSource f_19796_ = RandomSource.m_216327_();
     public int f_19797_;
-    private int f_19831_ = -this.m_6101_();
+    public int f_19831_ = -this.m_6101_();
     protected boolean f_19798_;
 +   @Deprecated // Forge: Use forgeFluidTypeHeight instead
     protected Object2DoubleMap<TagKey<Fluid>> f_19799_ = new Object2DoubleArrayMap<>(2);
@@ -35,9 +72,29 @@
     private final Set<TagKey<Fluid>> f_19801_ = new HashSet<>();
     public int f_19802_;
     protected boolean f_19803_ = true;
-@@ -231,6 +_,7 @@
+@@ -230,7 +_,27 @@
+    @Nullable
     private BlockState f_185934_ = null;
  
++   // CraftBukkit start
++   public boolean persist = true;
++   public boolean valid;
++   public boolean generation;
++   public int maxAirTicks = getDefaultMaxAirSupply(); // CraftBukkit - SPIGOT-6907: re-implement LivingEntity#setMaximumAir()
++   public org.bukkit.projectiles.ProjectileSource projectileSource; // For projectiles only
++   public boolean lastDamageCancelled; // SPIGOT-5339, SPIGOT-6252, SPIGOT-6777: Keep track if the event was canceled
++   public boolean persistentInvisibility = false;
++   public BlockPos lastLavaContact;
++
++   public float getBukkitYaw() {
++      return this.f_19857_;
++   }
++
++   public boolean isChunkLoaded() {
++      return f_19853_.m_7232_((int) Math.floor(this.m_20185_()) >> 4, (int) Math.floor(this.m_20189_()) >> 4);
++   }
++   // CraftBukkit end
++
     public Entity(EntityType<?> p_19870_, Level p_19871_) {
 +      super(Entity.class);
        this.f_19847_ = p_19870_;
@@ -151,6 +208,27 @@
              Vec3 vec33 = m_198894_(this, new Vec3(p_20273_.f_82479_, 0.0D, p_20273_.f_82481_), aabb.m_82383_(vec32), this.f_19853_, list).m_82549_(vec32);
              if (vec33.m_165925_() > vec31.m_165925_()) {
                 vec31 = vec33;
+@@ -899,6 +_,20 @@
+       return SoundEvents.f_11917_;
+    }
+ 
++   // CraftBukkit start - Add delegate methods
++   public SoundEvent getSwimSound0() {
++      return m_5501_();
++   }
++
++   public SoundEvent getSwimSplashSound0() {
++      return m_5509_();
++   }
++
++   public SoundEvent getSwimHighSpeedSplashSound0() {
++      return m_5508_();
++   }
++   // CraftBukkit end
++
+    protected void m_20101_() {
+       AABB aabb = this.m_20191_();
+       BlockPos blockpos = new BlockPos(aabb.f_82288_ + 1.0E-7D, aabb.f_82289_ + 1.0E-7D, aabb.f_82290_ + 1.0E-7D);
 @@ -943,7 +_,7 @@
        BlockState blockstate = this.f_19853_.m_8055_(p_20135_.m_7494_());
        boolean flag = blockstate.m_204336_(BlockTags.f_144271_);
@@ -527,11 +605,10 @@
  
     }
  
-@@ -3130,6 +_,103 @@
-    public boolean m_142265_(Level p_146843_, BlockPos p_146844_) {
+@@ -3131,8 +_,110 @@
        return true;
     }
-+
+ 
 +   /* ================================== Forge Start =====================================*/
 +
 +   private boolean canUpdate = true;
@@ -628,6 +705,14 @@
 +
 +   /* ================================== Forge End =====================================*/
 +
- 
++
     public Level m_9236_() {
        return this.f_19853_;
++   }
++
++   // Magma - stub
++   public void teleportTo(ServerLevel handle, PositionImpl position){
++
+    }
+ 
+    @FunctionalInterface

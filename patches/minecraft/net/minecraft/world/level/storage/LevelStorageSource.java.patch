@@ -1,5 +1,43 @@
 --- a/net/minecraft/world/level/storage/LevelStorageSource.java
 +++ b/net/minecraft/world/level/storage/LevelStorageSource.java
+@@ -298,9 +_,17 @@
+       return this.f_78195_;
+    }
+ 
++   // Magma start
+    public LevelStorageSource.LevelStorageAccess m_78260_(String p_78261_) throws IOException {
+-      return new LevelStorageSource.LevelStorageAccess(p_78261_);
+-   }
++      return createAccess(p_78261_, null);
++   }
++   // Magma end
++
++   // CraftBukkit start
++   public LevelStorageAccess createAccess(String name, @Nullable ResourceKey<LevelStem> actualDimension) throws IOException {
++      return new LevelStorageSource.LevelStorageAccess(name, actualDimension);
++   }
++   // CraftBukkit end
+ 
+    public static record LevelCandidates(List<LevelStorageSource.LevelDirectory> f_230840_) implements Iterable<LevelStorageSource.LevelDirectory> {
+       public boolean m_230843_() {
+@@ -344,11 +_,15 @@
+ 
+    public class LevelStorageAccess implements AutoCloseable {
+       final DirectoryLock f_78270_;
+-      final LevelStorageSource.LevelDirectory f_230867_;
++      public final LevelStorageSource.LevelDirectory f_230867_;
+       private final String f_78272_;
+       private final Map<LevelResource, Path> f_78273_ = Maps.newHashMap();
+ 
+-      public LevelStorageAccess(String p_78276_) throws IOException {
++      // CraftBukkit start
++      public final ResourceKey<LevelStem> dimensionType;
++
++      public LevelStorageAccess(String p_78276_, @Nullable ResourceKey<LevelStem> dimensionType) throws IOException {
++         this.dimensionType = dimensionType;
+          this.f_78272_ = p_78276_;
+          this.f_230867_ = new LevelStorageSource.LevelDirectory(LevelStorageSource.this.f_78194_.resolve(p_78276_));
+          this.f_78270_ = DirectoryLock.m_13640_(this.f_230867_.f_230850_());
 @@ -389,6 +_,19 @@
           return LevelStorageSource.this.m_230817_(this.f_230867_, LevelStorageSource.m_245503_(p_248747_, p_251873_, p_249187_, p_249736_));
        }
