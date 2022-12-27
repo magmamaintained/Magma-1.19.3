@@ -1,9 +1,10 @@
 --- a/net/minecraft/network/Connection.java
 +++ b/net/minecraft/network/Connection.java
-@@ -82,6 +_,7 @@
+@@ -82,6 +_,8 @@
     private float f_129477_;
     private int f_129478_;
     private boolean f_129479_;
++   public String hostname = ""; // CraftBukkit - add field
 +   private java.util.function.Consumer<Connection> activationHandler;
  
     public Connection(PacketFlow p_129482_) {
@@ -25,6 +26,15 @@
        }
  
        if (this.f_129468_.eventLoop().inEventLoop()) {
+@@ -273,7 +_,7 @@
+ 
+    public void m_129507_(Component p_129508_) {
+       if (this.f_129468_.isOpen()) {
+-         this.f_129468_.close().awaitUninterruptibly();
++         this.f_129468_.close();  // We can't wait as this may be called from an event loop.
+          this.f_129471_ = p_129508_;
+       }
+ 
 @@ -292,7 +_,9 @@
     }
  

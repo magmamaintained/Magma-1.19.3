@@ -1,13 +1,11 @@
 package org.bukkit.craftbukkit.entity;
 
-import net.minecraft.world.entity.ai.goal.PathfinderGoalSelector;
-import net.minecraft.world.entity.animal.EntityRabbit;
-import net.minecraft.world.level.World;
+import net.minecraft.world.entity.ai.goal.GoalSelector;
+import net.minecraft.world.level.Level;
 import org.bukkit.craftbukkit.CraftServer;
 import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Rabbit;
-import org.bukkit.entity.Rabbit.Type;
 
 public class CraftRabbit extends CraftAnimals implements Rabbit {
 

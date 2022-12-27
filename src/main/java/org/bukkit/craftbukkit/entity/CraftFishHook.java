@@ -1,5 +1,6 @@
 package org.bukkit.craftbukkit.entity;
 
+import net.minecraft.core.BlockPos;
 import org.apache.commons.lang3.Validate;
 import org.bukkit.craftbukkit.CraftServer;
 import org.bukkit.entity.Entity;

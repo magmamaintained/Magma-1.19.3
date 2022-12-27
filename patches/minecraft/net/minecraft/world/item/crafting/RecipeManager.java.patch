@@ -1,7 +1,18 @@
 --- a/net/minecraft/world/item/crafting/RecipeManager.java
 +++ b/net/minecraft/world/item/crafting/RecipeManager.java
+@@ -19,7 +_,10 @@
+ import java.util.stream.Collectors;
+ import java.util.stream.Stream;
+ import javax.annotation.Nullable;
++
++import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
+ import net.minecraft.core.NonNullList;
++import net.minecraft.core.Registry;
+ import net.minecraft.core.registries.BuiltInRegistries;
+ import net.minecraft.resources.ResourceLocation;
+ import net.minecraft.server.packs.resources.ResourceManager;
 @@ -37,9 +_,17 @@
-    private Map<RecipeType<?>, Map<ResourceLocation, Recipe<?>>> f_44007_ = ImmutableMap.of();
+    public Map<RecipeType<?>, Map<ResourceLocation, Recipe<?>>> f_44007_ = ImmutableMap.of();
     private Map<ResourceLocation, Recipe<?>> f_199900_ = ImmutableMap.of();
     private boolean f_44008_;
 +   private final net.minecraftforge.common.crafting.conditions.ICondition.IContext context; //Forge: add context
@@ -57,3 +68,32 @@
     }
  
     public void m_44024_(Iterable<Recipe<?>> p_44025_) {
+@@ -186,7 +_,28 @@
+       };
+    }
+ 
++   // Magma - stub
++   public void addRecipe(Recipe<?> stonecutterRecipe) {
++   }
++
+    public interface CachedCheck<C extends Container, T extends Recipe<C>> {
+       Optional<T> m_213657_(C p_220280_, Level p_220281_);
+    }
++
++   // CraftBukkit start
++   public boolean removeRecipe(ResourceLocation mcKey) {
++      for (Map<ResourceLocation, Recipe<?>> recipes : f_44007_.values()) {
++         recipes.remove(mcKey);
++      }
++      return f_199900_.remove(mcKey) != null;
++   }
++
++   public void clearRecipes() {
++      this.f_44007_ = Maps.newHashMap();
++      for (RecipeType<?> recipeType : BuiltInRegistries.f_256990_) {
++         this.f_44007_.put(recipeType, new Object2ObjectLinkedOpenHashMap<>());
++      }
++      this.f_199900_ = Maps.newHashMap();
++   }
++   // CraftBukkit end
+ }

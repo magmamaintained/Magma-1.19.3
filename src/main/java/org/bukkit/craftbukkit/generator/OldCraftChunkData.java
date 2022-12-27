@@ -119,7 +119,7 @@ public final class OldCraftChunkData implements ChunkGenerator.ChunkData {
             return;
         }
         for (int y = yMin; y < yMax; y++) {
-            ChunkSection section = getChunkSection(y, true);
+            LevelChunkSection section = getChunkSection(y, true);
             int offsetBase = y & 0xf;
             for (int x = xMin; x < xMax; x++) {
                 for (int z = zMin; z < zMax; z++) {

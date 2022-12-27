@@ -1,5 +1,31 @@
 --- a/net/minecraft/world/entity/raid/Raid.java
 +++ b/net/minecraft/world/entity/raid/Raid.java
+@@ -165,6 +_,12 @@
+       return this.f_37687_ == Raid.RaidStatus.LOSS;
+    }
+ 
++   // CraftBukkit start
++   public boolean isInProgress() {
++      return this.f_37687_ == Raid.RaidStatus.ONGOING;
++   }
++   // CraftBukkit end
++
+    public float m_150220_() {
+       return this.f_37678_;
+    }
+@@ -794,6 +_,12 @@
+       this.f_37672_.add(p_37727_.m_20148_());
+    }
+ 
++   // CraftBukkit start - a method to get all raiders
++   public java.util.Collection<Raider> getRaiders() {
++      return this.f_37671_.values().stream().flatMap(Set::stream).collect(java.util.stream.Collectors.toSet());
++   }
++   // CraftBukkit end
++
+    static enum RaidStatus {
+       ONGOING,
+       VICTORY,
 @@ -817,7 +_,7 @@
        }
     }

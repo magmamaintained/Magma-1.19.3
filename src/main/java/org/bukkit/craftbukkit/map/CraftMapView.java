@@ -2,6 +2,7 @@ package org.bukkit.craftbukkit.map;
 
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.saveddata.maps.MapItemSavedData;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -56,8 +57,8 @@ public final class CraftMapView implements MapView {
 
     @Override
     public World getWorld() {
-        ResourceKey<net.minecraft.world.level.World> dimension = worldMap.dimension;
-        WorldServer world = MinecraftServer.getServer().getLevel(dimension);
+        ResourceKey<net.minecraft.world.level.Level> dimension = worldMap.dimension;
+        ServerLevel world = MinecraftServer.getServer().getLevel(dimension);
 
         return (world == null) ? null : world.getWorld();
     }

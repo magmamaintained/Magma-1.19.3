@@ -1,0 +1,11 @@
+--- a/net/minecraft/network/protocol/game/ClientboundLevelChunkPacketData.java
++++ b/net/minecraft/network/protocol/game/ClientboundLevelChunkPacketData.java
+@@ -21,7 +_,7 @@
+ 
+ public class ClientboundLevelChunkPacketData {
+    private static final int f_195646_ = 2097152;
+-   public final CompoundTag f_195647_;
++   private final CompoundTag f_195647_;
+    private final byte[] f_195648_;
+    private final List<ClientboundLevelChunkPacketData.BlockEntityInfo> f_195649_;
+ 

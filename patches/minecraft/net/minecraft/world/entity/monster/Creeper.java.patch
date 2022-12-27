@@ -1,0 +1,11 @@
+--- a/net/minecraft/world/entity/monster/Creeper.java
++++ b/net/minecraft/world/entity/monster/Creeper.java
+@@ -262,4 +_,8 @@
+    public void m_32314_() {
+       ++this.f_32273_;
+    }
++
++   // Magma - stub
++   public void setPowered(boolean powered) {
++   }
+ }

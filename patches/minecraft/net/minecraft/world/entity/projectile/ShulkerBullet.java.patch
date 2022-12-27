@@ -1,5 +1,27 @@
 --- a/net/minecraft/world/entity/projectile/ShulkerBullet.java
 +++ b/net/minecraft/world/entity/projectile/ShulkerBullet.java
+@@ -57,7 +_,20 @@
+       this.f_37312_ = p_37332_;
+       this.f_37313_ = Direction.UP;
+       this.m_37348_(p_37333_);
+-   }
++      projectileSource = (org.bukkit.entity.LivingEntity) p_37331_.getBukkitEntity(); // CraftBukkit
++   }
++
++   // CraftBukkit start
++   public Entity getTarget() {
++      return this.f_37312_;
++   }
++
++   public void setTarget(Entity e) {
++      this.f_37312_ = e;
++      this.f_37313_ = Direction.UP;
++      this.m_37348_(Direction.Axis.X);
++   }
++   // CraftBukkit end
+ 
+    public SoundSource m_5720_() {
+       return SoundSource.HOSTILE;
 @@ -211,7 +_,7 @@
           }
  

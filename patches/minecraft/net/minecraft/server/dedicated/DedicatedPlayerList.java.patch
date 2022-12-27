@@ -1,0 +1,24 @@
+--- a/net/minecraft/server/dedicated/DedicatedPlayerList.java
++++ b/net/minecraft/server/dedicated/DedicatedPlayerList.java
+@@ -5,8 +_,11 @@
+ import java.io.IOException;
+ import net.minecraft.core.LayeredRegistryAccess;
+ import net.minecraft.server.RegistryLayer;
++import net.minecraft.server.level.ServerLevel;
++import net.minecraft.server.level.ServerPlayer;
+ import net.minecraft.server.players.PlayerList;
+ import net.minecraft.world.level.storage.PlayerDataStorage;
++import org.bukkit.Location;
+ import org.slf4j.Logger;
+ 
+ public class DedicatedPlayerList extends PlayerList {
+@@ -132,5 +_,9 @@
+ 
+    public boolean m_5765_(GameProfile p_139592_) {
+       return this.m_11307_().m_11351_(p_139592_);
++   }
++
++   // Magma - stub
++   public void respawn(ServerPlayer entity, ServerLevel toWorld, boolean b, Location to, boolean b1) {
+    }
+ }

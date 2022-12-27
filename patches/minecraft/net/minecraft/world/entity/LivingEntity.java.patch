@@ -1,7 +1,29 @@
 --- a/net/minecraft/world/entity/LivingEntity.java
 +++ b/net/minecraft/world/entity/LivingEntity.java
-@@ -119,12 +_,14 @@
+@@ -9,13 +_,8 @@
+ import com.mojang.logging.LogUtils;
+ import com.mojang.serialization.DataResult;
+ import com.mojang.serialization.Dynamic;
+-import java.util.Collection;
+-import java.util.ConcurrentModificationException;
+-import java.util.Iterator;
+-import java.util.List;
+-import java.util.Map;
+-import java.util.Optional;
+-import java.util.UUID;
++
++import java.util.*;
+ import java.util.function.Predicate;
+ import javax.annotation.Nullable;
+ import net.minecraft.BlockUtil;
+@@ -117,14 +_,20 @@
+ import net.minecraft.world.phys.HitResult;
+ import net.minecraft.world.phys.Vec3;
  import net.minecraft.world.scores.PlayerTeam;
++import org.bukkit.craftbukkit.attribute.CraftAttributeMap;
++import org.bukkit.craftbukkit.event.CraftEventFactory;
++import org.bukkit.event.entity.ArrowBodyCountChangeEvent;
++import org.bukkit.event.entity.EntityPotionEffectEvent;
  import org.slf4j.Logger;
  
 -public abstract class LivingEntity extends Entity {
@@ -16,6 +38,35 @@
     public static final int f_147166_ = 2;
     public static final int f_147167_ = 4;
     public static final int f_147168_ = 98;
+@@ -229,10 +_,27 @@
+    protected Brain<?> f_20939_;
+    private boolean f_217034_;
+ 
++   // CraftBukkit start
++   public int expToDrop;
++   public boolean forceDrops;
++   public ArrayList<org.bukkit.inventory.ItemStack> drops = new ArrayList<org.bukkit.inventory.ItemStack>();
++   public final org.bukkit.craftbukkit.attribute.CraftAttributeMap craftAttributes;
++   public boolean collides = true;
++   public Set<UUID> collidableExemptions = new HashSet<>();
++   public boolean bukkitPickUpLoot;
++
++   @Override
++   public float getBukkitYaw() {
++      return m_6080_();
++   }
++   // CraftBukkit end
++
+    protected LivingEntity(EntityType<? extends LivingEntity> p_20966_, Level p_20967_) {
+       super(p_20966_, p_20967_);
+       this.f_20943_ = new AttributeMap(DefaultAttributes.m_22297_(p_20966_));
+-      this.m_21153_(this.m_21233_());
++      this.craftAttributes = new CraftAttributeMap(f_20943_); // CraftBukkit
++      // CraftBukkit - setHealth(getMaxHealth()) inlined and simplified to skip the instanceof check for EntityPlayer, as getBukkitEntity() is not initialized in constructor
++      this.f_19804_.m_135381_(LivingEntity.f_20961_, (float) this.m_21051_(Attributes.f_22276_).m_22135_());
+       this.f_19850_ = true;
+       this.f_20928_ = (float)((Math.random() + 1.0D) * (double)0.01F);
+       this.m_20090_();
 @@ -275,7 +_,7 @@
     }
  
@@ -107,14 +158,34 @@
        return d0;
     }
  
-@@ -869,7 +_,9 @@
+@@ -861,7 +_,13 @@
+       this.f_19804_.m_135381_(f_20962_, 0);
+    }
+ 
++   // CraftBukkit start
+    public boolean m_21219_() {
++      return removeAllEffects(org.bukkit.event.entity.EntityPotionEffectEvent.Cause.UNKNOWN);
++   }
++
++   public boolean removeAllEffects(EntityPotionEffectEvent.Cause cause) {
++      // CraftBukkit end
+       if (this.f_19853_.f_46443_) {
+          return false;
+       } else {
+@@ -869,7 +_,15 @@
  
           boolean flag;
           for(flag = false; iterator.hasNext(); flag = true) {
 -            this.m_7285_(iterator.next());
 +            MobEffectInstance effect = iterator.next();
 +            if(net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(new net.minecraftforge.event.entity.living.MobEffectEvent.Remove(this, effect))) continue;
++            // CraftBukkit start
++            EntityPotionEffectEvent event = CraftEventFactory.callEntityPotionEffectChangeEvent(this, effect, null, cause, EntityPotionEffectEvent.Action.CLEARED);
++            if (event.isCancelled()) {
++               continue;
++            }
 +            this.m_7285_(effect);
++            // CraftBukkit end
              iterator.remove();
           }
  
@@ -264,7 +335,7 @@
  
        boolean flag = this.f_20889_ > 0;
        if (this.m_6125_() && this.f_19853_.m_46469_().m_46207_(GameRules.f_46135_)) {
-@@ -1324,6 +_,10 @@
+@@ -1324,14 +_,24 @@
  
        this.m_5907_();
        this.m_21226_();
@@ -275,8 +346,13 @@
     }
  
     protected void m_5907_() {
-@@ -1331,7 +_,8 @@
+    }
  
++   // Magma - stub
++   public int getExpReward() {
++      return -1;
++   }
++
     protected void m_21226_() {
        if (this.f_19853_ instanceof ServerLevel && !this.m_217046_() && (this.m_6124_() || this.f_20889_ > 0 && this.m_6149_() && this.f_19853_.m_46469_().m_46207_(GameRules.f_46135_))) {
 -         ExperienceOrb.m_147082_((ServerLevel)this.f_19853_, this.m_20182_(), this.m_213860_());
@@ -388,6 +464,28 @@
              this.m_7911_(this.m_6103_() - f2);
              this.m_146850_(GameEvent.f_223706_);
           }
+@@ -1598,8 +_,19 @@
+    }
+ 
+    public final void m_21317_(int p_21318_) {
+-      this.f_19804_.m_135381_(f_20940_, p_21318_);
+-   }
++      // CraftBukkit start
++      setArrowCount( p_21318_, false );
++   }
++
++   public final void setArrowCount(int p_21318_, boolean flag){
++      ArrowBodyCountChangeEvent event = CraftEventFactory.callArrowBodyCountChangeEvent( this, m_21234_(), p_21318_, flag );
++      if(event.isCancelled()){
++         return;
++      }
++
++      this.f_19804_.m_135381_(f_20940_, event.getNewAmount());
++   }
++   // CraftBukkit end
+ 
+    public final int m_21235_() {
+       return this.f_19804_.m_135370_(f_20941_);
 @@ -1622,6 +_,8 @@
     }
  
@@ -397,6 +495,19 @@
        if (!this.f_20911_ || this.f_20913_ >= this.m_21304_() / 2 || this.f_20913_ < 0) {
           this.f_20913_ = -1;
           this.f_20911_ = true;
+@@ -1895,6 +_,12 @@
+ 
+    public abstract ItemStack m_6844_(EquipmentSlot p_21127_);
+ 
++   // CraftBukkit start
++   public void setItemSlot(EquipmentSlot enumitemslot, ItemStack itemstack, boolean silent) {
++      this.m_8061_(enumitemslot, itemstack);
++   }
++   // CraftBukkit end
++
+    public abstract void m_8061_(EquipmentSlot p_21036_, ItemStack p_21037_);
+ 
+    protected void m_181122_(ItemStack p_181123_) {
 @@ -1989,14 +_,17 @@
        }
  
@@ -751,3 +862,37 @@
           }
        } else {
           return EquipmentSlot.HEAD;
+@@ -3341,6 +_,33 @@
+ 
+    public boolean m_213824_() {
+       return this.m_21205_().m_41720_() instanceof AxeItem;
++   }
++
++   // Magma - stub
++   public void addEffect(MobEffectInstance p147208, EntityPotionEffectEvent.Cause plugin) {
++   }
++
++   public void removeEffect(MobEffect byId, EntityPotionEffectEvent.Cause plugin) {
++   }
++
++   public SoundEvent getHurtSound0(DamageSource generic) {
++      return null;
++   }
++
++   public SoundEvent getDeathSound0() {
++      return null;
++   }
++
++   public SoundEvent getFallDamageSound0(int fallHeight) {
++      return null;
++   }
++
++   public SoundEvent getDrinkingSound0(ItemStack asNMSCopy) {
++      return null;
++   }
++
++   public SoundEvent getEatingSound0(ItemStack asNMSCopy) {
++      return null;
+    }
+ 
+    public static record Fallsounds(SoundEvent f_196626_, SoundEvent f_196627_) {

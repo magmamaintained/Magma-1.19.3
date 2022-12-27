@@ -1,0 +1,11 @@
+--- a/net/minecraft/server/dedicated/DedicatedServerSettings.java
++++ b/net/minecraft/server/dedicated/DedicatedServerSettings.java
+@@ -5,7 +_,7 @@
+ 
+ public class DedicatedServerSettings {
+    private final Path f_139772_;
+-   public DedicatedServerProperties f_139773_;
++   private DedicatedServerProperties f_139773_;
+ 
+    public DedicatedServerSettings(Path p_180932_) {
+       this.f_139772_ = p_180932_;

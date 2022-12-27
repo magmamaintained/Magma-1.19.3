@@ -9,3 +9,16 @@
        return this.f_38505_.m_45412_(p_38522_);
     }
  
+@@ -119,5 +_,12 @@
+       public CommandSourceStack m_6712_() {
+          return new CommandSourceStack(this, MinecartCommandBlock.this.m_20182_(), MinecartCommandBlock.this.m_20155_(), this.m_5991_(), 2, this.m_45439_().getString(), MinecartCommandBlock.this.m_5446_(), this.m_5991_().m_7654_(), MinecartCommandBlock.this);
+       }
++
++      // CraftBukkit start
++      @Override
++      public org.bukkit.command.CommandSender getBukkitSender(CommandSourceStack wrapper) {
++         return (org.bukkit.craftbukkit.entity.CraftMinecartCommand) MinecartCommandBlock.this.getBukkitEntity();
++      }
++      // CraftBukkit end
+    }
+ }

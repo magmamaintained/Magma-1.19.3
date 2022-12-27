@@ -1,5 +1,15 @@
 --- a/net/minecraft/world/entity/animal/Bee.java
 +++ b/net/minecraft/world/entity/animal/Bee.java
+@@ -131,7 +_,8 @@
+    @Nullable
+    BlockPos f_27697_;
+    @Nullable
+-   public BlockPos f_27698_;
++   public
++   BlockPos f_27698_;
+    Bee.BeePollinateGoal f_27699_;
+    Bee.BeeGoToHiveGoal f_27700_;
+    private Bee.BeeGoToKnownFlowerGoal f_27701_;
 @@ -474,7 +_,7 @@
           return false;
        } else {

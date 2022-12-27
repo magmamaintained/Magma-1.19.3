@@ -1,0 +1,11 @@
+--- a/net/minecraft/world/level/block/entity/SignBlockEntity.java
++++ b/net/minecraft/world/level/block/entity/SignBlockEntity.java
+@@ -32,7 +_,7 @@
+    private static final String[] f_155694_ = new String[]{"FilteredText1", "FilteredText2", "FilteredText3", "FilteredText4"};
+    public final Component[] f_59720_ = new Component[]{CommonComponents.f_237098_, CommonComponents.f_237098_, CommonComponents.f_237098_, CommonComponents.f_237098_};
+    private final Component[] f_155695_ = new Component[]{CommonComponents.f_237098_, CommonComponents.f_237098_, CommonComponents.f_237098_, CommonComponents.f_237098_};
+-   private boolean f_59721_ = true;
++   public boolean f_59721_ = true;
+    @Nullable
+    private UUID f_59722_;
+    @Nullable

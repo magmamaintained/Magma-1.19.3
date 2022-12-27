@@ -3,6 +3,8 @@ package org.bukkit.craftbukkit.entity;
 import com.google.common.base.Preconditions;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.animal.allay.Allay;
+import org.apache.commons.lang3.Validate;
+import org.apache.logging.log4j.core.util.Assert;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.CraftServer;
@@ -88,8 +90,11 @@ public class CraftAllay extends CraftCreature implements org.bukkit.entity.Allay
 
     @Override
     public org.bukkit.entity.Allay duplicateAllay() {
-        Allay nmsAllay = getHandle().duplicateAllay();
-        return (nmsAllay != null) ? (org.bukkit.entity.Allay) nmsAllay.getBukkitEntity() : null;
+        // Magma todo: Allay duplication
+//        Allay nmsAllay = getHandle().duplicateAllay();
+//        return (nmsAllay != null) ? (org.bukkit.entity.Allay) nmsAllay.getBukkitEntity() : null;
+        Validate.isTrue(false, "Allay duplication is not implemented yet");
+         return null;
     }
 
     public Location getJukebox() {

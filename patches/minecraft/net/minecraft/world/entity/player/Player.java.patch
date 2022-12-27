@@ -1,7 +1,19 @@
 --- a/net/minecraft/world/entity/player/Player.java
 +++ b/net/minecraft/world/entity/player/Player.java
-@@ -112,7 +_,8 @@
+@@ -4,6 +_,8 @@
+ import com.google.common.collect.ImmutableMap;
+ import com.google.common.collect.Lists;
+ import com.mojang.authlib.GameProfile;
++import com.mojang.datafixers.kinds.K2;
++import com.mojang.datafixers.optics.profunctors.Cocartesian;
+ import com.mojang.datafixers.util.Either;
+ import com.mojang.logging.LogUtils;
+ import java.util.Collection;
+@@ -110,9 +_,11 @@
+ import net.minecraft.world.scores.PlayerTeam;
+ import net.minecraft.world.scores.Scoreboard;
  import net.minecraft.world.scores.Team;
++import org.bukkit.craftbukkit.entity.CraftHumanEntity;
  import org.slf4j.Logger;
  
 -public abstract class Player extends LivingEntity {
@@ -10,13 +22,23 @@
     private static final Logger f_219722_ = LogUtils.getLogger();
     public static final int f_150082_ = 16;
     public static final int f_150083_ = 20;
-@@ -164,6 +_,9 @@
+@@ -164,6 +_,19 @@
     private Optional<GlobalPos> f_238176_ = Optional.empty();
     @Nullable
     public FishingHook f_36083_;
 +   private final java.util.Collection<MutableComponent> prefixes = new java.util.LinkedList<>();
 +   private final java.util.Collection<MutableComponent> suffixes = new java.util.LinkedList<>();
 +   @Nullable private Pose forcedPose;
++
++   // CraftBukkit start
++   public boolean fauxSleeping;
++   public int oldLevel = -1;
++
++   @Override
++   public CraftHumanEntity getBukkitEntity() {
++      return (CraftHumanEntity) super.getBukkitEntity();
++   }
++   // CraftBukkit end
  
     public Player(Level p_250508_, BlockPos p_250289_, float p_251702_, GameProfile p_252153_) {
        super(EntityType.f_20532_, p_250508_);
@@ -297,7 +319,19 @@
           this.m_5810_();
           this.f_19853_.m_7605_(this, (byte)30);
        }
-@@ -1283,6 +_,7 @@
+@@ -1277,12 +_,19 @@
+    }
+ 
+    public Either<Player.BedSleepingProblem, Unit> m_7720_(BlockPos p_36203_) {
++      // CraftBukkit start
++      return this.startSleepInBed(p_36203_, false);
++   }
++
++   public Either<Player.BedSleepingProblem, Unit> startSleepInBed(BlockPos p_36203_, boolean force) {
++      // CraftBukkit end
+       this.m_5802_(p_36203_);
+       this.f_36110_ = 0;
+       return Either.right(Unit.INSTANCE);
     }
  
     public void m_6145_(boolean p_36226_, boolean p_36227_) {

@@ -374,8 +374,8 @@ public abstract class CraftRegionAccessor implements RegionAccessor {
     public <T extends Entity> T addEntity(net.minecraft.world.entity.Entity entity, CreatureSpawnEvent.SpawnReason reason, Consumer<T> function, boolean randomizeData) throws IllegalArgumentException {
         Preconditions.checkArgument(entity != null, "Cannot spawn null entity");
 
-        if (randomizeData && entity instanceof Mob) {
-            ((Mob) entity).finalizeSpawn(getHandle(), getHandle().getCurrentDifficultyAt(entity.blockPosition()), MobSpawnType.COMMAND, (SpawnGroupData) null, null);
+        if (randomizeData && entity instanceof net.minecraft.world.entity.Mob) {
+            ((net.minecraft.world.entity.Mob) entity).finalizeSpawn(getHandle(), getHandle().getCurrentDifficultyAt(entity.blockPosition()), MobSpawnType.COMMAND, (SpawnGroupData) null, null);
         }
 
         if (!isNormalWorld()) {

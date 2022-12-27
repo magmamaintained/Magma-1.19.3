@@ -31,7 +31,7 @@
 +      net.minecraftforge.event.ForgeEventFactory.firePlayerLoggedIn( p_11263_ );
     }
  
-    protected void m_11273_(ServerScoreboard p_11274_, ServerPlayer p_11275_) {
+    public void m_11273_(ServerScoreboard p_11274_, ServerPlayer p_11275_) {
 @@ -304,6 +_,7 @@
           compoundtag1 = compoundtag;
           p_11225_.m_20258_(compoundtag);
@@ -80,20 +80,43 @@
        this.f_11200_.m_11393_(p_11281_);
        ServerPlayer serverplayer = this.m_11259_(p_11281_.getId());
        if (serverplayer != null) {
-@@ -774,13 +_,6 @@
+@@ -768,22 +_,29 @@
+       return p_251384_.m_245272_() && !p_251384_.m_240431_(Instant.now());
+    }
+ 
+-   public ServerStatsCounter m_11239_(Player p_11240_) {
+-      UUID uuid = p_11240_.m_20148_();
+-      ServerStatsCounter serverstatscounter = this.f_11202_.get(uuid);
++   // CraftBukkit start
++   public ServerStatsCounter getPlayerStats(ServerPlayer p_11240_) {
++      ServerStatsCounter serverstatisticmanager = p_11240_.m_8951_();
++      return serverstatisticmanager == null ? getPlayerStats(p_11240_.m_20148_(), p_11240_.m_5446_().getString()) : serverstatisticmanager;
++   }
++
++   public ServerStatsCounter getPlayerStats(UUID uuid, String displayName) {
++      ServerPlayer player = m_11259_(uuid);
++      ServerStatsCounter serverstatscounter = player == null ? null : (ServerStatsCounter) player.m_8951_();
++      // CraftBukkit end
++
        if (serverstatscounter == null) {
           File file1 = this.f_11195_.m_129843_(LevelResource.f_78175_).toFile();
           File file2 = new File(file1, uuid + ".json");
--         if (!file2.exists()) {
+          if (!file2.exists()) {
 -            File file3 = new File(file1, p_11240_.m_7755_().getString() + ".json");
 -            Path path = file3.toPath();
 -            if (FileUtil.m_133728_(path) && FileUtil.m_133734_(path) && path.startsWith(file1.getPath()) && file3.isFile()) {
--               file3.renameTo(file2);
--            }
--         }
++            File file3 = new File(file1, displayName + ".json"); // CraftBukkit
++            if(file3.exists() && file3.isFile()) {
+                file3.renameTo(file2);
+             }
+          }
  
           serverstatscounter = new ServerStatsCounter(this.f_11195_, file2);
-          this.f_11202_.put(uuid, serverstatscounter);
+-         this.f_11202_.put(uuid, serverstatscounter);
++         // this.stats.put(uuid, serverstatscounter);  // CraftBukkit
+       }
+ 
+       return serverstatscounter;
 @@ -799,6 +_,8 @@
           this.f_11203_.put(uuid, playeradvancements);
        }
