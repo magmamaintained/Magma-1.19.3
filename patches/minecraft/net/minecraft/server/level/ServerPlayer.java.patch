@@ -16,7 +16,7 @@
  import net.minecraft.world.inventory.AbstractContainerMenu;
  import net.minecraft.world.inventory.ContainerListener;
  import net.minecraft.world.inventory.ContainerSynchronizer;
-@@ -142,8 +_,11 @@
+@@ -142,8 +_,12 @@
  import net.minecraft.world.phys.Vec3;
  import net.minecraft.world.scores.PlayerTeam;
  import net.minecraft.world.scores.Score;
@@ -25,6 +25,7 @@
  import net.minecraft.world.scores.criteria.ObjectiveCriteria;
 +import org.bukkit.WeatherType;
 +import org.bukkit.craftbukkit.entity.CraftPlayer;
++import org.bukkit.event.player.PlayerTeleportEvent;
  import org.slf4j.Logger;
  
  public class ServerPlayer extends Player {
@@ -197,6 +198,18 @@
     }
  
     protected void m_142540_(MobEffectInstance p_143393_, @Nullable Entity p_143394_) {
+@@ -1178,6 +_,11 @@
+       CriteriaTriggers.f_10550_.m_149262_(this, (Entity)null);
+    }
+ 
++   //Magma TODO - stub
++   public void teleportTo(ServerLevel p139017, double p139018, double p139019, double p139020, float f, float f1, PlayerTeleportEvent.TeleportCause command) {
++   }
++
++
+    public void m_6021_(double p_8969_, double p_8970_, double p_8971_) {
+       this.f_8906_.m_9780_(p_8969_, p_8970_, p_8971_, this.m_146908_(), this.m_146909_(), ClientboundPlayerPositionPacket.RelativeArgument.f_244247_);
+    }
 @@ -1211,6 +_,8 @@
     }
  
@@ -370,7 +383,7 @@
     }
  
     public boolean m_184128_() {
-@@ -1582,4 +_,147 @@
+@@ -1582,4 +_,148 @@
     public RemoteChatSession m_246404_() {
        return this.f_244040_;
     }
@@ -516,5 +529,6 @@
 +   public int nextContainerCounterInt() {
 +      return 0;
 +   }
++
 +
  }

@@ -29,7 +29,16 @@
  import org.slf4j.Logger;
  
  public class ServerLevel extends Level implements WorldGenLevel {
-@@ -187,13 +_,32 @@
+@@ -168,7 +_,7 @@
+    final List<ServerPlayer> f_8546_ = Lists.newArrayList();
+    private final ServerChunkCache f_8547_;
+    private final MinecraftServer f_8548_;
+-   public final ServerLevelData f_8549_;
++   public final PrimaryLevelData f_8549_;
+    final EntityTickList f_143243_ = new EntityTickList();
+    public final PersistentEntitySectionManager<Entity> f_143244_;
+    private final GameEventDispatcher f_243695_;
+@@ -187,17 +_,35 @@
     private final List<CustomSpawner> f_8558_;
     @Nullable
     private final EndDragonFight f_8559_;
@@ -43,7 +52,6 @@
 +   // CraftBukkit start
 +   public final LevelStorageSource.LevelStorageAccess convertable;
 +   public final UUID uuid;
-+   public PrimaryLevelData worldDataServer; // Magma
 +
 +   public LevelChunk getChunkIfLoaded(int x, int z) {
 +      return this.f_8547_.m_62227_(x, z, false);
@@ -63,6 +71,11 @@
        this.f_8561_ = p_215009_;
        this.f_8548_ = p_214999_;
        this.f_8558_ = p_215008_;
+-      this.f_8549_ = p_215002_;
++      this.f_8549_ = (PrimaryLevelData) p_215002_;
+       ChunkGenerator chunkgenerator = p_215004_.f_63976_();
+       boolean flag = p_214999_.m_6365_();
+       DataFixer datafixer = p_214999_.m_129933_();
 @@ -231,6 +_,15 @@
  
        this.f_143245_ = new SleepStatus();
@@ -216,11 +229,12 @@
     }
  
     private boolean m_8872_(Entity p_8873_) {
-@@ -825,7 +_,28 @@
+@@ -825,8 +_,35 @@
           f_8566_.warn("Tried to add entity {} but it was marked as removed already", (Object)EntityType.m_20613_(p_8873_.m_6095_()));
           return false;
        } else {
 -         return this.f_143244_.m_157533_(p_8873_);
+-      }
 +         if (this.f_143244_.m_157533_(p_8873_)) {
 +            p_8873_.onAddedToWorld();
 +            return true;
@@ -243,9 +257,16 @@
 +         // CraftBukkit end
 +
 +         return this.f_143244_.m_157533_(entity);
-       }
++      }
++   }
++
++
++   //Magma TODO - stub
++   public boolean tryAddFreshEntityWithPassengers(Entity p_8861_, CreatureSpawnEvent.SpawnReason command) {
++      return false;
     }
  
+    public boolean m_8860_(Entity p_8861_) {
 @@ -862,10 +_,22 @@
     }
  
