@@ -1,0 +1,20 @@
+--- a/net/minecraft/util/datafix/DataFixers.java
++++ b/net/minecraft/util/datafix/DataFixers.java
+@@ -39,6 +_,7 @@
+ import net.minecraft.util.datafix.fixes.BlockRenameFix;
+ import net.minecraft.util.datafix.fixes.BlockRenameFixWithJigsaw;
+ import net.minecraft.util.datafix.fixes.BlockStateStructureTemplateFix;
++import net.minecraft.util.datafix.fixes.BukkitNameFix;
+ import net.minecraft.util.datafix.fixes.CatTypeFix;
+ import net.minecraft.util.datafix.fixes.CauldronRenameFix;
+ import net.minecraft.util.datafix.fixes.CavesAndCliffsRenames;
+@@ -393,6 +_,9 @@
+       Schema schema46 = p_14514_.addSchema(1456, f_14509_);
+       p_14514_.addFixer(new EntityItemFrameDirectionFix(schema46, false));
+       Schema schema47 = p_14514_.addSchema(1458, f_14509_);
++      // CraftBukkit start
++      p_14514_.addFixer(new BukkitNameFix(schema47, false));
++      // CraftBukkit end
+       p_14514_.addFixer(new EntityCustomNameToComponentFix(schema47, false));
+       p_14514_.addFixer(new ItemCustomNameToComponentFix(schema47, false));
+       p_14514_.addFixer(new BlockEntityCustomNameToComponentFix(schema47, false));
