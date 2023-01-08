@@ -10,7 +10,7 @@
  import net.minecraft.CrashReport;
  import net.minecraft.ReportedException;
  import net.minecraft.SharedConstants;
-@@ -144,21 +_,21 @@
+@@ -144,25 +_,25 @@
  import net.minecraft.world.level.levelgen.PhantomSpawner;
  import net.minecraft.world.level.levelgen.WorldOptions;
  import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplateManager;
@@ -41,6 +41,11 @@
  import org.slf4j.Logger;
  
  public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTask> implements CommandSource, AutoCloseable {
+-   private static final Logger f_129750_ = LogUtils.getLogger();
++   public static final Logger f_129750_ = LogUtils.getLogger();
+    public static final String f_195495_ = "vanilla";
+    private static final float f_177884_ = 0.8F;
+    private static final int f_177885_ = 100;
 @@ -245,9 +_,23 @@
     protected final WorldData f_129749_;
     private volatile boolean f_195494_;

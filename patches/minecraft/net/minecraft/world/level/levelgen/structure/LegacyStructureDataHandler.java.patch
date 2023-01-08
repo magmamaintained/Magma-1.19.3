@@ -1,0 +1,20 @@
+--- a/net/minecraft/world/level/levelgen/structure/LegacyStructureDataHandler.java
++++ b/net/minecraft/world/level/levelgen/structure/LegacyStructureDataHandler.java
+@@ -18,6 +_,8 @@
+ import net.minecraft.resources.ResourceKey;
+ import net.minecraft.world.level.ChunkPos;
+ import net.minecraft.world.level.Level;
++import net.minecraft.world.level.LevelSettings;
++import net.minecraft.world.level.dimension.LevelStem;
+ import net.minecraft.world.level.storage.DimensionDataStorage;
+ 
+ public class LegacyStructureDataHandler {
+@@ -202,7 +_,7 @@
+       }
+    }
+ 
+-   public static LegacyStructureDataHandler m_71331_(ResourceKey<Level> p_71332_, @Nullable DimensionDataStorage p_71333_) {
++    public static LegacyStructureDataHandler m_71331_(ResourceKey<Level> p_71332_, @Nullable DimensionDataStorage p_71333_) { // CraftBukkit
+       if (p_71332_ == Level.f_46428_) {
+          return new LegacyStructureDataHandler(p_71333_, ImmutableList.of("Monument", "Stronghold", "Village", "Mineshaft", "Temple", "Mansion"), ImmutableList.of("Village", "Mineshaft", "Mansion", "Igloo", "Desert_Pyramid", "Jungle_Pyramid", "Swamp_Hut", "Stronghold", "Monument"));
+       } else if (p_71332_ == Level.f_46429_) {

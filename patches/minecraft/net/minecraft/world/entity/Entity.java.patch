@@ -998,6 +998,14 @@
     public boolean m_6063_() {
        return true;
     }
+@@ -2477,7 +_,6 @@
+    public void m_142098_(double p_146825_, double p_146826_, double p_146827_) {
+       this.m_6021_(p_146825_, p_146826_, p_146827_);
+    }
+-
+    public void m_6021_(double p_19887_, double p_19888_, double p_19889_) {
+       if (this.f_19853_ instanceof ServerLevel) {
+          this.m_7678_(p_19887_, p_19888_, p_19889_, this.m_146908_(), this.m_146909_());
 @@ -2518,8 +_,10 @@
        EntityDimensions entitydimensions = this.f_19815_;
        Pose pose = this.m_20089_();
