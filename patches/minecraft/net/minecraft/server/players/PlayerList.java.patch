@@ -92,6 +92,16 @@
        if (flag2) {
           serverplayer.f_8906_.m_9829_(new ClientboundSoundPacket(SoundEvents.f_12377_, SoundSource.BLOCKS, (double)blockpos.m_123341_(), (double)blockpos.m_123342_(), (double)blockpos.m_123343_(), 1.0F, 1.0F, serverlevel1.m_213780_().m_188505_()));
        }
+@@ -488,6 +_,9 @@
+ 
+    }
+ 
++   public void broadcastAll(Packet<?> p_11271_, ServerPlayer player) {
++   }
++
+    public void m_11268_(Packet<?> p_11269_) {
+       for(ServerPlayer serverplayer : this.f_11196_) {
+          serverplayer.f_8906_.m_9829_(p_11269_);
 @@ -551,6 +_,7 @@
     }
  
@@ -171,3 +181,9 @@
        this.m_11268_(new ClientboundUpdateTagsPacket(TagNetworkSerialization.m_245799_(this.f_243858_)));
        ClientboundUpdateRecipesPacket clientboundupdaterecipespacket = new ClientboundUpdateRecipesPacket(this.f_11195_.m_129894_().m_44051_());
  
+@@ -858,4 +_,5 @@
+    public boolean m_11316_() {
+       return this.f_11209_;
+    }
++
+ }
