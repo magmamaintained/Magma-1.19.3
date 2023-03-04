@@ -1,5 +1,13 @@
 --- a/net/minecraft/server/dedicated/DedicatedServerProperties.java
 +++ b/net/minecraft/server/dedicated/DedicatedServerProperties.java
+@@ -34,6 +_,7 @@
+ import net.minecraft.world.level.DataPackConfig;
+ import net.minecraft.world.level.GameType;
+ import net.minecraft.world.level.WorldDataConfiguration;
++import net.minecraft.world.level.biome.FixedBiomeSource;
+ import net.minecraft.world.level.levelgen.FlatLevelSource;
+ import net.minecraft.world.level.levelgen.WorldDimensions;
+ import net.minecraft.world.level.levelgen.WorldOptions;
 @@ -46,6 +_,7 @@
     static final Logger f_214805_ = LogUtils.getLogger();
     private static final Pattern f_214806_ = Pattern.compile("^[a-fA-F0-9]{40}$");

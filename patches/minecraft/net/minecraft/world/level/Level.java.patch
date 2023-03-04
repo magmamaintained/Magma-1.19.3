@@ -11,6 +11,23 @@
  import java.util.function.Consumer;
  import java.util.function.Predicate;
  import java.util.function.Supplier;
+@@ -21,10 +_,16 @@
+ import net.minecraft.core.registries.Registries;
+ import net.minecraft.nbt.CompoundTag;
+ import net.minecraft.network.protocol.Packet;
++import net.minecraft.network.protocol.game.ClientboundSetBorderCenterPacket;
++import net.minecraft.network.protocol.game.ClientboundSetBorderLerpSizePacket;
++import net.minecraft.network.protocol.game.ClientboundSetBorderSizePacket;
++import net.minecraft.network.protocol.game.ClientboundSetBorderWarningDelayPacket;
++import net.minecraft.network.protocol.game.ClientboundSetBorderWarningDistancePacket;
+ import net.minecraft.resources.ResourceKey;
+ import net.minecraft.resources.ResourceLocation;
+ import net.minecraft.server.MinecraftServer;
+ import net.minecraft.server.level.ChunkHolder;
++import net.minecraft.server.level.ServerLevel;
+ import net.minecraft.sounds.SoundEvent;
+ import net.minecraft.sounds.SoundSource;
+ import net.minecraft.util.AbortableIterationConsumer;
 @@ -36,6 +_,7 @@
  import net.minecraft.world.entity.Entity;
  import net.minecraft.world.entity.boss.EnderDragonPart;
@@ -19,7 +36,13 @@
  import net.minecraft.world.entity.player.Player;
  import net.minecraft.world.item.ItemStack;
  import net.minecraft.world.item.crafting.RecipeManager;
-@@ -52,6 +_,7 @@
+@@ -47,11 +_,13 @@
+ import net.minecraft.world.level.block.entity.BlockEntity;
+ import net.minecraft.world.level.block.entity.TickingBlockEntity;
+ import net.minecraft.world.level.block.state.BlockState;
++import net.minecraft.world.level.border.BorderChangeListener;
+ import net.minecraft.world.level.border.WorldBorder;
+ import net.minecraft.world.level.chunk.ChunkAccess;
  import net.minecraft.world.level.chunk.ChunkStatus;
  import net.minecraft.world.level.chunk.LevelChunk;
  import net.minecraft.world.level.dimension.DimensionType;
@@ -44,10 +67,12 @@
     public static final Codec<ResourceKey<Level>> f_46427_ = ResourceKey.m_195966_(Registries.f_256858_);
     public static final ResourceKey<Level> f_46428_ = ResourceKey.m_135785_(Registries.f_256858_, new ResourceLocation("overworld"));
     public static final ResourceKey<Level> f_46429_ = ResourceKey.m_135785_(Registries.f_256858_, new ResourceLocation("the_nether"));
-@@ -107,8 +_,45 @@
+@@ -107,8 +_,48 @@
     private final BiomeManager f_46420_;
     private final ResourceKey<Level> f_46421_;
     private long f_186455_;
+-
+-   protected Level(WritableLevelData p_220352_, ResourceKey<Level> p_220353_, Holder<DimensionType> p_220354_, Supplier<ProfilerFiller> p_220355_, boolean p_220356_, boolean p_220357_, long p_220358_, int p_220359_) {
 +   public boolean restoringBlockSnapshots = false;
 +   public boolean captureBlockSnapshots = false;
 +   public java.util.ArrayList<net.minecraftforge.common.util.BlockSnapshot> capturedBlockSnapshots = new java.util.ArrayList<>();
@@ -77,9 +102,12 @@
 +      return (CraftServer) Bukkit.getServer();
 +   }
 +   public abstract ResourceKey<LevelStem> getTypeKey();
- 
-    protected Level(WritableLevelData p_220352_, ResourceKey<Level> p_220353_, Holder<DimensionType> p_220354_, Supplier<ProfilerFiller> p_220355_, boolean p_220356_, boolean p_220357_, long p_220358_, int p_220359_) {
++
++   protected Level(WritableLevelData p_220352_, ResourceKey<Level> p_220353_, Holder<DimensionType> p_220354_, Supplier<ProfilerFiller> p_220355_, boolean p_220356_, boolean p_220357_, long p_220358_, int p_220359_, org.bukkit.generator.ChunkGenerator gen, org.bukkit.generator.BiomeProvider biomeProvider, org.bukkit.World.Environment env) {
 +      super(Level.class);
++
++      this.generator = gen;
++      this.world = new CraftWorld((ServerLevel) this, gen, biomeProvider, env);
 +      // CraftBukkit Ticks things
 +      for (SpawnCategory spawnCategory : SpawnCategory.values()) {
 +         if (CraftSpawnCategory.isValidForLimits( spawnCategory )) {
@@ -90,11 +118,47 @@
        this.f_46446_ = p_220355_;
        this.f_46442_ = p_220352_;
        this.f_204147_ = p_220354_;
-@@ -136,6 +_,7 @@
+@@ -136,6 +_,43 @@
        this.f_46420_ = new BiomeManager(this, p_220358_);
        this.f_46424_ = p_220357_;
        this.f_220350_ = new CollectingNeighborUpdater(this, p_220359_);
 +
++      // CraftBukkit start
++      m_6857_().world = (ServerLevel) this;
++      // From PlayerList.setPlayerFileData
++//      getWorldBorder().addListener(new BorderChangeListener() {
++//         @Override
++//         public void onBorderSizeSet(WorldBorder worldborder, double d0) {
++//            getCraftServer().getHandle().broadcastAll(new ClientboundSetBorderSizePacket(worldborder), worldborder.world);
++//         }
++//
++//         @Override
++//         public void onBorderSizeLerping(WorldBorder worldborder, double d0, double d1, long i) {
++//            getCraftServer().getHandle().broadcastAll(new ClientboundSetBorderLerpSizePacket(worldborder), worldborder.world);
++//         }
++//
++//         @Override
++//         public void onBorderCenterSet(WorldBorder worldborder, double d0, double d1) {
++//            getCraftServer().getHandle().broadcastAll(new ClientboundSetBorderCenterPacket(worldborder), worldborder.world);
++//         }
++//
++//         @Override
++//         public void onBorderSetWarningTime(WorldBorder worldborder, int i) {
++//            getCraftServer().getHandle().broadcastAll(new ClientboundSetBorderWarningDelayPacket(worldborder), worldborder.world);
++//         }
++//
++//         @Override
++//         public void onBorderSetWarningBlocks(WorldBorder worldborder, int i) {
++//            getCraftServer().getHandle().broadcastAll(new ClientboundSetBorderWarningDistancePacket(worldborder), worldborder.world);
++//         }
++//
++//         @Override
++//         public void onBorderSetDamagePerBlock(WorldBorder worldborder, double d0) {}
++//
++//         @Override
++//         public void onBorderSetDamageSafeZOne(WorldBorder worldborder, double d0) {}
++//      });
++      // CraftBukkit end
     }
  
     public boolean m_5776_() {
