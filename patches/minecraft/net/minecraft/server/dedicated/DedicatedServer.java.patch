@@ -1,5 +1,13 @@
 --- a/net/minecraft/server/dedicated/DedicatedServer.java
 +++ b/net/minecraft/server/dedicated/DedicatedServer.java
+@@ -30,6 +_,7 @@
+ import net.minecraft.server.MinecraftServer;
+ import net.minecraft.server.ServerInterface;
+ import net.minecraft.server.Services;
++import net.minecraft.server.WorldLoader;
+ import net.minecraft.server.WorldStem;
+ import net.minecraft.server.gui.MinecraftServerGui;
+ import net.minecraft.server.level.ServerLevel;
 @@ -51,6 +_,11 @@
  import net.minecraft.world.level.Level;
  import net.minecraft.world.level.block.entity.SkullBlockEntity;
@@ -12,7 +20,7 @@
  import org.slf4j.Logger;
  
  public class DedicatedServer extends MinecraftServer implements ServerInterface {
-@@ -63,7 +_,7 @@
+@@ -63,14 +_,14 @@
     public final RconConsoleSource f_139602_;
     @Nullable
     private RconThread f_139603_;
@@ -21,6 +29,15 @@
     @Nullable
     private MinecraftServerGui f_139605_;
     @Nullable
+    private final TextFilterClient f_139606_;
+ 
+-   public DedicatedServer(Thread p_214789_, LevelStorageSource.LevelStorageAccess p_214790_, PackRepository p_214791_, WorldStem p_214792_, DedicatedServerSettings p_214793_, DataFixer p_214794_, Services p_214795_, ChunkProgressListenerFactory p_214796_) {
+-      super(p_214789_, p_214790_, p_214791_, p_214792_, Proxy.NO_PROXY, p_214794_, p_214795_, p_214796_);
++   public DedicatedServer(joptsimple.OptionSet options, WorldLoader.DataLoadContext worldLoader, Thread p_214789_, LevelStorageSource.LevelStorageAccess p_214790_, PackRepository p_214791_, WorldStem p_214792_, DedicatedServerSettings p_214793_, DataFixer p_214794_, Services p_214795_, ChunkProgressListenerFactory p_214796_) {
++      super(options, worldLoader, p_214789_, p_214790_, p_214791_, p_214792_, Proxy.NO_PROXY, p_214794_, p_214795_, p_214796_);
+       this.f_139604_ = p_214793_;
+       this.f_139602_ = new RconConsoleSource(this);
+       this.f_139606_ = TextFilterClient.m_143736_(p_214793_.m_139777_().f_139724_);
 @@ -79,12 +_,43 @@
     public boolean m_7038_() throws IOException {
        Thread thread = new Thread("Server console handler") {
@@ -121,7 +138,8 @@
           GameProfileCache.m_11004_(this.m_129797_());
 +         if (!net.minecraftforge.server.ServerLifecycleHooks.handleServerAboutToStart(this)) return false;
           f_139598_.info("Preparing level \"{}\"", (Object)this.m_7123_());
-          this.m_130006_();
+-         this.m_130006_();
++         this.loadLevel(f_129744_.m_78277_());
           long j = Util.m_137569_() - i;
           String s = String.format(Locale.ROOT, "%.3fs", (double)j / 1.0E9D);
           f_139598_.info("Done ({})! For help, type \"help\"", (Object)s);

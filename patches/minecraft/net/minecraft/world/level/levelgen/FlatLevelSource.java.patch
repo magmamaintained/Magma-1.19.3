@@ -1,0 +1,17 @@
+--- a/net/minecraft/world/level/levelgen/FlatLevelSource.java
++++ b/net/minecraft/world/level/levelgen/FlatLevelSource.java
+@@ -31,9 +_,12 @@
+       return p_255577_.group(FlatLevelGeneratorSettings.f_70347_.fieldOf("settings").forGetter(FlatLevelSource::m_64191_)).apply(p_255577_, p_255577_.stable(FlatLevelSource::new));
+    });
+    private final FlatLevelGeneratorSettings f_64165_;
+-
+    public FlatLevelSource(FlatLevelGeneratorSettings p_256337_) {
+-      super(new FixedBiomeSource(p_256337_.m_204921_()), Util.m_143827_(p_256337_::m_226294_));
++      this(p_256337_, new FixedBiomeSource(p_256337_.m_204921_()));
++   }
++
++   public FlatLevelSource(FlatLevelGeneratorSettings p_256337_, net.minecraft.world.level.biome.BiomeSource worldchunkmanager) {
++      super(worldchunkmanager, Util.m_143827_(p_256337_::m_226294_));
+       this.f_64165_ = p_256337_;
+    }
+ 
