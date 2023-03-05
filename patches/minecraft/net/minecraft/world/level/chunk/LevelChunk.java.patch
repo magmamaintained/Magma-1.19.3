@@ -8,8 +8,11 @@
  import net.minecraft.world.level.block.Block;
  import net.minecraft.world.level.block.Blocks;
  import net.minecraft.world.level.block.EntityBlock;
-@@ -48,7 +_,7 @@
+@@ -46,9 +_,10 @@
+ import net.minecraft.world.level.material.Fluids;
+ import net.minecraft.world.ticks.LevelChunkTicks;
  import net.minecraft.world.ticks.TickContainerAccess;
++import org.bukkit.craftbukkit.v1_19_R3.CraftChunk;
  import org.slf4j.Logger;
  
 -public class LevelChunk extends ChunkAccess {
@@ -42,7 +45,7 @@
 -   }
 +      this.capProvider.initInternal();
 +      // CraftBukkit start
-+      this.bukkitChunk = new org.bukkit.craftbukkit.CraftChunk(this);
++      this.bukkitChunk = new CraftChunk(this);
 +   }
 +
 +   public org.bukkit.Chunk bukkitChunk;

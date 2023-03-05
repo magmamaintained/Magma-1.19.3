@@ -1,19 +1,18 @@
 --- a/net/minecraft/server/level/ServerLevel.java
 +++ b/net/minecraft/server/level/ServerLevel.java
-@@ -91,6 +_,7 @@
+@@ -89,7 +_,6 @@
+ import net.minecraft.world.entity.animal.Animal;
+ import net.minecraft.world.entity.animal.WaterAnimal;
  import net.minecraft.world.entity.animal.horse.SkeletonHorse;
- import net.minecraft.world.entity.boss.EnderDragonPart;
+-import net.minecraft.world.entity.boss.EnderDragonPart;
  import net.minecraft.world.entity.boss.enderdragon.EnderDragon;
-+import net.minecraft.world.entity.item.ItemEntity;
  import net.minecraft.world.entity.npc.Npc;
  import net.minecraft.world.entity.player.Player;
- import net.minecraft.world.entity.raid.Raid;
-@@ -109,6 +_,8 @@
+@@ -109,6 +_,7 @@
  import net.minecraft.world.level.StructureManager;
  import net.minecraft.world.level.WorldGenLevel;
  import net.minecraft.world.level.biome.Biome;
 +import net.minecraft.world.level.biome.BiomeSource;
-+import net.minecraft.world.level.biome.FixedBiomeSource;
  import net.minecraft.world.level.block.Block;
  import net.minecraft.world.level.block.Blocks;
  import net.minecraft.world.level.block.SnowLayerBlock;
@@ -35,15 +34,13 @@
  import net.minecraft.world.level.storage.ServerLevelData;
  import net.minecraft.world.phys.AABB;
  import net.minecraft.world.phys.Vec3;
-@@ -150,6 +_,13 @@
+@@ -150,6 +_,11 @@
  import net.minecraft.world.phys.shapes.Shapes;
  import net.minecraft.world.phys.shapes.VoxelShape;
  import net.minecraft.world.ticks.LevelTicks;
-+import org.bukkit.World;
-+import org.bukkit.craftbukkit.CraftWorld;
-+import org.bukkit.craftbukkit.event.CraftEventFactory;
-+import org.bukkit.craftbukkit.generator.CustomWorldChunkManager;
-+import org.bukkit.craftbukkit.util.WorldUUID;
++import org.bukkit.craftbukkit.v1_19_R3.event.CraftEventFactory;
++import org.bukkit.craftbukkit.v1_19_R3.generator.CustomWorldChunkManager;
++import org.bukkit.craftbukkit.v1_19_R3.util.WorldUUID;
 +import org.bukkit.event.entity.CreatureSpawnEvent;
 +import org.bukkit.event.weather.LightningStrikeEvent;
  import org.slf4j.Logger;
@@ -110,7 +107,7 @@
 +      }
 +
 +      if (gen != null) {
-+         chunkgenerator = new org.bukkit.craftbukkit.generator.CustomChunkGenerator(this, chunkgenerator, gen);
++         chunkgenerator = new org.bukkit.craftbukkit.v1_19_R3.generator.CustomChunkGenerator(this, chunkgenerator, gen);
 +      }
 +      // CraftBukkit end
        boolean flag = p_214999_.m_6365_();

@@ -1,5 +1,19 @@
 --- a/net/minecraft/server/dedicated/DedicatedServer.java
 +++ b/net/minecraft/server/dedicated/DedicatedServer.java
+@@ -4,13 +_,10 @@
+ import com.mojang.authlib.GameProfile;
+ import com.mojang.datafixers.DataFixer;
+ import com.mojang.logging.LogUtils;
+-import java.io.BufferedReader;
+ import java.io.IOException;
+-import java.io.InputStreamReader;
+ import java.io.Writer;
+ import java.net.InetAddress;
+ import java.net.Proxy;
+-import java.nio.charset.StandardCharsets;
+ import java.nio.file.Files;
+ import java.nio.file.Path;
+ import java.util.Collections;
 @@ -30,6 +_,7 @@
  import net.minecraft.server.MinecraftServer;
  import net.minecraft.server.ServerInterface;
@@ -8,13 +22,14 @@
  import net.minecraft.server.WorldStem;
  import net.minecraft.server.gui.MinecraftServerGui;
  import net.minecraft.server.level.ServerLevel;
-@@ -51,6 +_,11 @@
+@@ -51,6 +_,12 @@
  import net.minecraft.world.level.Level;
  import net.minecraft.world.level.block.entity.SkullBlockEntity;
  import net.minecraft.world.level.storage.LevelStorageSource;
 +import org.apache.logging.log4j.LogManager;
 +import org.apache.logging.log4j.io.IoBuilder;
 +import org.bukkit.command.CommandSender;
++import org.bukkit.craftbukkit.Main;
 +import org.bukkit.event.server.RemoteServerCommandEvent;
 +import org.bukkit.event.server.ServerCommandEvent;
  import org.slf4j.Logger;
@@ -45,7 +60,7 @@
 -            BufferedReader bufferedreader = new BufferedReader(new InputStreamReader(System.in, StandardCharsets.UTF_8));
 +            if (net.minecraftforge.server.console.TerminalHandler.handleCommands(DedicatedServer.this)) return;
 +            // CraftBukkit start
-+            if (!org.bukkit.craftbukkit.Main.useConsole) {
++            if (!Main.useConsole) {
 +               return;
 +            }
 +            jline.console.ConsoleReader bufferedreader = reader;
@@ -63,7 +78,7 @@
 -                  DedicatedServer.this.m_139645_(s1, DedicatedServer.this.m_129893_());
 +               // CraftBukkit start - JLine disabling compatibility
 +               while (!DedicatedServer.this.m_129918_() && DedicatedServer.this.m_130010_()) {
-+                  if (org.bukkit.craftbukkit.Main.useJline) {
++                  if (Main.useJline) {
 +                     s1 = bufferedreader.readLine(">", null);
 +                  } else {
 +                     s1 = bufferedreader.readLine();
@@ -96,7 +111,7 @@
 +      for (java.util.logging.Handler handler : global.getHandlers()) {
 +         global.removeHandler(handler);
 +      }
-+      global.addHandler(new org.bukkit.craftbukkit.util.ForwardLogHandler());
++      global.addHandler(new org.bukkit.craftbukkit.v1_19_R3.util.ForwardLogHandler());
 +
 +      final org.apache.logging.log4j.core.Logger logger = ((org.apache.logging.log4j.core.Logger) LogManager.getRootLogger());
 +      for (org.apache.logging.log4j.core.Appender appender : logger.getAppenders().values()) {
@@ -106,7 +121,7 @@
 +      }
 +
 +
-+      new org.bukkit.craftbukkit.util.TerminalConsoleWriterThread(System.out, this.reader).start();
++      new org.bukkit.craftbukkit.v1_19_R3.util.TerminalConsoleWriterThread(System.out, this.reader).start();
 +      System.setOut(IoBuilder.forLogger(logger).setLevel(org.apache.logging.log4j.Level.INFO).buildPrintStream());
 +      System.setErr(IoBuilder.forLogger(logger).setLevel(org.apache.logging.log4j.Level.WARN).buildPrintStream());
 +      // CraftBukkit end
@@ -151,7 +166,7 @@
           if (dedicatedserverproperties.f_139747_) {
              f_139598_.info("Starting remote control listener");
              this.f_139603_ = RconThread.m_11615_(this);
-+            this.remoteConsole = new org.bukkit.craftbukkit.command.CraftRemoteConsoleCommandSender(this.f_139602_); // CraftBukkit
++            this.remoteConsole = new org.bukkit.craftbukkit.v1_19_R3.command.CraftRemoteConsoleCommandSender(this.f_139602_); // CraftBukkit
           }
  
           if (this.m_139669_() > 0L) {

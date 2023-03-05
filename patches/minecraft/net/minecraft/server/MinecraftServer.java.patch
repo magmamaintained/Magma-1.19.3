@@ -29,14 +29,7 @@
  import net.minecraft.CrashReport;
  import net.minecraft.ReportedException;
  import net.minecraft.SharedConstants;
-@@ -56,12 +_,15 @@
- import net.minecraft.commands.Commands;
- import net.minecraft.core.BlockPos;
- import net.minecraft.core.HolderGetter;
-+import net.minecraft.core.HolderLookup;
- import net.minecraft.core.LayeredRegistryAccess;
- import net.minecraft.core.Registry;
- import net.minecraft.core.RegistryAccess;
+@@ -62,6 +_,8 @@
  import net.minecraft.core.registries.Registries;
  import net.minecraft.data.worldgen.features.MiscOverworldFeatures;
  import net.minecraft.gametest.framework.GameTestTicker;
@@ -66,9 +59,11 @@
  import net.minecraft.util.profiling.EmptyProfileResults;
  import net.minecraft.util.profiling.ProfileResults;
  import net.minecraft.util.profiling.ProfilerFiller;
-@@ -138,31 +_,35 @@
+@@ -136,33 +_,36 @@
+ import net.minecraft.world.level.WorldDataConfiguration;
+ import net.minecraft.world.level.biome.BiomeManager;
  import net.minecraft.world.level.block.Block;
- import net.minecraft.world.level.border.BorderChangeListener;
+-import net.minecraft.world.level.border.BorderChangeListener;
  import net.minecraft.world.level.border.WorldBorder;
 +import net.minecraft.world.level.dimension.DimensionType;
  import net.minecraft.world.level.dimension.LevelStem;
@@ -96,14 +91,14 @@
  import net.minecraft.world.phys.Vec3;
  import org.apache.commons.lang3.Validate;
 +import org.bukkit.Bukkit;
-+import org.bukkit.World;
-+import org.bukkit.craftbukkit.CraftServer;
++import org.bukkit.craftbukkit.v1_19_R3.CraftServer;
 +import org.bukkit.craftbukkit.Main;
-+import org.bukkit.craftbukkit.scoreboard.CraftScoreboardManager;
-+import org.bukkit.craftbukkit.util.CraftChatMessage;
-+import org.bukkit.craftbukkit.util.LazyPlayerSet;
++import org.bukkit.craftbukkit.v1_19_R3.util.CraftChatMessage;
++import org.bukkit.craftbukkit.v1_19_R3.util.LazyPlayerSet;
 +import org.bukkit.event.player.AsyncPlayerChatPreviewEvent;
 +import org.bukkit.event.server.ServerLoadEvent;
++import org.magmafoundation.magma.Magma;
++import org.magmafoundation.magma.patcher.PatcherManager;
  import org.slf4j.Logger;
  
  public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTask> implements CommandSource, AutoCloseable {
@@ -112,7 +107,7 @@
     public static final String f_195495_ = "vanilla";
     private static final float f_177884_ = 0.8F;
     private static final int f_177885_ = 100;
-@@ -242,12 +_,26 @@
+@@ -242,12 +_,37 @@
     private String f_129739_;
     public MinecraftServer.ReloadableResources f_129740_;
     private final StructureTemplateManager f_236720_;
@@ -122,7 +117,7 @@
  
 +   // CraftBukkit start
 +   public WorldLoader.DataLoadContext worldLoader;
-+   public org.bukkit.craftbukkit.CraftServer server;
++   public CraftServer server;
 +   public OptionSet options;
 +   public org.bukkit.command.ConsoleCommandSender console;
 +   public org.bukkit.command.RemoteConsoleCommandSender remoteConsole;
@@ -134,6 +129,17 @@
 +   private boolean forceTicks;
 +   // CraftBukkit end
 +
++
++   // Magma start
++   private static MinecraftServer instance;
++   private Magma magma;
++   // Magma end
++
++
++   public static MinecraftServer getServerInstance() {
++      return instance;
++   }
++
     public static <S extends MinecraftServer> S m_129872_(Function<Thread, S> p_129873_) {
        AtomicReference<S> atomicreference = new AtomicReference<>();
 -      Thread thread = new Thread(() -> {
@@ -141,13 +147,14 @@
           atomicreference.get().m_130011_();
        }, "Server thread");
        thread.setUncaughtExceptionHandler((p_177909_, p_177910_) -> {
-@@ -263,12 +_,12 @@
+@@ -263,12 +_,13 @@
        return s;
     }
  
 -   public MinecraftServer(Thread p_236723_, LevelStorageSource.LevelStorageAccess p_236724_, PackRepository p_236725_, WorldStem p_236726_, Proxy p_236727_, DataFixer p_236728_, Services p_236729_, ChunkProgressListenerFactory p_236730_) {
 +   public MinecraftServer(OptionSet options, WorldLoader.DataLoadContext worldLoader, Thread p_236723_, LevelStorageSource.LevelStorageAccess p_236724_, PackRepository p_236725_, WorldStem p_236726_, Proxy p_236727_, DataFixer p_236728_, Services p_236729_, ChunkProgressListenerFactory p_236730_) {
        super("Server");
++      instance = this;
 +      this.options = options;
        this.f_244176_ = p_236726_.f_244542_();
        this.f_129749_ = p_236726_.f_206895_();
@@ -157,7 +164,7 @@
        } else {
           this.f_129747_ = p_236727_;
           this.f_129730_ = p_236725_;
-@@ -288,6 +_,30 @@
+@@ -288,6 +_,37 @@
           this.f_236720_ = new StructureTemplateManager(p_236726_.f_206892_(), p_236724_, p_236728_, holdergetter);
           this.f_129725_ = p_236723_;
           this.f_129738_ = Util.m_183991_();
@@ -169,6 +176,13 @@
 +            System.setProperty("jline.terminal", "jline.UnsupportedTerminal");
 +            Main.useJline = false;
 +         }
++
++         magma = Magma.getInstance();
++
++         //init patcher
++         magma.setPatcherManager(new PatcherManager());
++         magma.getPatcherManager().init();
++
 +         try {
 +            reader = new ConsoleReader(System.in, System.out);
 +            reader.setExpandEvents(false); // Avoid parsing exceptions for uncommonly used event designators
@@ -184,7 +198,7 @@
 +               f_129750_.warn((String) null, ex);
 +            }
 +         }
-+         Runtime.getRuntime().addShutdownHook(new org.bukkit.craftbukkit.util.ServerShutdownThread(this));
++         Runtime.getRuntime().addShutdownHook(new org.bukkit.craftbukkit.v1_19_R3.util.ServerShutdownThread(this));
        }
     }
  
@@ -368,7 +382,7 @@
 +      List<CustomSpawner> list = ImmutableList.of(new PhantomSpawner(), new PatrolSpawner(), new CatSpawner(), new VillageSiege(), new WanderingTraderSpawner(iworlddataserver));
 +      LevelStem levelStem = (LevelStem) dimensions.m_6246_(dimensionKey);
 +
-+      org.bukkit.generator.WorldInfo worldInfo = new org.bukkit.craftbukkit.generator.CraftWorldInfo(iworlddataserver, worldSession, org.bukkit.World.Environment.getEnvironment(dimension), LevelStem.f_63975_().m_203334_());
++      org.bukkit.generator.WorldInfo worldInfo = new org.bukkit.craftbukkit.v1_19_R3.generator.CraftWorldInfo(iworlddataserver, worldSession, org.bukkit.World.Environment.getEnvironment(dimension), LevelStem.f_63975_().m_203334_());
 +      if (biomeProvider == null && gen != null) {
 +         biomeProvider = gen.getDefaultBiomeProvider(worldInfo);
 +      }
@@ -381,10 +395,10 @@
 +
 +         ChunkProgressListener worldloadlistener = this.f_129756_.m_9620_(11);
 +
-+         world = new ServerLevel(this, this.f_129738_, worldSession, iworlddataserver, worldKey, LevelStem, worldloadlistener, flag, j, list, true, org.bukkit.World.Environment.getEnvironment(dimension), gen, biomeProvider);
++         world = new ServerLevel(this, this.f_129738_, worldSession, iworlddataserver, worldKey, levelStem, worldloadlistener, flag, j, list, true, org.bukkit.World.Environment.getEnvironment(dimension), gen, biomeProvider);
 +         DimensionDataStorage worldpersistentdata = world.m_8895_();
 +         this.m_129841_(worldpersistentdata);
-+         this.server.scoreboardManager = new org.bukkit.craftbukkit.scoreboard.CraftScoreboardManager(this, world.m_6188_());
++         this.server.scoreboardManager = new org.bukkit.craftbukkit.v1_19_R3.scoreboard.CraftScoreboardManager(this, world.m_6188_());
 +         this.f_129732_ = new CommandStorage(worldpersistentdata);
 +      } else {
 +         ChunkProgressListener worldloadlistener = this.f_129756_.m_9620_(11);

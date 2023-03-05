@@ -1,5 +1,19 @@
 --- a/net/minecraft/world/entity/ai/behavior/HarvestFarmland.java
 +++ b/net/minecraft/world/entity/ai/behavior/HarvestFarmland.java
+@@ -17,13 +_,11 @@
+ import net.minecraft.world.entity.player.Player;
+ import net.minecraft.world.item.ItemStack;
+ import net.minecraft.world.item.Items;
+-import net.minecraft.world.level.GameRules;
+ import net.minecraft.world.level.block.Block;
+ import net.minecraft.world.level.block.Blocks;
+ import net.minecraft.world.level.block.CropBlock;
+ import net.minecraft.world.level.block.FarmBlock;
+ import net.minecraft.world.level.block.state.BlockState;
+-import net.minecraft.world.level.gameevent.GameEvent;
+ 
+ public class HarvestFarmland extends Behavior<Villager> {
+    private static final int f_147559_ = 200;
 @@ -39,7 +_,7 @@
     }
  
@@ -15,7 +29,7 @@
              if (block instanceof CropBlock && ((CropBlock)block).m_52307_(blockstate)) {
 -               p_23196_.m_46953_(this.f_23159_, true, p_23197_);
 +               // CraftBukkit start
-+               if (!org.bukkit.craftbukkit.event.CraftEventFactory.callEntityChangeBlockEvent(p_23197_, this.f_23159_, Blocks.f_50016_.m_49966_()).isCancelled()) {
++               if (!org.bukkit.craftbukkit.v1_19_R3.event.CraftEventFactory.callEntityChangeBlockEvent(p_23197_, this.f_23159_, Blocks.f_50016_.m_49966_()).isCancelled()) {
 +                  p_23196_.m_46953_(this.f_23159_, true, p_23197_);
 +               }
 +               // CraftBukkit end
@@ -60,7 +74,7 @@
 +                        }
 +                     }
 +
-+                     if (planted != null && !org.bukkit.craftbukkit.event.CraftEventFactory.callEntityChangeBlockEvent(p_23197_, this.f_23159_, planted.m_49966_()).isCancelled()) {
++                     if (planted != null && !org.bukkit.craftbukkit.v1_19_R3.event.CraftEventFactory.callEntityChangeBlockEvent(p_23197_, this.f_23159_, planted.m_49966_()).isCancelled()) {
 +                        p_23196_.m_7731_(this.f_23159_, planted.m_49966_(), 3);
 +                     } else {
 +                        flag = false;

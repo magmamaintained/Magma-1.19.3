@@ -50,16 +50,15 @@
  import net.minecraft.world.level.entity.EntityTypeTest;
  import net.minecraft.world.level.entity.LevelEntityGetter;
  import net.minecraft.world.level.gameevent.GameEvent;
-@@ -67,8 +_,15 @@
+@@ -67,8 +_,14 @@
  import net.minecraft.world.phys.AABB;
  import net.minecraft.world.phys.Vec3;
  import net.minecraft.world.scores.Scoreboard;
 +import org.bukkit.Bukkit;
-+import org.bukkit.World;
-+import org.bukkit.craftbukkit.CraftServer;
-+import org.bukkit.craftbukkit.CraftWorld;
-+import org.bukkit.craftbukkit.block.CapturedBlockState;
-+import org.bukkit.craftbukkit.util.CraftSpawnCategory;
++import org.bukkit.craftbukkit.v1_19_R3.CraftServer;
++import org.bukkit.craftbukkit.v1_19_R3.CraftWorld;
++import org.bukkit.craftbukkit.v1_19_R3.block.CapturedBlockState;
++import org.bukkit.craftbukkit.v1_19_R3.util.CraftSpawnCategory;
 +import org.bukkit.entity.SpawnCategory;
  
 -public abstract class Level implements LevelAccessor, AutoCloseable {
