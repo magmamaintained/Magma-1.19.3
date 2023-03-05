@@ -1,18 +1,11 @@
 --- a/net/minecraft/server/network/ServerLoginPacketListenerImpl.java
 +++ b/net/minecraft/server/network/ServerLoginPacketListenerImpl.java
-@@ -10,6 +_,7 @@
- import java.net.SocketAddress;
- import java.security.PrivateKey;
- import java.util.UUID;
-+import java.util.concurrent.ExecutionException;
- import java.util.concurrent.atomic.AtomicInteger;
- import javax.annotation.Nullable;
- import javax.crypto.Cipher;
-@@ -35,6 +_,9 @@
+@@ -35,6 +_,10 @@
  import net.minecraft.util.CryptException;
  import net.minecraft.util.RandomSource;
  import org.apache.commons.lang3.Validate;
-+import org.bukkit.craftbukkit.util.Waitable;
++import org.bukkit.craftbukkit.v1_19_R3.util.Waitable;
++import org.bukkit.craftbukkit.v1_19_R3.CraftServer;
 +import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
 +import org.bukkit.event.player.PlayerPreLoginEvent;
  import org.slf4j.Logger;
@@ -108,7 +101,7 @@
 +                  String playerName = f_10021_.getName();
 +                  java.net.InetAddress address = ((java.net.InetSocketAddress) f_10013_.m_129523_()).getAddress();
 +                  java.util.UUID uniqueId = f_10021_.getId();
-+                  final org.bukkit.craftbukkit.CraftServer server = ServerLoginPacketListenerImpl.this.f_10018_.server;
++                  final CraftServer server = ServerLoginPacketListenerImpl.this.f_10018_.server;
 +
 +                  AsyncPlayerPreLoginEvent asyncEvent = new AsyncPlayerPreLoginEvent(playerName, address, uniqueId);
 +                  server.getPluginManager().callEvent(asyncEvent);

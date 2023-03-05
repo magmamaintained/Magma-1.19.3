@@ -1,5 +1,13 @@
 --- a/net/minecraft/world/entity/animal/Bee.java
 +++ b/net/minecraft/world/entity/animal/Bee.java
+@@ -79,7 +_,6 @@
+ import net.minecraft.world.level.block.SweetBerryBushBlock;
+ import net.minecraft.world.level.block.entity.BeehiveBlockEntity;
+ import net.minecraft.world.level.block.entity.BlockEntity;
+-import net.minecraft.world.level.block.entity.BlockEntityType;
+ import net.minecraft.world.level.block.state.BlockState;
+ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+ import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
 @@ -131,7 +_,8 @@
     @Nullable
     BlockPos f_27697_;
@@ -72,7 +80,7 @@
                    }
  
 -                  if (flag) {
-+                  if (flag && !org.bukkit.craftbukkit.event.CraftEventFactory.callEntityChangeBlockEvent(Bee.this, blockpos, blockstate.m_61124_(integerproperty, (Integer) blockstate.m_61143_(integerproperty) + 1)).isCancelled()) { // Spigot
++                  if (flag && !org.bukkit.craftbukkit.v1_19_R3.event.CraftEventFactory.callEntityChangeBlockEvent(Bee.this, blockpos, blockstate.m_61124_(integerproperty, (Integer) blockstate.m_61143_(integerproperty) + 1)).isCancelled()) { // Spigot
                       Bee.this.f_19853_.m_46796_(2005, blockpos, 0);
                       Bee.this.f_19853_.m_46597_(blockpos, blockstate.m_61124_(integerproperty, Integer.valueOf(blockstate.m_61143_(integerproperty) + 1)));
                       Bee.this.m_27871_();
