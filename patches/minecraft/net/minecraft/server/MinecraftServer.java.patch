@@ -141,13 +141,14 @@
           atomicreference.get().m_130011_();
        }, "Server thread");
        thread.setUncaughtExceptionHandler((p_177909_, p_177910_) -> {
-@@ -263,12 +_,11 @@
+@@ -263,12 +_,12 @@
        return s;
     }
  
 -   public MinecraftServer(Thread p_236723_, LevelStorageSource.LevelStorageAccess p_236724_, PackRepository p_236725_, WorldStem p_236726_, Proxy p_236727_, DataFixer p_236728_, Services p_236729_, ChunkProgressListenerFactory p_236730_) {
 +   public MinecraftServer(OptionSet options, WorldLoader.DataLoadContext worldLoader, Thread p_236723_, LevelStorageSource.LevelStorageAccess p_236724_, PackRepository p_236725_, WorldStem p_236726_, Proxy p_236727_, DataFixer p_236728_, Services p_236729_, ChunkProgressListenerFactory p_236730_) {
        super("Server");
++      this.options = options;
        this.f_244176_ = p_236726_.f_244542_();
        this.f_129749_ = p_236726_.f_206895_();
 -      if (!this.f_244176_.m_247579_().m_175515_(Registries.f_256862_).m_142003_(LevelStem.f_63971_)) {

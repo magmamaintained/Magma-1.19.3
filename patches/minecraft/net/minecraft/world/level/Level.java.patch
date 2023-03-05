@@ -126,38 +126,38 @@
 +      // CraftBukkit start
 +      m_6857_().world = (ServerLevel) this;
 +      // From PlayerList.setPlayerFileData
-+//      getWorldBorder().addListener(new BorderChangeListener() {
-+//         @Override
-+//         public void onBorderSizeSet(WorldBorder worldborder, double d0) {
-+//            getCraftServer().getHandle().broadcastAll(new ClientboundSetBorderSizePacket(worldborder), worldborder.world);
-+//         }
-+//
-+//         @Override
-+//         public void onBorderSizeLerping(WorldBorder worldborder, double d0, double d1, long i) {
-+//            getCraftServer().getHandle().broadcastAll(new ClientboundSetBorderLerpSizePacket(worldborder), worldborder.world);
-+//         }
-+//
-+//         @Override
-+//         public void onBorderCenterSet(WorldBorder worldborder, double d0, double d1) {
-+//            getCraftServer().getHandle().broadcastAll(new ClientboundSetBorderCenterPacket(worldborder), worldborder.world);
-+//         }
-+//
-+//         @Override
-+//         public void onBorderSetWarningTime(WorldBorder worldborder, int i) {
-+//            getCraftServer().getHandle().broadcastAll(new ClientboundSetBorderWarningDelayPacket(worldborder), worldborder.world);
-+//         }
-+//
-+//         @Override
-+//         public void onBorderSetWarningBlocks(WorldBorder worldborder, int i) {
-+//            getCraftServer().getHandle().broadcastAll(new ClientboundSetBorderWarningDistancePacket(worldborder), worldborder.world);
-+//         }
-+//
-+//         @Override
-+//         public void onBorderSetDamagePerBlock(WorldBorder worldborder, double d0) {}
-+//
-+//         @Override
-+//         public void onBorderSetDamageSafeZOne(WorldBorder worldborder, double d0) {}
-+//      });
++      m_6857_().m_61929_(new BorderChangeListener() {
++         @Override
++         public void m_6312_(WorldBorder worldborder, double d0) {
++            getCraftServer().getHandle().broadcastAll(new ClientboundSetBorderSizePacket(worldborder), worldborder.world);
++         }
++
++         @Override
++         public void m_6689_(WorldBorder worldborder, double d0, double d1, long i) {
++            getCraftServer().getHandle().broadcastAll(new ClientboundSetBorderLerpSizePacket(worldborder), worldborder.world);
++         }
++
++         @Override
++         public void m_7721_(WorldBorder worldborder, double d0, double d1) {
++            getCraftServer().getHandle().broadcastAll(new ClientboundSetBorderCenterPacket(worldborder), worldborder.world);
++         }
++
++         @Override
++         public void m_5904_(WorldBorder worldborder, int i) {
++            getCraftServer().getHandle().broadcastAll(new ClientboundSetBorderWarningDelayPacket(worldborder), worldborder.world);
++         }
++
++         @Override
++         public void m_5903_(WorldBorder worldborder, int i) {
++            getCraftServer().getHandle().broadcastAll(new ClientboundSetBorderWarningDistancePacket(worldborder), worldborder.world);
++         }
++
++         @Override
++         public void m_6315_(WorldBorder worldborder, double d0) {}
++
++         @Override
++         public void m_6313_(WorldBorder worldborder, double d0) {}
++      });
 +      // CraftBukkit end
     }
  
