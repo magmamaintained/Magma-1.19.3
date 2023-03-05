@@ -59,6 +59,11 @@ public class ItemStackHandler implements IItemHandler, IItemHandlerModifiable, I
         return this.stacks.get(slot);
     }
 
+    // Magma start - add forge inventory support
+    public NonNullList<ItemStack> getStacks() {
+        return this.stacks;
+    }
+    // Magma end
     @Override
     @NotNull
     public ItemStack insertItem(int slot, @NotNull ItemStack stack, boolean simulate)

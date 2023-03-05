@@ -21,18 +21,18 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.Statistic;
 import org.bukkit.World;
 import org.bukkit.block.Biome;
-import org.bukkit.craftbukkit.v1_18_R2.CraftStatistic;
-import org.bukkit.craftbukkit.v1_18_R2.block.data.CraftBlockData;
-import org.bukkit.craftbukkit.v1_18_R2.enchantments.CraftEnchantment;
-import org.bukkit.craftbukkit.v1_18_R2.potion.CraftPotionEffectType;
-import org.bukkit.craftbukkit.v1_18_R2.potion.CraftPotionUtil;
-import org.bukkit.craftbukkit.v1_18_R2.util.CraftMagicNumbers;
-import org.bukkit.craftbukkit.v1_18_R2.util.CraftNamespacedKey;
+import org.bukkit.craftbukkit.v1_19_R3.CraftStatistic;
+import org.bukkit.craftbukkit.v1_19_R3.block.data.CraftBlockData;
+import org.bukkit.craftbukkit.v1_19_R3.enchantments.CraftEnchantment;
+import org.bukkit.craftbukkit.v1_19_R3.potion.CraftPotionEffectType;
+import org.bukkit.craftbukkit.v1_19_R3.potion.CraftPotionUtil;
+import org.bukkit.craftbukkit.v1_19_R3.util.CraftMagicNumbers;
+import org.bukkit.craftbukkit.v1_19_R3.util.CraftNamespacedKey;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Villager;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.potion.PotionType;
-import org.magmafoundation.Magma;
+import org.magmafoundation.magma.Magma;
 import org.magmafoundation.magma.configuration.MagmaConfig;
 import org.magmafoundation.magma.craftbukkit.entity.CraftCustomEntity;
 import org.magmafoundation.magma.helpers.EnumJ17Helper;
@@ -54,7 +54,7 @@ public class ForgeInject {
     	EntityType type = EntityType.fromName(ENTITY_TYPES.get(entity.getType()));
     	return type == null ? EntityType.UNKNOWN : type;
     }
-
+/* //TODO Fix stuff
     public static void init() {
         debug("Injecting Forge Materials into Bukkit");
         addForgeMaterials();
@@ -346,4 +346,5 @@ public class ForgeInject {
         CraftStatistic.statistics = statistics;
         debug("Injecting Forge Statistic into Bukkit: DONE");
     }
+ */
 }

@@ -25,7 +25,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.apache.commons.lang3.ClassUtils;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
-import org.magmafoundation.Magma;
+import org.magmafoundation.magma.Magma;
 import org.magmafoundation.magma.remapping.ClassLoaderRemapper;
 import org.magmafoundation.magma.remapping.PluginTransformer;
 import org.magmafoundation.magma.remapping.handlers.MagmaReflectionHandler;

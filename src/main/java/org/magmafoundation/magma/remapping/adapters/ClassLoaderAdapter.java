@@ -8,7 +8,7 @@ import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
 import org.magmafoundation.magma.remapping.MagmaRemapper;
 import org.magmafoundation.magma.remapping.PluginTransformer;
-import org.magmafoundation.Magma;
+import org.magmafoundation.magma.Magma;
 import org.magmafoundation.magma.remapping.ClassLoaderRemapper;
 import org.magmafoundation.magma.remapping.loaders.RemappingClassLoader;
 import org.magmafoundation.magma.remapping.loaders.RemappingURLClassLoader;
