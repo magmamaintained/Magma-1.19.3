@@ -6,7 +6,7 @@ import java.util.Map;
 import java.util.Set;
 import net.md_5.specialsource.provider.InheritanceProvider;
 import net.md_5.specialsource.repo.ClassRepo;
-import org.magmafoundation.Magma;
+import org.magmafoundation.magma.Magma;
 import org.magmafoundation.magma.remapping.repos.GlobalClassRepo;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;

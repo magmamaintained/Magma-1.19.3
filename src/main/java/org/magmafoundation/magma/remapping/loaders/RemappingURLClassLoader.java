@@ -31,23 +31,23 @@ public class RemappingURLClassLoader extends URLClassLoader implements Remapping
     }
 
     public RemappingURLClassLoader(URL[] urls, ClassLoader parent) {
-        super(urls, asTransforming(parent));
+        super(urls, RemappingClassLoader.asTransforming(parent));
     }
 
     public RemappingURLClassLoader(URL[] urls) {
-        super(urls, asTransforming(null));
+        super(urls, RemappingClassLoader.asTransforming(null));
     }
 
     public RemappingURLClassLoader(URL[] urls, ClassLoader parent, URLStreamHandlerFactory factory) {
-        super(urls, asTransforming(parent), factory);
+        super(urls, RemappingClassLoader.asTransforming(parent), factory);
     }
 
     public RemappingURLClassLoader(String name, URL[] urls, ClassLoader parent) {
-        super(name, urls, asTransforming(parent));
+        super(name, urls, RemappingClassLoader.asTransforming(parent));
     }
 
     public RemappingURLClassLoader(String name, URL[] urls, ClassLoader parent, URLStreamHandlerFactory factory) {
-        super(name, urls, asTransforming(parent), factory);
+        super(name, urls, RemappingClassLoader.asTransforming(parent), factory);
     }
 
     @Override

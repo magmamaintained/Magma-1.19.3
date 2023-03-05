@@ -1,8 +1,8 @@
 package org.magmafoundation.magma.craftbukkit.entity;
 
 import net.minecraft.world.entity.Entity;
-import org.bukkit.craftbukkit.v1_18_R2.CraftServer;
-import org.bukkit.craftbukkit.v1_18_R2.entity.CraftEntity;
+import org.bukkit.craftbukkit.v1_19_R3.CraftServer;
+import org.bukkit.craftbukkit.v1_19_R3.entity.CraftEntity;
 import org.bukkit.entity.LivingEntity;
 
 public class CraftCustomEntity extends CraftEntity {

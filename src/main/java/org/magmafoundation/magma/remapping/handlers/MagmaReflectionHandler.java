@@ -21,7 +21,7 @@ import java.security.ProtectionDomain;
 import java.security.SecureClassLoader;
 import java.util.Enumeration;
 import java.util.StringJoiner;
-import org.magmafoundation.Magma;
+import org.magmafoundation.magma.Magma;
 import org.magmafoundation.magma.remapping.ClassLoaderRemapper;
 import org.magmafoundation.magma.remapping.adapters.MagmaRedirectAdapter;
 import org.magmafoundation.magma.remapping.loaders.RemappingClassLoader;

@@ -18,7 +18,7 @@
 
 package org.magmafoundation.magma.configuration.value.values;
 
-import org.apache.commons.lang.math.NumberUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.magmafoundation.magma.configuration.ConfigBase;
 import org.magmafoundation.magma.configuration.value.Value;
 
