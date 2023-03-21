@@ -22,7 +22,7 @@
  import net.minecraft.util.datafix.DataFixTypes;
  import net.minecraft.world.Difficulty;
  import net.minecraft.world.level.GameRules;
-@@ -34,447 +_,568 @@
+@@ -34,447 +_,573 @@
  import net.minecraft.world.level.LevelSettings;
  import net.minecraft.world.level.WorldDataConfiguration;
  import net.minecraft.world.level.border.WorldBorder;
@@ -528,6 +528,11 @@
 +    pdc = null;
 +  }
 +  // CraftBukkit end
++
++
++  public SpecialWorldProperty getSpecialWorldProperty() {
++    return f_244368_;
++  }
 +
 +  private PrimaryLevelData(@Nullable DataFixer p_249266_, int p_249857_, @Nullable CompoundTag p_249309_,
 +                           boolean p_251525_, int p_249614_, int p_252310_, int p_250544_, float p_250495_,
