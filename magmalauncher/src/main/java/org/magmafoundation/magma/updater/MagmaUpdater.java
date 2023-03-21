@@ -3,7 +3,6 @@ package org.magmafoundation.magma.updater;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
-import org.magmafoundation.magma.MagmaStart;
 import org.magmafoundation.magma.common.MagmaConstants;
 import org.yaml.snakeyaml.Yaml;
 

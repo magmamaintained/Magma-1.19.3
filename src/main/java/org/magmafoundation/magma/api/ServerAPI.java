@@ -18,13 +18,14 @@
 
 package org.magmafoundation.magma.api;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.entity.EntityType;
 import org.bukkit.Bukkit;
-import org.bukkit.craftbukkit.v1_19_R3.CraftServer;
+import org.bukkit.craftbukkit.CraftServer;
 import org.magmafoundation.magma.common.MagmaConstants;
+
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * ServerAPI

@@ -1,11 +1,12 @@
 package org.magmafoundation.magma.protect;
 
-import java.util.Optional;
 import net.minecraftforge.fml.ModContainer;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.forgespi.language.IModInfo;
 import org.jetbrains.annotations.Nullable;
 import org.magmafoundation.magma.common.utils.ShortenedStackTrace;
+
+import java.util.Optional;
 
 public class InjectionProcessor {
 
@@ -40,7 +41,7 @@ public class InjectionProcessor {
     }
 
     private static @Nullable String getJsonFromString(String message) {
-        int index = message.indexOf(".mixins.json"); //should be required in all mixin errors
+        int index = message.indexOf(".json"); //should be required in all mixin errors
         if (index == -1)
             return null;
 
@@ -66,6 +67,10 @@ public class InjectionProcessor {
             return null;
 
         int index = file.indexOf(".mixins.json");
+
+        if (index == -1)
+            index = file.indexOf(".mixin.json");
+
         if (index == -1)
             return null;
 

@@ -66,10 +66,11 @@ public class ServerInitHelper {
                     StringBuilder tmp = new StringBuilder();
 
                     for (String s : split) {
-                        if (s.startsWith("libraries/com/mojang/brigadier"))
+                        //TODO: Add our own versions of these libraries
+                        /*if (s.startsWith("libraries/com/mojang/brigadier"))
                             continue;
                         if (s.startsWith("libraries/com/mojang/datafixerupper"))
-                            continue;
+                            continue;*/
 
                         if (s.startsWith("libraries/")) {
                             tmp.append(libsPath).append(s.substring("libraries/".length() - 1)).append(File.pathSeparator);

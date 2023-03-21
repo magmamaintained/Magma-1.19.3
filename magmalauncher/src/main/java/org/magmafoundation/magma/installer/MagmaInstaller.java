@@ -9,7 +9,6 @@ import dev.vankka.dependencydownload.repository.StandardRepository;
 import me.tongfei.progressbar.ProgressBar;
 import me.tongfei.progressbar.ProgressBarBuilder;
 import me.tongfei.progressbar.ProgressBarStyle;
-import org.magmafoundation.magma.MagmaStart;
 import org.magmafoundation.magma.common.MagmaConstants;
 import org.magmafoundation.magma.common.utils.JarTool;
 import org.magmafoundation.magma.common.utils.MD5;
@@ -25,10 +24,9 @@ import java.net.URLClassLoader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.spi.FileSystemProvider;
-import java.security.NoSuchAlgorithmException;
-import java.util.*;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Project: Magma
@@ -90,10 +88,11 @@ public class MagmaInstaller extends AbstractMagmaInstaller {
                         new ArrayList<>(Arrays.asList("--task", "BUNDLER_EXTRACT", "--input", minecraft_server.getAbsolutePath(), "--output", LIB_PATH, "--libraries")),
                         stringToUrl(loadedLibsPaths));
 
-                //Delete brigadier, we have our own implementation
-                //deleteLib("com/mojang/brigadier");
+                //TODO: Replace with our own implementation
+                /*//Delete brigadier, we have our own implementation
+                deleteLib("com/mojang/brigadier");
                 //Delete datafixers, we have our own implementation
-                // deleteLib("com/mojang/datafixerupper");
+                deleteLib("com/mojang/datafixerupper");*/
                 System.out.println();
                 unmute();
                 pb.step();
@@ -203,8 +202,8 @@ public class MagmaInstaller extends AbstractMagmaInstaller {
                         new ArrayList<>(Arrays.asList("--clean", srg.getAbsolutePath(), "--output", serverJar.getAbsolutePath(), "--apply", lzma.getAbsolutePath())),
                         stringToUrl(new ArrayList<>(Arrays.asList(
                                 LIB_PATH + "net/minecraftforge/binarypatcher/1.1.1/binarypatcher-1.1.1.jar",
-                                LIB_PATH + "commons-io/commons-io/2.11.0/commons-io-2.11.0.jar",
-                                LIB_PATH + "com/google/guava/guava/31.1-jre/guava-31.1-jre.jar",
+                                LIB_PATH + "commons-io/commons-io/2.4/commons-io-2.4.jar",
+                                LIB_PATH + "com/google/guava/guava/25.1-jre/guava-25.1-jre.jar",
                                 LIB_PATH + "net/sf/jopt-simple/jopt-simple/5.0.4/jopt-simple-5.0.4.jar",
                                 LIB_PATH + "com/github/jponge/lzma-java/1.3/lzma-java-1.3.jar",
                                 LIB_PATH + "com/nothome/javaxdelta/2.0.1/javaxdelta-2.0.1.jar",
@@ -293,7 +292,7 @@ public class MagmaInstaller extends AbstractMagmaInstaller {
         var dependencies = new InternalDependency[] {
                 new InternalDependency(LIB_PATH + "dev/vankka/dependencydownload-common/1.3.0/dependencydownload-common-1.3.0.jar", "b6d32a6d0c4d4407f54e601cfa3f0a5a", "https://repo1.maven.org/maven2/dev/vankka/dependencydownload-common/1.3.0/dependencydownload-common-1.3.0.jar"),
                 new InternalDependency(LIB_PATH + "dev/vankka/dependencydownload-runtime/1.3.0/dependencydownload-runtime-1.3.0.jar", "ec35cf4906c6151111d9eabe4f4ea949", "https://repo1.maven.org/maven2/dev/vankka/dependencydownload-runtime/1.3.0/dependencydownload-runtime-1.3.0.jar"),
-                new InternalDependency(LIB_PATH + "org/jline/jline/3.21.1/jline-3.21.1.jar", "859778f9cdd3bd42bbaaf0f6f7fe5e6a", "https://repo1.maven.org/maven2/org/jline/jline/3.21.0/jline-3.21.0.jar"),
+                new InternalDependency(LIB_PATH + "org/jline/jline/3.21.0/jline-3.21.0.jar", "859778f9cdd3bd42bbaaf0f6f7fe5e6a", "https://repo1.maven.org/maven2/org/jline/jline/3.21.0/jline-3.21.0.jar"),
                 new InternalDependency(LIB_PATH + "me/tongfei/progressbar/0.9.3/progressbar-0.9.3.jar", "25d3101d2ca7f0847a804208d5411d78", "https://repo1.maven.org/maven2/me/tongfei/progressbar/0.9.3/progressbar-0.9.3.jar")
         };
         var urls = new ArrayList<URL>();
@@ -418,7 +417,9 @@ public class MagmaInstaller extends AbstractMagmaInstaller {
                 return;
             minecraft_server.getParentFile().mkdirs();
             try {
-                NetworkUtils.downloadFile("https://launcher.mojang.com/v1/objects/c8f83c5655308435b3dcf03c06d9fe8740a77469/server.jar", minecraft_server);
+                // 1.19.4 = NetworkUtils.downloadFile("https://piston-data.mojang.com/v1/objects/8f3112a1049751cc472ec13e397eade5336ca7ae/server.jar", minecraft_server);
+                //TODO: Replace with 1.19.4 when updated
+                NetworkUtils.downloadFile("https://piston-data.mojang.com/v1/objects/c9df48efed58511cdd0213c56b9013a7b5c9ac1f/server.jar", minecraft_server);
             } catch (Exception e) {
                 System.out.println("Can't download minecraft_server");
                 e.printStackTrace();

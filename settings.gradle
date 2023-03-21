@@ -13,6 +13,7 @@ include 'fmlcore'
 include 'mclanguage'
 include 'javafmllanguage'
 include 'lowcodelanguage'
+include 'magmalauncher'
 
 include ':mcp'
 include ':clean'

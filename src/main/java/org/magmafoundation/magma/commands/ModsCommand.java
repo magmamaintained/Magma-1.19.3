@@ -1,8 +1,5 @@
 package org.magmafoundation.magma.commands;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 import net.minecraftforge.forgespi.language.IModInfo;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -10,6 +7,10 @@ import org.bukkit.command.defaults.BukkitCommand;
 import org.jetbrains.annotations.NotNull;
 import org.magmafoundation.magma.common.MagmaConstants;
 import org.magmafoundation.magma.configuration.MagmaConfig;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 public class ModsCommand extends BukkitCommand {
 

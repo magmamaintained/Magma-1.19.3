@@ -17,12 +17,12 @@ package org.magmafoundation.magma;/*
  */
 
 import org.magmafoundation.magma.common.betterui.BetterUI;
+import org.magmafoundation.magma.common.utils.JarTool;
+import org.magmafoundation.magma.common.utils.SystemType;
 import org.magmafoundation.magma.installer.MagmaInstaller;
 import org.magmafoundation.magma.updater.MagmaUpdater;
 import org.magmafoundation.magma.utils.BootstrapLauncher;
-import org.magmafoundation.magma.common.utils.JarTool;
 import org.magmafoundation.magma.utils.ServerInitHelper;
-import org.magmafoundation.magma.common.utils.SystemType;
 
 import java.io.File;
 import java.lang.reflect.Array;
@@ -83,11 +83,10 @@ public class MagmaStart {
 
         ServerInitHelper.init(launchArgs);
 
-        ServerInitHelper.addToPath(new File("libraries/com/google/code/gson/gson/2.10/gson-2.10.jar").toPath());
-        ServerInitHelper.addToPath(new File("libraries/org/yaml/snakeyaml/1.33/snakeyaml-1.33.jar").toPath());
-
-//        if (enableUpdate)
-//            MagmaUpdater.checkForUpdates();
+        ServerInitHelper.addToPath(new File("libraries/com/google/code/gson/gson/2.8.8/gson-2.8.8.jar").toPath());
+        ServerInitHelper.addToPath(new File("libraries/org/yaml/snakeyaml/1.30/snakeyaml-1.30.jar").toPath());
+        if (enableUpdate)
+            MagmaUpdater.checkForUpdates();
 
         String[] invokeArgs = Stream.concat(forgeArgs.stream(), Stream.of(MagmaStart.args)).toArray(String[]::new);
         BootstrapLauncher.startServer(invokeArgs);
