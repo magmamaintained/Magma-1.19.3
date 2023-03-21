@@ -1,14 +1,11 @@
 package org.magmafoundation.magma.common.betterui;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import org.magmafoundation.magma.common.utils.ShortenedStackTrace;
+
+import java.io.*;
 import java.nio.file.Path;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import org.magmafoundation.magma.common.utils.ShortenedStackTrace;
 
 public class BetterUI {
 
