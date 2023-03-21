@@ -22,7 +22,7 @@
  import net.minecraft.util.datafix.DataFixTypes;
  import net.minecraft.world.Difficulty;
  import net.minecraft.world.level.GameRules;
-@@ -34,447 +_,573 @@
+@@ -34,447 +_,568 @@
  import net.minecraft.world.level.LevelSettings;
  import net.minecraft.world.level.WorldDataConfiguration;
  import net.minecraft.world.level.border.WorldBorder;
@@ -685,10 +685,9 @@
 +      p_78547_.m_128362_("WanderingTraderId", this.f_78438_);
 +    }
 +
-+    if (Bukkit.getServer() != null) {
-+      p_78547_.m_128359_("Bukkit.Version", Bukkit.getName() + "/" + Bukkit.getVersion() + "/" + Bukkit.getBukkitVersion()); // CraftBukkit
-+      world.getWorld().storeBukkitValues(p_78547_); // CraftBukkit - add pdc
-+    }
++//    p_78547_.putString("Bukkit.Version",
++//        Bukkit.getName() + "/" + Bukkit.getVersion() + "/" + Bukkit.getBukkitVersion()); // CraftBukkit
++//    world.getWorld().storeBukkitValues(p_78547_); // CraftBukkit - add pdc
 +
 +    p_78547_.m_128359_("forgeLifecycle",
 +        net.minecraftforge.common.ForgeHooks.encodeLifecycle(this.f_78443_.getLifecycle()));
@@ -924,10 +923,6 @@
 +
 +  public boolean m_7513_() {
 +    return this.f_244368_ == PrimaryLevelData.SpecialWorldProperty.DEBUG;
-+  }
-+
-+  public SpecialWorldProperty getSpecialWorldProperty() {
-+    return f_244368_;
 +  }
 +
 +  public Lifecycle m_5754_() {

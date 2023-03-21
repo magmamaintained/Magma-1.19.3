@@ -1,13 +1,5 @@
 --- a/net/minecraft/world/entity/EntityType.java
 +++ b/net/minecraft/world/entity/EntityType.java
-@@ -156,6 +_,7 @@
- import net.minecraft.world.phys.AABB;
- import net.minecraft.world.phys.shapes.Shapes;
- import net.minecraft.world.phys.shapes.VoxelShape;
-+import org.bukkit.event.entity.CreatureSpawnEvent;
- import org.slf4j.Logger;
- 
- public class EntityType<T extends Entity> implements FeatureElement, EntityTypeTest<Entity, T> {
 @@ -300,6 +_,11 @@
     private final EntityDimensions f_20547_;
     private final FeatureFlagSet f_244139_;
@@ -30,52 +22,25 @@
        this.f_20535_ = p_251402_;
        this.f_20536_ = p_251431_;
        this.f_20541_ = p_250908_;
-@@ -324,7 +_,19 @@
+@@ -324,6 +_,10 @@
        this.f_20542_ = p_250479_;
        this.f_20543_ = p_249249_;
        this.f_244139_ = p_250427_;
--   }
 +      this.velocityUpdateSupplier = velocityUpdateSupplier;
 +      this.trackingRangeSupplier = trackingRangeSupplier;
 +      this.updateIntervalSupplier = updateIntervalSupplier;
 +      this.customClientFactory = customClientFactory;
-+   }
-+
-+   //Magma start - spawn reason
-+   private @Nullable CreatureSpawnEvent.SpawnReason spawn_spawnReason = CreatureSpawnEvent.SpawnReason.SPAWNER_EGG;
-+   public void prepareSpawn(CreatureSpawnEvent.SpawnReason spawnReason) {
-+      this.spawn_spawnReason = spawnReason;
-+   }
-+   //Magma end
-+
- 
-    @Nullable
-    public T m_20592_(ServerLevel p_20593_, @Nullable ItemStack p_20594_, @Nullable Player p_20595_, BlockPos p_20596_, MobSpawnType p_20597_, boolean p_20598_, boolean p_20599_) {
-@@ -358,7 +_,11 @@
-    public static <T extends Entity> Consumer<T> m_263559_(Consumer<T> p_263579_, ServerLevel p_263571_, ItemStack p_263582_, @Nullable Player p_263574_) {
-       CompoundTag compoundtag = p_263582_.m_41783_();
-       return compoundtag != null ? p_263579_.andThen((p_262558_) -> {
--         m_20620_(p_263571_, p_263574_, p_262558_, compoundtag);
-+         try {
-+            m_20620_(p_263571_, p_263574_, p_262558_, compoundtag);
-+         } catch (Throwable t0) {
-+            f_20534_.warn("Error loading spawn eg NBT", t0);
-+         }
-       }) : p_263579_;
     }
  
-@@ -371,7 +_,11 @@
+    @Nullable
+@@ -371,6 +_,7 @@
     public T m_262455_(ServerLevel p_262704_, @Nullable CompoundTag p_262603_, @Nullable Consumer<T> p_262621_, BlockPos p_262672_, MobSpawnType p_262644_, boolean p_262690_, boolean p_262590_) {
        T t = this.m_262451_(p_262704_, p_262603_, p_262621_, p_262672_, p_262644_, p_262690_, p_262590_);
        if (t != null) {
 +         if (t instanceof net.minecraft.world.entity.Mob && net.minecraftforge.event.ForgeEventFactory.doSpecialSpawn((net.minecraft.world.entity.Mob) t, p_262704_, p_262672_.m_123341_(), p_262672_.m_123342_(), p_262672_.m_123343_(), null, p_262644_)) return null;
-+         p_262704_.prepareEntity(t, spawn_spawnReason); //Magma - add spawn reason
-+         prepareSpawn(CreatureSpawnEvent.SpawnReason.SPAWNER_EGG); //Magma - reset spawn reason
           p_262704_.m_47205_(t);
-+         return !t.m_213877_() ? t : null;
        }
  
-       return t;
 @@ -591,14 +_,23 @@
     }
  

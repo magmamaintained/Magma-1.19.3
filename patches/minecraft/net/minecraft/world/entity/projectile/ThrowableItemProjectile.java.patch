@@ -8,29 +8,14 @@
  import net.minecraft.nbt.CompoundTag;
  import net.minecraft.network.syncher.EntityDataAccessor;
  import net.minecraft.network.syncher.EntityDataSerializers;
-@@ -29,12 +_,18 @@
-    public void m_37446_(ItemStack p_37447_) {
-       if (!p_37447_.m_150930_(this.m_7881_()) || p_37447_.m_41782_()) {
-          this.m_20088_().m_135381_(f_37429_, Util.m_137469_(p_37447_.m_41777_(), (p_37451_) -> {
--            p_37451_.m_41764_(1);
-+            if (!p_37451_.m_41619_()) p_37451_.m_41764_(1); // CraftBukkit
-          }));
-       }
- 
-    }
- 
-+   // CraftBukkit start
-+   public Item getDefaultItemPublic() {
-+      return m_7881_();
-+   }
-+   // CraftBukkit end
-+
-    protected abstract Item m_7881_();
- 
-    public ItemStack m_37454_() {
-@@ -64,4 +_,5 @@
+@@ -63,5 +_,10 @@
+       super.m_7378_(p_37445_);
        ItemStack itemstack = ItemStack.m_41712_(p_37445_.m_128469_("Item"));
        this.m_37446_(itemstack);
-    }
++   }
 +
++   // Magma - stub
++   public Holder<Item> getDefaultItemPublic() {
++      return null;
+    }
  }

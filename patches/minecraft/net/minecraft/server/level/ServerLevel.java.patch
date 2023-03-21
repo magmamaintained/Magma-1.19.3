@@ -28,10 +28,10 @@
  import net.minecraft.world.level.levelgen.structure.StructureCheck;
 @@ -143,6 +_,7 @@
  import net.minecraft.world.level.saveddata.maps.MapItemSavedData;
--import net.minecraft.world.level.storage.DimensionDataStorage;
--import net.minecraft.world.level.storage.LevelStorageSource;
--import net.minecraft.world.level.storage.ServerLevelData;
-+import net.minecraft.world.level.storage.*;
+ import net.minecraft.world.level.storage.DimensionDataStorage;
+ import net.minecraft.world.level.storage.LevelStorageSource;
++import net.minecraft.world.level.storage.PrimaryLevelData;
+ import net.minecraft.world.level.storage.ServerLevelData;
  import net.minecraft.world.phys.AABB;
  import net.minecraft.world.phys.Vec3;
 @@ -150,6 +_,11 @@
@@ -43,7 +43,6 @@
 +import org.bukkit.craftbukkit.v1_19_R3.util.WorldUUID;
 +import org.bukkit.event.entity.CreatureSpawnEvent;
 +import org.bukkit.event.weather.LightningStrikeEvent;
-+import org.magmafoundation.magma.helpers.DelegateWorldInfo;
  import org.slf4j.Logger;
  
  public class ServerLevel extends Level implements WorldGenLevel {
@@ -73,7 +72,6 @@
 +   // CraftBukkit start
 +   public final LevelStorageSource.LevelStorageAccess convertable;
 +   public final UUID uuid;
-+   public PrimaryLevelData worldDataServer;
 +
 +   public LevelChunk getChunkIfLoaded(int x, int z) {
 +      return this.f_8547_.m_62227_(x, z, false);
@@ -122,16 +120,6 @@
 +      this.initCapabilities();
 +
 +      this.getCraftServer().addWorld(this.getWorld()); //Magma - add world to bukkit's world list
-+
-+      //Magma start
-+      if (p_215002_ instanceof PrimaryLevelData data) {
-+         this.worldDataServer = data;
-+      } else if (p_215002_ instanceof DerivedLevelData derived) {
-+         this.worldDataServer = DelegateWorldInfo.wrap(derived);
-+      }
-+
-+      this.worldDataServer.setWorld(this);
-+      //Magma end
 +
     }
  
