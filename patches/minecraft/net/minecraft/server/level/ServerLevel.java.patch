@@ -8,15 +8,17 @@
  import net.minecraft.world.entity.npc.Npc;
  import net.minecraft.world.entity.player.Player;
  import net.minecraft.world.entity.raid.Raid;
-@@ -143,6 +_,7 @@
+@@ -141,15 +_,20 @@
+ import net.minecraft.world.level.portal.PortalForcer;
+ import net.minecraft.world.level.saveddata.maps.MapIndex;
  import net.minecraft.world.level.saveddata.maps.MapItemSavedData;
- import net.minecraft.world.level.storage.DimensionDataStorage;
- import net.minecraft.world.level.storage.LevelStorageSource;
-+import net.minecraft.world.level.storage.PrimaryLevelData;
- import net.minecraft.world.level.storage.ServerLevelData;
+-import net.minecraft.world.level.storage.DimensionDataStorage;
+-import net.minecraft.world.level.storage.LevelStorageSource;
+-import net.minecraft.world.level.storage.ServerLevelData;
++import net.minecraft.world.level.storage.*;
  import net.minecraft.world.phys.AABB;
  import net.minecraft.world.phys.Vec3;
-@@ -150,6 +_,12 @@
+ import net.minecraft.world.phys.shapes.BooleanOp;
  import net.minecraft.world.phys.shapes.Shapes;
  import net.minecraft.world.phys.shapes.VoxelShape;
  import net.minecraft.world.ticks.LevelTicks;
@@ -26,19 +28,11 @@
 +import org.bukkit.craftbukkit.util.WorldUUID;
 +import org.bukkit.event.entity.CreatureSpawnEvent;
 +import org.bukkit.event.weather.LightningStrikeEvent;
++import org.magmafoundation.magma.helpers.DelegateWorldInfo;
  import org.slf4j.Logger;
  
  public class ServerLevel extends Level implements WorldGenLevel {
-@@ -168,7 +_,7 @@
-    final List<ServerPlayer> f_8546_ = Lists.newArrayList();
-    private final ServerChunkCache f_8547_;
-    private final MinecraftServer f_8548_;
--   public final ServerLevelData f_8549_;
-+   public final PrimaryLevelData f_8549_;
-    final EntityTickList f_143243_ = new EntityTickList();
-    public final PersistentEntitySectionManager<Entity> f_143244_;
-    private final GameEventDispatcher f_243695_;
-@@ -187,17 +_,35 @@
+@@ -187,13 +_,32 @@
     private final List<CustomSpawner> f_8558_;
     @Nullable
     private final EndDragonFight f_8559_;
@@ -52,6 +46,7 @@
 +   // CraftBukkit start
 +   public final LevelStorageSource.LevelStorageAccess convertable;
 +   public final UUID uuid;
++   public PrimaryLevelData worldDataServer;
 +
 +   public LevelChunk getChunkIfLoaded(int x, int z) {
 +      return this.f_8547_.m_62227_(x, z, false);
@@ -71,12 +66,7 @@
        this.f_8561_ = p_215009_;
        this.f_8548_ = p_214999_;
        this.f_8558_ = p_215008_;
--      this.f_8549_ = p_215002_;
-+      this.f_8549_ = (PrimaryLevelData) p_215002_;
-       ChunkGenerator chunkgenerator = p_215004_.f_63976_();
-       boolean flag = p_214999_.m_6365_();
-       DataFixer datafixer = p_214999_.m_129933_();
-@@ -231,6 +_,15 @@
+@@ -231,6 +_,25 @@
  
        this.f_143245_ = new SleepStatus();
        this.f_243695_ = new GameEventDispatcher(this);
@@ -88,6 +78,16 @@
 +      // CraftBukkit end
 +
 +      this.getCraftServer().addWorld(this.getWorld()); //Magma - add world to bukkit's world list
++
++      //Magma start
++      if (p_215002_ instanceof PrimaryLevelData data) {
++         this.worldDataServer = data;
++      } else if (p_215002_ instanceof DerivedLevelData derived) {
++         this.worldDataServer = DelegateWorldInfo.wrap(derived);
++      }
++
++      this.worldDataServer.setWorld(this);
++      //Magma end
 +
     }
  
