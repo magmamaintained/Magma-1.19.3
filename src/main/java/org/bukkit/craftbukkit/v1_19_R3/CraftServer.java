@@ -860,7 +860,7 @@ public final class CraftServer implements Server {
 
     @Override
     public World createWorld(WorldCreator creator) {
-        Preconditions.checkState(console.getAllLevels().iterator().hasNext(), "Cannot create additional worlds on STARTUP");
+        Preconditions.checkState(!console.levels.isEmpty(), "Cannot create additional worlds on STARTUP");
         Validate.notNull(creator, "Creator may not be null");
 
         String name = creator.name();
@@ -973,7 +973,7 @@ public final class CraftServer implements Server {
         console.initWorld(internal, worlddata, worlddata, worlddata.worldGenOptions());
 
         internal.setSpawnSettings(true, true);
-        console.addLevel(internal);
+        console.levels.put(internal.dimension(), internal);
 
         getServer().prepareLevels(internal.getChunkSource().chunkMap.progressListener, internal);
         internal.entityManager.tick(); // SPIGOT-6526: Load pending entities so they are available to the API
@@ -1027,7 +1027,7 @@ public final class CraftServer implements Server {
         }
 
         worlds.remove(world.getName().toLowerCase(java.util.Locale.ENGLISH));
-        console.removeLevel(handle);
+        console.levels.remove(handle.dimension());
         return true;
     }
 

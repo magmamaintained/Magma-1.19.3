@@ -581,9 +581,17 @@
           this.m_5810_();
           this.f_19853_.m_7605_(this, (byte)30);
        }
-@@ -1277,12 +_,19 @@
+@@ -1276,13 +_,27 @@
+       return this.f_36096_ != this.f_36095_;
     }
  
++   //Magma start - force sleep
++   protected boolean startSleepInBed_force = false;
++   public Player forceSleepInBed(boolean force) {
++      startSleepInBed_force = force;
++      return this;
++   }
++   //Magma end
     public Either<Player.BedSleepingProblem, Unit> m_7720_(BlockPos p_36203_) {
 +      // CraftBukkit start
 +      return this.startSleepInBed(p_36203_, false);
