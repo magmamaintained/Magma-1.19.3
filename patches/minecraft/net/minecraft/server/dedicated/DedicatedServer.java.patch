@@ -32,7 +32,6 @@
 +import org.bukkit.craftbukkit.Main;
 +import org.bukkit.event.server.RemoteServerCommandEvent;
 +import org.bukkit.event.server.ServerCommandEvent;
-+import org.magmafoundation.magma.protect.InjectProtect;
  import org.slf4j.Logger;
  
  public class DedicatedServer extends MinecraftServer implements ServerInterface {
@@ -186,14 +185,10 @@
        }
     }
  
-@@ -263,6 +_,12 @@
+@@ -263,6 +_,8 @@
           this.f_139601_.m_7530_();
        }
  
-+      //Magma start - injectprotect
-+      InjectProtect.shutdownCalled();
-+      //Magma end
-+
 +      System.exit(0); // CraftBukkit
 +
     }
