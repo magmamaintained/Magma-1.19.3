@@ -1,14 +1,3 @@
-buildscript {
-    repositories {
-        mavenLocal()
-        maven { url = 'https://maven.minecraftforge.net/' }
-        mavenCentral()
-    }
-    dependencies {
-        classpath "dev.vankka:gradle-plugin:1.2.1"
-    }
-}
-
 import groovy.json.JsonBuilder
 import net.minecraftforge.forge.tasks.checks.CheckATs
 import net.minecraftforge.forge.tasks.checks.CheckExcs
@@ -40,6 +29,7 @@ plugins {
     id 'net.minecraftforge.gradle.patcher' version '[5.1.50,5.2.0)' apply false
     id 'net.minecraftforge.gradle.mcp' version '[5.1.50,5.2.0)' apply false
     id 'net.nemerosa.versioning' version '2.8.2'
+    id 'dev.vankka.dependencydownload.plugin' version '1.2.1' apply false
 }
 
 Util.init() //Init all our extension methods!
@@ -63,10 +53,11 @@ ext {
     COREMODS_VERSION = '5.0.1'
     EVENTBUS_VERSION = '6.0.3'
     MODLAUNCHER_VERSION = '10.0.8'
-    SECUREJARHANDLER_VERSION = '2.1.4'
+    SECUREJARHANDLER_VERSION = '2.1.6'
     BOOTSTRAPLAUNCHER_VERSION = '1.1.2'
     ASM_VERSION = '9.3'
     INSTALLER_VERSION = '2.1.+'
+    INSTALLERTOOLS_VERSION = '1.3.0'
     MIXIN_VERSION = '0.8.5'
     TERMINALCONSOLEAPPENDER_VERSION = '1.2.0'
     JLINE_VERSION = '3.12.1'
@@ -93,7 +84,7 @@ ext {
 
     SPECIAL_SOURCE = 'net.md-5:SpecialSource:1.11.0'
     BINPATCH_TOOL = 'net.minecraftforge:binarypatcher:1.1.1:fatjar'
-    INSTALLER_TOOLS = 'net.minecraftforge:installertools:1.3.0'
+    INSTALLER_TOOLS = "net.minecraftforge:installertools:${INSTALLERTOOLS_VERSION}"
     JAR_SPLITTER = 'net.minecraftforge:jarsplitter:1.1.4'
     FART = 'net.minecraftforge:ForgeAutoRenamingTool:0.1.22:all'
     MIN_TAG_FOR_CHANGELOG = '41.0'
@@ -106,6 +97,7 @@ println('Version: ' + VERSION +
         ' JVM: ' + System.getProperty('java.vm.version') + '(' + System.getProperty('java.vendor') + ')' +
         ' Arch: ' + System.getProperty('os.arch'))
 
+println('Forge Version: ' + MAGMA_VERSION)
 
 def extraTxts = [
     rootProject.file('CREDITS.txt'),
@@ -162,15 +154,13 @@ subprojects {
             name = 'forge'
             url = 'https://maven.minecraftforge.net/'
         }
+        maven { url 'https://hub.spigotmc.org/nexus/content/groups/public/' }
+        maven { url 'https://raw.github.com/Hexeption/Magma-Repo/master/' }
+        maven { url 'https://maven.izzel.io/releases' }
         maven {
             name = 'minecraft'
             url = 'https://libraries.minecraft.net/'
         }
-        maven {
-            name = 'spigot'
-            url 'https://hub.spigotmc.org/nexus/content/groups/public/'
-        }
-        maven { url 'https://maven.izzel.io/releases' }
     }
 
     java.toolchain.languageVersion = JavaLanguageVersion.of(17)
@@ -182,44 +172,6 @@ subprojects {
                 'implNote:a:<em>Implementation Note:</em>'
         ]
         options.addStringOption('Xdoclint:all,-missing', '-public')
-    }
-
-    publishing {
-        publications {
-            mavenJava(MavenPublication) {
-                // Normal Maven/old gradle doesn't support '2.+' version wildcards
-                // For now we just suppress. We *should* force the resolution to pinned versions.
-                suppressPomMetadataWarningsFor('apiElements')
-                suppressPomMetadataWarningsFor('runtimeElements')
-                pom {
-                    name = project.name
-                    description = 'Modifactions to Minecraft to enable mod developers.'
-                    url = 'https://github.com/MinecraftForge/MinecraftForge'
-
-                    scm {
-                        url = 'https://github.com/MinecraftForge/MinecraftForge'
-                        connection = 'scm:git:git://github.com/MinecraftForge/MinecraftForge.git'
-                        developerConnection = 'scm:git:git@github.com:MinecraftForge/MinecraftForge.git'
-                    }
-
-                    issueManagement {
-                        system = 'github'
-                        url = 'https://github.com/MinecraftForge/MinecraftForge/issues'
-                    }
-
-                    licenses {
-                        license {
-                            name = 'LGPL 2.1'
-                            url = 'https://github.com/MinecraftForge/MinecraftForge/blob/1.13-pre/LICENSE.txt'
-                            distribution = 'repo'
-                        }
-                    }
-                }
-            }
-        }
-        repositories {
-            maven gradleutils.getPublishingForgeMaven()
-        }
     }
 }
 
@@ -249,21 +201,6 @@ project(':clean') {
         mappings channel: MAPPING_CHANNEL, version: MAPPING_VERSION
 
         runs {
-            clean_client {
-                client true
-                taskName 'clean_client'
-                ideaModule "${rootProject.name}.${project.name}.main"
-
-                main 'net.minecraft.client.main.Main'
-                workingDirectory project.file('run')
-
-                args '--gameDir', '.'
-                args '--version', MC_VERSION
-                args '--assetsDir', downloadAssets.output
-                args '--assetIndex', '{asset_index}'
-                args '--accessToken', '0'
-            }
-
             clean_server {
                 client false
                 taskName 'clean_server'
@@ -327,7 +264,8 @@ def sharedDeps = {
     installer 'net.md-5:SpecialSource:1.11.0'
     installer 'org.yaml:snakeyaml:1.33'
 
-    //Magma
+    // Magma
+    installer 'org.magma:magma-common:2.6'
     installer 'io.izzel:tools:1.3.0'
 
     autolibraries BIN_PATCHER
@@ -416,22 +354,6 @@ def sharedFmlonlyForge = { Project prj ->
         //libraries.add("${project.group}:${project.name}:${project.version}:launcher")
         inject = '' // We don't have a userdev sourceset anymore. Empty as a gradle workaround...
         runs {
-            client {
-                environment 'MOD_CLASSES', '{source_roots}'
-                environment 'MCP_MAPPINGS', '{mcp_mappings}'
-
-                // Natives are loaded from the classpath now in all cases
-                // property 'nativesDirectory', '{natives}'
-                if (prj.name == 'forge') {
-                    property 'forge.enableGameTest', 'true'
-                }
-
-                args '--launchTarget', "${launchPrefix}clientuserdev"
-                args '--version', 'MOD_DEV'
-                args '--assetIndex', '{asset_index}'
-                args '--assetsDir', '{assets_root}'
-            }
-
             server {
                 environment 'MOD_CLASSES', '{source_roots}'
                 environment 'MCP_MAPPINGS', '{mcp_mappings}'
@@ -645,14 +567,6 @@ project(':fmlonly') {
 
         mappings channel: MAPPING_CHANNEL, version: MAPPING_VERSION
         runs {
-            fmlonly_client {
-                args '--launchTarget', 'fmlclientdev'
-                ideaModule "${rootProject.name}.${project.name}.main"
-
-                mods {
-                    minecraft { source sourceSets.main }
-                }
-            }
             fmlonly_server {
                 args '--launchTarget', 'fmlserverdev'
                 ideaModule "${rootProject.name}.${project.name}.main"
@@ -894,7 +808,7 @@ project(':fmlonly') {
         packedDependencies = PACKED_DEPS
         from(extraTxts)
         //TODO: make FML installer logo?
-        from(rootProject.file('/forge_installer_logo.png')) {
+        from(rootProject.file('/magma-logo.png')) {
             rename { 'big_logo.png' }
         }
     }
@@ -919,6 +833,7 @@ project(':forge') {
     apply plugin: 'java-library'
     apply plugin: 'net.minecraftforge.gradle.patcher'
     apply plugin: 'org.cadixdev.licenser'
+    apply plugin: 'dev.vankka.dependencydownload.plugin'
 
     sourceSets {
         main {
@@ -933,6 +848,19 @@ project(':forge') {
                     "$rootDir/src/main/resources",
                     "$rootDir/src/generated/resources",
                     "$rootDir/src/fmlcommon/resources"
+                ]
+            }
+        }
+        test {
+            java {
+                srcDirs = [
+                        "$rootDir/src/test/java"
+                ]
+            }
+            resources {
+                srcDirs = [
+                        "$rootDir/src/test/resources",
+                        "$rootDir/src/generated_test/resources"
                 ]
             }
         }
@@ -958,7 +886,6 @@ project(':forge') {
         }
         moduleonly
         api.extendsFrom(installer)
-        runtimeDownloadOnly
         autolibraries
         autolibraries.extendsFrom(installer)
         autolibraries.extendsFrom(moduleonly)
@@ -988,29 +915,6 @@ project(':forge') {
         sideAnnotationStrippers.from file("$rootDir/src/main/resources/forge.sas")
 
         runs {
-            forge_client {
-                property 'eventbus.checkTypesOnDispatch', 'true'
-                args '--launchTarget', 'forgeclientdev'
-                ideaModule "${rootProject.name}.${project.name}.main"
-                mods {
-                    minecraft { source sourceSets.main }
-                }
-            }
-
-            forge_test_client {
-                parent runs.forge_client
-                taskName 'forge_test_client'
-
-                property 'forge.enableGameTest', 'true'
-                environment 'MOD_CLASSES', 'dummy' // Needed to work around FG limitation, FG will replace this!
-
-                ideaModule "${rootProject.name}.${project.name}.test"
-
-                mods {
-                    tests { sources sourceSets.test }
-                }
-            }
-
             forge_server {
                 args '--launchTarget', 'forgeserverdev'
                 ideaModule "${rootProject.name}.${project.name}.main"
@@ -1115,76 +1019,70 @@ project(':forge') {
 
     ext {
         MANIFESTS = [
-                '/': [
-                        'Timestamp': new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
-                        'FML-System-Mods': 'forge'
-                ] as LinkedHashMap,
-                'net/minecraftforge/versions/forge/': [
-                        'Specification-Title':      'Forge',
-                        'Specification-Vendor':     'Forge Development LLC',
-                        'Specification-Version':    SPEC_VERSION,
-                        'Implementation-Title':     project.group,
-                        'Implementation-Version':   project.version.substring(MC_VERSION.length() + 1),
-                        'Implementation-Vendor':    'Forge Development LLC'
-                ] as LinkedHashMap,
-                'net/minecraftforge/versions/mcp/': [
-                        'Specification-Title':      'Minecraft',
-                        'Specification-Vendor':     'Mojang',
-                        'Specification-Version':    MC_VERSION,
-                        'Implementation-Title':     'MCP',
-                        'Implementation-Version':   MCP_VERSION,
-                        'Implementation-Vendor':    'Forge'
-                ] as LinkedHashMap,
-                'net/minecraftforge/fml/javafmlmod/': [
-                        'Specification-Title':      'Mod Language Provider',
-                        'Specification-Vendor':     'Forge Development LLC',
-                        'Specification-Version':    '1',
-                        'Implementation-Title':     'FML Java Mod',
-                        'Implementation-Version':   SPEC_VERSION,
-                        'Implementation-Vendor':    'Forge'
-                ] as LinkedHashMap,
-                'net/minecraftforge/fml/mclanguageprovider/': [
-                        'Specification-Title':      'Mod Language Provider',
-                        'Specification-Vendor':     'Forge Development LLC',
-                        'Specification-Version':    '1',
-                        'Implementation-Title':     'Minecraft Language Mod Provider',
-                        'Implementation-Version':   '1',
-                        'Implementation-Vendor':    'Forge'
-                ] as LinkedHashMap,
-                'net/minecraftforge/fml/loading/': [
-                        'Specification-Title':      'Launcher',
-                        'Specification-Vendor':     'Forge Development LLC',
-                        'Specification-Version':    '1',
-                        'Implementation-Title':     'FML Launcher',
-                        'Implementation-Version':   SPEC_VERSION,
-                        'Implementation-Vendor':    'Forge'
-                ] as LinkedHashMap,
-                'org/magmafoundation/magma/': [
-                        'Specification-Title'   : 'Magma Development Limited',
-                        'Specification-Vendor'  : 'Magma Development Limited',
-                        'Implementation-Title'  : "Magma",
-                        'Implementation-Version': MAGMA_VERSION + "-" + MCP_VERSION,
-                        'Implementation-Vendor' : 'Magma Development Limited',
-                ] as LinkedHashMap,
-                'org/magmafoundation/magma/common/': [
-                        'Specification-Title'   : 'Magma Development Limited',
-                        'Specification-Vendor'  : 'Magma Development Limited',
-                        'Implementation-Title'  : "Magma",
-                        'Implementation-Version': MAGMA_VERSION + "-" + MCP_VERSION,
-                        'Implementation-Vendor' : 'Magma Development Limited',
-                ] as LinkedHashMap,
-                'io/izzel/arclight/': [
-                        'Implementation-Title'  : "Arclight",
-                        'Implementation-Vendor' : 'Arclight Team',
-                ] as LinkedHashMap,
-                'org/bukkit/craftbukkit/v1_18_R2/': [
-                        'Specification-Title'   : MCP_VERSION,
-                        'Specification-Vendor'  : 'SpigotMC',
-                        'Specification-Version':  '1.18.2',
-                        'Implementation-Title'  : 'Spigot',
-                        'Implementation-Version': '7e29f765-296df566-9fb885e8',
-                        'Implementation-Vendor' : 'SpigotMC'
-                ] as LinkedHashMap
+            '/': [
+                'Timestamp': new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
+                'GitCommit': gradleutils.gitInfo.abbreviatedId,
+                'Git-Branch': gradleutils.gitInfo.branch,
+                'FML-System-Mods': 'forge'
+            ] as LinkedHashMap,
+            'net/minecraftforge/versions/forge/': [
+                'Specification-Title':      'Forge',
+                'Specification-Vendor':     'Forge Development LLC',
+                'Specification-Version':    SPEC_VERSION,
+                'Implementation-Title':     project.group,
+                'Implementation-Version':   project.version.substring(MC_VERSION.length() + 1),
+                'Implementation-Vendor':    'Forge Development LLC'
+            ] as LinkedHashMap,
+            'net/minecraftforge/versions/mcp/': [
+                'Specification-Title':      'Minecraft',
+                'Specification-Vendor':     'Mojang',
+                'Specification-Version':    MC_VERSION,
+                'Implementation-Title':     'MCP',
+                'Implementation-Version':   MCP_VERSION,
+                'Implementation-Vendor':    'Forge'
+            ] as LinkedHashMap,
+            'net/minecraftforge/fml/javafmlmod/': [
+                'Specification-Title':      'Mod Language Provider',
+                'Specification-Vendor':     'Forge Development LLC',
+                'Specification-Version':    '1',
+                'Implementation-Title':     'FML Java Mod',
+                'Implementation-Version':   SPEC_VERSION,
+                'Implementation-Vendor':    'Forge'
+            ] as LinkedHashMap,
+            'net/minecraftforge/fml/mclanguageprovider/': [
+                'Specification-Title':      'Mod Language Provider',
+                'Specification-Vendor':     'Forge Development LLC',
+                'Specification-Version':    '1',
+                'Implementation-Title':     'Minecraft Language Mod Provider',
+                'Implementation-Version':   '1',
+                'Implementation-Vendor':    'Forge'
+            ] as LinkedHashMap,
+            'net/minecraftforge/fml/loading/': [
+                'Specification-Title':      'Launcher',
+                'Specification-Vendor':     'Forge Development LLC',
+                'Specification-Version':    '1',
+                'Implementation-Title':     'FML Launcher',
+                'Implementation-Version':   SPEC_VERSION,
+                'Implementation-Vendor':    'Forge'
+            ] as LinkedHashMap,
+            'org/magmafoundation/magma/': [
+                    'Specification-Title'   : 'Magma Development Limited',
+                    'Specification-Vendor'  : 'Magma Development Limited',
+                    'Implementation-Title'  : "Magma",
+                    'Implementation-Version': MAGMA_VERSION + "-" + MCP_VERSION,
+                    'Implementation-Vendor' : 'Magma Development Limited',
+            ] as LinkedHashMap,
+            'org/magmafoundation/magma/common/': [
+                    'Specification-Title'   : 'Magma Development Limited',
+                    'Specification-Vendor'  : 'Magma Development Limited',
+                    'Implementation-Title'  : "Magma",
+                    'Implementation-Version': MAGMA_VERSION + "-" + MCP_VERSION,
+                    'Implementation-Vendor' : 'Magma Development Limited',
+            ] as LinkedHashMap,
+            'io/izzel/arclight/': [
+                    'Implementation-Title'  : "Arclight",
+                    'Implementation-Vendor' : 'Arclight Team',
+            ] as LinkedHashMap
         ]
     }
 
@@ -1580,7 +1478,6 @@ project(':forge') {
         includeShadowJarRelocations = false
     }
 
-
     task magmaJar(type: Jar, dependsOn: [downloadServerRaw, genServerBinPatches, 'signUniversalJar']) {
         archiveClassifier = 'server'
         archiveExtension = 'jar'
@@ -1592,8 +1489,8 @@ project(':forge') {
                 [
                         'libraries/' + Util.getMavenPath(rootProject.tasks.findByPath(':fmlloader:jar')),
                         "libraries/net/minecraft/server/${MC_VERSION}-${MCP_VERSION}/server-${MC_VERSION}-${MCP_VERSION}-extra.jar",
-                        "libraries/cpw/mods/bootstraplauncher/1.0.0/bootstraplauncher-1.0.0.jar",
-                        "libraries/net/minecraftforge/installertools/1.3.0/installertools-1.3.0.jar"
+                        "libraries/cpw/mods/bootstraplauncher/${BOOTSTRAPLAUNCHER_VERSION}/bootstraplauncher-${BOOTSTRAPLAUNCHER_VERSION}.jar",
+                        "libraries/net/minecraftforge/installertools/${INSTALLERTOOLS_VERSION}/installertools-${INSTALLERTOOLS_VERSION}.jar"
                 ]
         def claimed = CLASS_PATH.collect { it.rsplit('/', 2)[0] }.toSet() // Allow us to override versions
         if (rootProject.downloadServerRaw.dest.exists()) {
@@ -1708,7 +1605,7 @@ project(':forge') {
     task installerJar(type: InstallerJar, dependsOn: [genClientBinPatches, genServerBinPatches, 'signUniversalJar', launcherJson]) {
         packedDependencies = PACKED_DEPS
         from(extraTxts)
-        from(rootProject.file('/forge_installer_logo.png')) {
+        from(rootProject.file('/magma-logo.png')) {
             rename { 'big_logo.png' }
         }
         from(genClientBinPatches.output) {
@@ -1830,11 +1727,64 @@ project(':forge') {
     publishing {
         publications {
             mavenJava(MavenPublication) {
-                artifact universalJar
                 artifact installerJar
-                //TODO: installer-win
-                artifact userdevJar
-                artifact sourcesJar
+                artifact magmaJar
+
+                pom {
+                    name = 'Magma'
+                    groupId = 'org.magmafoundation'
+                    artifactId = 'Magma'
+                    description = 'Minecraft Forge Hybrid server implementing the Spigot/Bukkit API (Cauldron for 1.19)'
+                    url = 'https://git.magmafoundation.org/magmafoundation/Magma-1-19-x'
+                    version = MAGMA_VERSION
+
+                    scm {
+                        url = 'https://git.magmafoundation.org/magmafoundation/Magma-1-19-x'
+                        connection = 'scm:git:git://git.magmafoundation.org/magmafoundation/Magma-1-19-x.git'
+                        developerConnection = 'scm:git:git@git.magmafoundation.org:2224/magmafoundation/Magma-1-19-x.git'
+                    }
+
+                    issueManagement {
+                        system = 'gitlab'
+                        url = 'https://git.magmafoundation.org/magmafoundation/Magma-1-19-x/issues'
+                    }
+
+                    licenses {
+                        license {
+                            name = 'LGPL 3.0'
+                            url = 'https://git.magmafoundation.org/magmafoundation/Magma-1-19-x/-/raw/1.19.x/LICENSE'
+                            distribution = 'repo'
+                        }
+                    }
+                    developers {
+                        developer {
+                            id = 'Hexeption'
+                            name = 'Hexeption'
+                            email = 'admin@hexeption.co.uk'
+                        }
+                    }
+                }
+            }
+        }
+        repositories {
+            if (System.getenv("CI_JOB_TOKEN") != null) {
+                maven {
+                    // gitlab repo
+                    name = 'MagmaFoundation'
+                    url = 'https://git.magmafoundation.org/api/v4/projects/5/packages/maven/'
+                    credentials(HttpHeaderCredentials) {
+                        name = "Private-Token"
+                        value = System.getenv("CI_JOB_TOKEN")
+                    }
+                    authentication {
+                        header(HttpHeaderAuthentication)
+                    }
+                }
+            } else {
+                maven {
+                    name = 'myRepo'
+                    url = "file://${buildDir}/repo"
+                }
             }
         }
     }
@@ -1852,4 +1802,13 @@ task setup() {  //These must be strings so that we can do lazy resolution. Else 
     if (symlinkValid)
         dependsOn ':fmlonly:extractMapped'
     dependsOn ':forge:extractMapped'
+}
+
+allprojects {
+    gradle.projectsEvaluated {
+        tasks.withType(JavaCompile) {
+            options.compilerArgs << "-Xmaxerrs" << "1000"
+            options.deprecation = false
+        }
+    }
 }

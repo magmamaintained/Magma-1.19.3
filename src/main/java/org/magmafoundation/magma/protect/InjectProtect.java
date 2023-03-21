@@ -1,7 +1,5 @@
 package org.magmafoundation.magma.protect;
 
-import java.util.ArrayList;
-import java.util.List;
 import net.minecraftforge.forgespi.language.IModInfo;
 import org.jetbrains.annotations.NotNull;
 import org.magmafoundation.magma.common.betterui.BetterUI;
@@ -13,10 +11,14 @@ import org.spongepowered.asm.mixin.Mixins;
 import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
 import org.spongepowered.asm.mixin.throwables.MixinError;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class InjectProtect {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(InjectProtect.class);
     private static final List<InjectSet> errors = new ArrayList<>();
+    private static boolean shutdownCalled = false;
 
     public static void init() {
         LOGGER.info("Booting up InjectProtect");
@@ -35,6 +37,10 @@ public class InjectProtect {
     }
 
     public static void shutdownCalled() {
+        if (shutdownCalled)
+            return;
+        shutdownCalled = true;
+
         LOGGER.debug("Processing shutdown request");
         if (errors.isEmpty()) {
             LOGGER.debug("No errors found, shutting down");

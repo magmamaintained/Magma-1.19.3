@@ -177,6 +177,7 @@ public final class PluginClassLoader extends URLClassLoader implements Remapping
         throw new ClassNotFoundException(name);
     }
 
+    //TODO: Remapper
     @Override
     public Class<?> findClass(String name) throws ClassNotFoundException {
         return findClass(name, true);

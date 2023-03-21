@@ -1,8 +1,16 @@
 package org.magmafoundation.magma.common;
 
+import net.minecraftforge.forgespi.language.IModInfo;
+
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class MagmaConstants {
+
+    public static Map<String, Integer> mods = new ConcurrentHashMap<>();
+    public static Set<String> modList = new HashSet<>();
+
+    public static List<IModInfo> modInfoList = new ArrayList<>();
 
     private static final String fullVersion = (MagmaConstants.class.getPackage().getImplementationVersion() != null) ? MagmaConstants.class.getPackage().getImplementationVersion() : "dev-env";
 
