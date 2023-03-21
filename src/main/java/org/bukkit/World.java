@@ -1,11 +1,13 @@
 package org.bukkit;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
+import net.minecraftforge.fml.loading.progress.EarlyProgressVisualization;
 import org.bukkit.block.Biome;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.BlockData;
@@ -2705,7 +2707,6 @@ public interface World extends RegionAccessor, WorldInfo, PluginMessageRecipient
         CUSTOM(-999);
 
         private final int id;
-        private static final Map<Integer, Environment> lookup = new HashMap<Integer, Environment>();
 
         private Environment(int id) {
             this.id = id;
@@ -2715,9 +2716,7 @@ public interface World extends RegionAccessor, WorldInfo, PluginMessageRecipient
          * Gets the dimension ID of this environment
          *
          * @return dimension ID
-         * @deprecated Magic value
          */
-        @Deprecated
         public int getId() {
             return id;
         }
@@ -2727,18 +2726,10 @@ public interface World extends RegionAccessor, WorldInfo, PluginMessageRecipient
          *
          * @param id The ID of the environment
          * @return The environment
-         * @deprecated Magic value
          */
-        @Deprecated
-        @Nullable
         public static Environment getEnvironment(int id) {
-            return lookup.get(id);
+            return Arrays.stream(values()).filter(x -> x.id == id).findFirst().orElse(Environment.CUSTOM);
         }
 
-        static {
-            for (Environment env : values()) {
-                lookup.put(env.getId(), env);
-            }
-        }
     }
 }

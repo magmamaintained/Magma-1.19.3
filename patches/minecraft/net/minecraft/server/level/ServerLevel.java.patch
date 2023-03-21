@@ -369,6 +369,18 @@
              ++i;
           }
        }
+@@ -1349,7 +_,11 @@
+       }
+    }
+ 
++
+    public static void m_8617_(ServerLevel p_8618_) {
++      makeObsidianPlatform(p_8618_, null);
++   }
++   public static void makeObsidianPlatform(ServerLevel p_8618_, Entity entity) {
+       BlockPos blockpos = f_8562_;
+       int i = blockpos.m_123341_();
+       int j = blockpos.m_123342_() - 2;
 @@ -1362,6 +_,12 @@
        });
     }
