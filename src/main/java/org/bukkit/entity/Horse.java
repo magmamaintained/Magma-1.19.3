@@ -41,6 +41,11 @@ public interface Horse extends AbstractHorse {
          * Also not really a horse :)
          */
         CAMEL,
+
+        /**
+         * Also not really a horse :)
+         */
+        MODDED,
         ;
     }
 

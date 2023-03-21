@@ -9,6 +9,15 @@
     private static final ConcurrentMap<ResourceKey.InternKey, ResourceKey<?>> f_135775_ = (new MapMaker()).weakValues().makeMap();
     private final ResourceLocation f_135776_;
     private final ResourceLocation f_135777_;
+@@ -32,7 +_,7 @@
+       });
+    }
+ 
+-   private ResourceKey(ResourceLocation p_135780_, ResourceLocation p_135781_) {
++   public ResourceKey(ResourceLocation p_135780_, ResourceLocation p_135781_) {
+       this.f_135776_ = p_135780_;
+       this.f_135777_ = p_135781_;
+    }
 @@ -55,6 +_,19 @@
  
     public ResourceLocation m_211136_() {
