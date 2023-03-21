@@ -1,0 +1,24 @@
+--- a/net/minecraft/world/level/block/CauldronBlock.java
++++ b/net/minecraft/world/level/block/CauldronBlock.java
+@@ -10,6 +_,7 @@
+ import net.minecraft.world.level.gameevent.GameEvent;
+ import net.minecraft.world.level.material.Fluid;
+ import net.minecraft.world.level.material.Fluids;
++import org.bukkit.event.block.CauldronLevelChangeEvent;
+ 
+ public class CauldronBlock extends AbstractCauldronBlock {
+    private static final float f_182448_ = 0.05F;
+@@ -36,11 +_,9 @@
+    public void m_141997_(BlockState p_152935_, Level p_152936_, BlockPos p_152937_, Biome.Precipitation p_152938_) {
+       if (m_182450_(p_152936_, p_152938_)) {
+          if (p_152938_ == Biome.Precipitation.RAIN) {
+-            p_152936_.m_46597_(p_152937_, Blocks.f_152476_.m_49966_());
+-            p_152936_.m_142346_((Entity)null, GameEvent.f_157792_, p_152937_);
++            LayeredCauldronBlock.changeLevel(p_152935_, p_152936_, p_152937_, p_152935_, null, CauldronLevelChangeEvent.ChangeReason.NATURAL_FILL); // CraftBukkit
+          } else if (p_152938_ == Biome.Precipitation.SNOW) {
+-            p_152936_.m_46597_(p_152937_, Blocks.f_152478_.m_49966_());
+-            p_152936_.m_142346_((Entity)null, GameEvent.f_157792_, p_152937_);
++            LayeredCauldronBlock.changeLevel(p_152935_, p_152936_, p_152937_, p_152935_, null, CauldronLevelChangeEvent.ChangeReason.NATURAL_FILL); // CraftBukkit
+          }
+ 
+       }
