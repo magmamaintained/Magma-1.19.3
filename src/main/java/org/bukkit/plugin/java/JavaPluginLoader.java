@@ -1,12 +1,14 @@
 package org.bukkit.plugin.java;
 
-import com.google.common.base.Preconditions;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.net.URLClassLoader;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
@@ -19,6 +21,7 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.logging.Level;
 import java.util.regex.Pattern;
+import org.apache.commons.lang3.Validate;
 import org.bukkit.Server;
 import org.bukkit.Warning;
 import org.bukkit.Warning.WarningState;
@@ -43,16 +46,27 @@ import org.bukkit.plugin.TimedRegisteredListener;
 import org.bukkit.plugin.UnknownDependencyException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.magmafoundation.magma.util.JavaPluginLoaderBridge;
+import org.objectweb.asm.ClassVisitor;
+import org.objectweb.asm.Label;
+import org.objectweb.asm.MethodVisitor;
+import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.Type;
 import org.yaml.snakeyaml.error.YAMLException;
 
 /**
  * Represents a Java plugin loader, allowing plugins in the form of .jar
  */
-public final class JavaPluginLoader implements PluginLoader {
+public final class JavaPluginLoader implements PluginLoader, JavaPluginLoaderBridge {
     final Server server;
     private final Pattern[] fileFilters = new Pattern[]{Pattern.compile("\\.jar$")};
     private final List<PluginClassLoader> loaders = new CopyOnWriteArrayList<PluginClassLoader>();
-    private final LibraryLoader libraryLoader = null;
+    private final LibraryLoader libraryLoader;
+
+    private static final String HIDDEN_FORM =
+            Float.parseFloat(System.getProperty("java.class.version")) < 57
+                    ? "Ljava/lang/invoke/LambdaForm$Hidden;"
+                    : "Ljdk/internal/vm/annotation/Hidden;";
 
     /**
      * This class was not meant to be constructed explicitly
@@ -61,23 +75,23 @@ public final class JavaPluginLoader implements PluginLoader {
      */
     @Deprecated
     public JavaPluginLoader(@NotNull Server instance) {
-        Preconditions.checkArgument(instance != null, "Server cannot be null");
+        Validate.notNull(instance, "Server cannot be null");
         server = instance;
 
-//        LibraryLoader libraryLoader = null;
-//        try {
-//            libraryLoader = new LibraryLoader(server.getLogger());
-//        } catch (NoClassDefFoundError ex) {
-//            // Provided depends were not added back
-//            server.getLogger().warning("Could not initialize LibraryLoader (missing dependencies?)");
-//        }
-//        this.libraryLoader = libraryLoader;
+        LibraryLoader libraryLoader = null;
+        try {
+            libraryLoader = new LibraryLoader(server.getLogger());
+        } catch (NoClassDefFoundError ex) {
+            // Provided depends were not added back
+            server.getLogger().warning("Could not initialize LibraryLoader (missing dependencies?)");
+        }
+        this.libraryLoader = libraryLoader;
     }
 
     @Override
     @NotNull
     public Plugin loadPlugin(@NotNull final File file) throws InvalidPluginException {
-        Preconditions.checkArgument(file != null, "File cannot be null");
+        Validate.notNull(file, "File cannot be null");
 
         if (!file.exists()) {
             throw new InvalidPluginException(new FileNotFoundException(file.getPath() + " does not exist"));
@@ -155,7 +169,7 @@ public final class JavaPluginLoader implements PluginLoader {
     @Override
     @NotNull
     public PluginDescriptionFile getPluginDescription(@NotNull File file) throws InvalidDescriptionException {
-        Preconditions.checkArgument(file != null, "File cannot be null");
+        Validate.notNull(file, "File cannot be null");
 
         JarFile jar = null;
         InputStream stream = null;
@@ -226,8 +240,8 @@ public final class JavaPluginLoader implements PluginLoader {
     @Override
     @NotNull
     public Map<Class<? extends Event>, Set<RegisteredListener>> createRegisteredListeners(@NotNull Listener listener, @NotNull final Plugin plugin) {
-        Preconditions.checkArgument(plugin != null, "Plugin can not be null");
-        Preconditions.checkArgument(listener != null, "Listener can not be null");
+        Validate.notNull(plugin, "Plugin can not be null");
+        Validate.notNull(listener, "Listener can not be null");
 
         boolean useTimings = server.getPluginManager().useTimings();
         Map<Class<? extends Event>, Set<RegisteredListener>> ret = new HashMap<Class<? extends Event>, Set<RegisteredListener>>();
@@ -235,13 +249,9 @@ public final class JavaPluginLoader implements PluginLoader {
         try {
             Method[] publicMethods = listener.getClass().getMethods();
             Method[] privateMethods = listener.getClass().getDeclaredMethods();
-            methods = new HashSet<Method>(publicMethods.length + privateMethods.length, 1.0f);
-            for (Method method : publicMethods) {
-                methods.add(method);
-            }
-            for (Method method : privateMethods) {
-                methods.add(method);
-            }
+            methods = new HashSet<>(publicMethods.length + privateMethods.length, 1.0f);
+            methods.addAll(Arrays.asList(publicMethods));
+            methods.addAll(Arrays.asList(privateMethods));
         } catch (NoClassDefFoundError e) {
             plugin.getLogger().severe("Plugin " + plugin.getDescription().getFullName() + " has failed to register events for " + listener.getClass() + " because " + e.getMessage() + " does not exist.");
             return ret;
@@ -290,33 +300,102 @@ public final class JavaPluginLoader implements PluginLoader {
                 }
             }
 
-            EventExecutor executor = new EventExecutor() {
-                @Override
-                public void execute(@NotNull Listener listener, @NotNull Event event) throws EventException {
-                    try {
-                        if (!eventClass.isAssignableFrom(event.getClass())) {
-                            return;
-                        }
-                        method.invoke(listener, event);
-                    } catch (InvocationTargetException ex) {
-                        throw new EventException(ex.getCause());
-                    } catch (Throwable t) {
-                        throw new EventException(t);
-                    }
-                }
-            };
-            if (useTimings) {
-                eventSet.add(new TimedRegisteredListener(listener, executor, eh.priority(), plugin, eh.ignoreCancelled()));
-            } else {
-                eventSet.add(new RegisteredListener(listener, executor, eh.priority(), plugin, eh.ignoreCancelled()));
-            }
         }
         return ret;
     }
 
+
+    private void createConstructor(ClassVisitor cv) {
+        MethodVisitor mv = cv.visitMethod(
+                Opcodes.ACC_PRIVATE,
+                "<init>",
+                "()V",
+                null, null);
+        mv.visitCode();
+        mv.visitVarInsn(Opcodes.ALOAD, 0);
+        mv.visitMethodInsn(Opcodes.INVOKESPECIAL, Type.getInternalName(Object.class), "<init>", "()V", false);
+        mv.visitInsn(Opcodes.RETURN);
+        mv.visitMaxs(-1, -1);
+        mv.visitEnd();
+    }
+
+    private void createImpl(Method method, Class<? extends Event> eventClass, ClassVisitor cv) {
+        String ownerType = Type.getInternalName(method.getDeclaringClass());
+        MethodVisitor mv = cv.visitMethod(
+                Opcodes.ACC_PUBLIC,
+                "execute",
+                Type.getMethodDescriptor(Type.VOID_TYPE, Type.getType(Listener.class), Type.getType(Event.class)),
+                null, null
+        );
+        mv.visitAnnotation(HIDDEN_FORM, true);
+
+        Label label0 = new Label();
+        Label label1 = new Label();
+        Label label2 = new Label();
+        mv.visitTryCatchBlock(label0, label1, label2, "java/lang/Throwable");
+        Label label3 = new Label();
+        Label label4 = new Label();
+        // try {
+        mv.visitTryCatchBlock(label3, label4, label2, "java/lang/Throwable");
+        //   if (!(event instanceof TYPE))
+        mv.visitLabel(label0);
+        mv.visitVarInsn(Opcodes.ALOAD, 2);
+        mv.visitTypeInsn(Opcodes.INSTANCEOF, Type.getInternalName(eventClass));
+        mv.visitJumpInsn(Opcodes.IFNE, label3);
+        //      return;
+        mv.visitLabel(label1);
+        mv.visitInsn(Opcodes.RETURN);
+        mv.visitLabel(label3);
+        mv.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
+        //   ((TYPE) listener).<method>(event);
+        //   TYPE.<method>(event);
+        int invokeCode;
+        if (Modifier.isStatic(method.getModifiers())) {
+            invokeCode = Opcodes.INVOKESTATIC;
+        } else if (method.getDeclaringClass().isInterface()) {
+            invokeCode = Opcodes.INVOKEINTERFACE;
+        } else {
+            invokeCode = Opcodes.INVOKEVIRTUAL;
+        }
+        if (invokeCode != Opcodes.INVOKESTATIC) {
+            mv.visitVarInsn(Opcodes.ALOAD, 1);
+            mv.visitTypeInsn(Opcodes.CHECKCAST, ownerType);
+        }
+        mv.visitVarInsn(Opcodes.ALOAD, 2);
+        mv.visitTypeInsn(Opcodes.CHECKCAST, Type.getInternalName(eventClass));
+        mv.visitMethodInsn(invokeCode, ownerType, method.getName(), Type.getMethodDescriptor(method), invokeCode == Opcodes.INVOKEINTERFACE);
+        int retSize = Type.getType(method.getReturnType()).getSize();
+        if (retSize > 0) {
+            mv.visitInsn(Opcodes.POP + retSize - 1);
+        }
+        mv.visitLabel(label4);
+        // } catch (Throwable t) {
+        Label label5 = new Label();
+        mv.visitJumpInsn(Opcodes.GOTO, label5);
+        mv.visitLabel(label2);
+        mv.visitFrame(Opcodes.F_SAME1, 0, null, 1, new Object[]{"java/lang/Throwable"});
+        mv.visitVarInsn(Opcodes.ASTORE, 3);
+        // throw new EventException(t);
+        Label label6 = new Label();
+        mv.visitLabel(label6);
+        mv.visitTypeInsn(Opcodes.NEW, "org/bukkit/event/EventException");
+        mv.visitInsn(Opcodes.DUP);
+        mv.visitVarInsn(Opcodes.ALOAD, 3);
+        mv.visitMethodInsn(Opcodes.INVOKESPECIAL, "org/bukkit/event/EventException", "<init>", "(Ljava/lang/Throwable;)V", false);
+        mv.visitInsn(Opcodes.ATHROW);
+        mv.visitLabel(label5);
+        mv.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
+        mv.visitInsn(Opcodes.RETURN);
+        // }
+        Label label7 = new Label();
+        mv.visitLabel(label7);
+        mv.visitMaxs(-1, -1);
+        mv.visitEnd();
+    }
+
     @Override
     public void enablePlugin(@NotNull final Plugin plugin) {
-        Preconditions.checkArgument(plugin instanceof JavaPlugin, "Plugin is not associated with this PluginLoader");
+        Validate.isTrue(plugin instanceof JavaPlugin, "Plugin is not associated with this PluginLoader");
 
         if (!plugin.isEnabled()) {
             plugin.getLogger().info("Enabling " + plugin.getDescription().getFullName());
@@ -344,7 +423,7 @@ public final class JavaPluginLoader implements PluginLoader {
 
     @Override
     public void disablePlugin(@NotNull Plugin plugin) {
-        Preconditions.checkArgument(plugin instanceof JavaPlugin, "Plugin is not associated with this PluginLoader");
+        Validate.isTrue(plugin instanceof JavaPlugin, "Plugin is not associated with this PluginLoader");
 
         if (plugin.isEnabled()) {
             String message = String.format("Disabling %s", plugin.getDescription().getFullName());
@@ -378,5 +457,17 @@ public final class JavaPluginLoader implements PluginLoader {
                 }
             }
         }
+    }
+
+    @Override
+    public List<URLClassLoader> bridge$getLoaders() {
+        List<URLClassLoader> classLoaders = new ArrayList<>();
+        loaders.parallelStream().parallel().forEach(classLoaders::add);
+        return classLoaders;
+    }
+
+    @Override
+    public void bridge$setClass(String name, Class<?> clazz) {
+        setClass(name, clazz);
     }
 }

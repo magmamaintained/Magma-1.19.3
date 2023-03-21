@@ -15,7 +15,7 @@
  import net.minecraft.world.level.WorldGenLevel;
  import net.minecraft.world.level.levelgen.WorldgenRandom;
  import net.minecraft.world.phys.Vec3;
-+import org.bukkit.craftbukkit.event.CraftEventFactory;
++import org.bukkit.craftbukkit.v1_19_R3.event.CraftEventFactory;
 +import org.bukkit.event.entity.EntityTransformEvent;
 +import org.bukkit.event.entity.SlimeSplitEvent;
  

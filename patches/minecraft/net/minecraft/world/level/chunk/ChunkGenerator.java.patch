@@ -1,18 +1,9 @@
 --- a/net/minecraft/world/level/chunk/ChunkGenerator.java
 +++ b/net/minecraft/world/level/chunk/ChunkGenerator.java
-@@ -74,6 +_,7 @@
- import net.minecraft.world.level.levelgen.structure.placement.StructurePlacement;
- import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplateManager;
- import org.apache.commons.lang3.mutable.MutableBoolean;
-+import org.bukkit.craftbukkit.generator.CraftLimitedRegion;
- 
- public abstract class ChunkGenerator {
-    public static final Codec<ChunkGenerator> f_62136_ = BuiltInRegistries.f_256914_.m_194605_().dispatchStable(ChunkGenerator::m_6909_, Function.identity());
-@@ -264,6 +_,28 @@
-          return false;
+@@ -265,6 +_,28 @@
        }
     }
-+
+ 
 +   // CraftBukkit start
 +   public void applyBiomeDecoration(WorldGenLevel generatoraccessseed, ChunkAccess ichunkaccess, StructureManager structuremanager, boolean vanilla) {
 +      if (vanilla) {
@@ -21,19 +12,20 @@
 +      org.bukkit.World world = generatoraccessseed.getMinecraftWorld().getWorld();
 +      // only call when a populator is present (prevents unnecessary entity conversion)
 +      if (!world.getPopulators().isEmpty()) {
-+         org.bukkit.craftbukkit.generator.CraftLimitedRegion limitedRegion = new org.bukkit.craftbukkit.generator.CraftLimitedRegion(generatoraccessseed, ichunkaccess.m_7697_());
++         org.bukkit.craftbukkit.v1_19_R3.generator.CraftLimitedRegion limitedRegion = new org.bukkit.craftbukkit.v1_19_R3.generator.CraftLimitedRegion(generatoraccessseed, ichunkaccess.m_7697_());
 +         int x = ichunkaccess.m_7697_().f_45578_;
 +         int z = ichunkaccess.m_7697_().f_45579_;
 +         for (org.bukkit.generator.BlockPopulator populator : world.getPopulators()) {
 +            WorldgenRandom seededrandom = new WorldgenRandom(new net.minecraft.world.level.levelgen.LegacyRandomSource(generatoraccessseed.m_7328_()));
 +            seededrandom.m_64690_(generatoraccessseed.m_7328_(), x, z);
-+            populator.populate(world, new org.bukkit.craftbukkit.util.RandomSourceWrapper.RandomWrapper(seededrandom), x, z, limitedRegion);
++            populator.populate(world, new org.bukkit.craftbukkit.v1_19_R3.util.RandomSourceWrapper.RandomWrapper(seededrandom), x, z, limitedRegion);
 +         }
 +         limitedRegion.saveEntities();
 +         limitedRegion.breakLink();
 +      }
 +   }
 +   // CraftBukkit end
- 
++
     public void m_213609_(WorldGenLevel p_223087_, ChunkAccess p_223088_, StructureManager p_223089_) {
        ChunkPos chunkpos = p_223088_.m_7697_();
+       if (!SharedConstants.m_183707_(chunkpos)) {

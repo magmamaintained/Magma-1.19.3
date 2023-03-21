@@ -12,13 +12,9 @@
  import org.slf4j.Logger;
  
  public class DedicatedPlayerList extends PlayerList {
-@@ -132,5 +_,9 @@
- 
+@@ -133,4 +_,5 @@
     public boolean m_5765_(GameProfile p_139592_) {
        return this.m_11307_().m_11351_(p_139592_);
-+   }
-+
-+   // Magma - stub
-+   public void respawn(ServerPlayer entity, ServerLevel toWorld, boolean b, Location to, boolean b1) {
     }
++
  }

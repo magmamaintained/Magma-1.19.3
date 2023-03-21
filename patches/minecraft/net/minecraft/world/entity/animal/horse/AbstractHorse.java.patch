@@ -100,7 +100,7 @@
 +      } else {
 +         power = 0.4F + 0.4F * (float) p_30574_ / 90.0F;
 +      }
-+      org.bukkit.event.entity.HorseJumpEvent event = org.bukkit.craftbukkit.event.CraftEventFactory.callHorseJumpEvent(this, power);
++      org.bukkit.event.entity.HorseJumpEvent event = org.bukkit.craftbukkit.v1_19_R3.event.CraftEventFactory.callHorseJumpEvent(this, power);
 +      if (event.isCancelled()) {
 +         return;
 +      }

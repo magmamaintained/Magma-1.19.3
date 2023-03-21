@@ -1,8 +1,11 @@
 --- a/net/minecraft/world/item/BucketItem.java
 +++ b/net/minecraft/world/item/BucketItem.java
-@@ -32,14 +_,28 @@
+@@ -30,16 +_,30 @@
+ import net.minecraft.world.phys.HitResult;
+ 
  public class BucketItem extends Item implements DispensibleContainerItem {
-    public final Fluid f_40687_;
+-   public final Fluid f_40687_;
++   private final Fluid f_40687_;
  
 +   // Forge: Use the other constructor that takes a Supplier
 +   @Deprecated
@@ -56,7 +59,7 @@
              ((LiquidBlockContainer)block).m_7361_(p_150717_, p_150718_, blockstate, ((FlowingFluid)this.f_40687_).m_76068_(false));
              this.m_7718_(p_150716_, p_150717_, p_150718_);
              return true;
-@@ -140,8 +_,25 @@
+@@ -140,8 +_,29 @@
     }
  
     protected void m_7718_(@Nullable Player p_40696_, LevelAccessor p_40697_, BlockPos p_40698_) {
@@ -77,6 +80,10 @@
 +
 +   private final java.util.function.Supplier<? extends Fluid> fluidSupplier;
 +   public Fluid getFluid() { return fluidSupplier.get(); }
++
++   public Fluid getContent() {
++      return f_40687_;
++   }
 +
 +   private boolean canBlockContainFluid(Level worldIn, BlockPos posIn, BlockState blockstate)
 +   {

@@ -6,7 +6,7 @@
              int j = this.f_25884_.m_7555_();
 -            if (j > 0 && this.f_25884_.m_217043_().m_188503_(j) < i) {
 +            // CraftBukkit - fire EntityTameEvent
-+            if (j > 0 && this.f_25884_.m_217043_().m_188503_(j) < i && !org.bukkit.craftbukkit.event.CraftEventFactory.callEntityTameEvent(this.f_25884_, ((org.bukkit.craftbukkit.entity.CraftHumanEntity) this.f_25884_.getBukkitEntity().getPassenger()).getHandle()).isCancelled()) {
++            if (j > 0 && this.f_25884_.m_217043_().m_188503_(j) < i && !org.bukkit.craftbukkit.v1_19_R3.event.CraftEventFactory.callEntityTameEvent(this.f_25884_, ((org.bukkit.craftbukkit.v1_19_R3.entity.CraftHumanEntity) this.f_25884_.getBukkitEntity().getPassenger()).getHandle()).isCancelled()) {
                 this.f_25884_.m_30637_((Player)entity);
                 return;
              }

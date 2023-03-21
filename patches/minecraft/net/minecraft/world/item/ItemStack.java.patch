@@ -34,7 +34,7 @@
  import net.minecraft.world.level.block.Block;
  import net.minecraft.world.level.block.state.BlockState;
  import net.minecraft.world.level.block.state.pattern.BlockInWorld;
-+import org.bukkit.craftbukkit.util.CraftMagicNumbers;
++import org.bukkit.craftbukkit.v1_19_R3.util.CraftMagicNumbers;
  import org.slf4j.Logger;
  
 -public final class ItemStack {
