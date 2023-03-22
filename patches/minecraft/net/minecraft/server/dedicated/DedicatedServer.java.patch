@@ -22,7 +22,7 @@
  import net.minecraft.server.WorldStem;
  import net.minecraft.server.gui.MinecraftServerGui;
  import net.minecraft.server.level.ServerLevel;
-@@ -51,477 +_,623 @@
+@@ -51,477 +_,621 @@
  import net.minecraft.world.level.Level;
  import net.minecraft.world.level.block.entity.SkullBlockEntity;
  import net.minecraft.world.level.storage.LevelStorageSource;
@@ -799,9 +799,7 @@
 +    InjectProtect.shutdownCalled();
 +    //Magma end
 +
-+
-+    System.exit(0); // CraftBukkit
-+
++    Runtime.getRuntime().halt(0);
 +  }
 +
 +  public void m_5703_(BooleanSupplier p_139661_) {
