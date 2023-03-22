@@ -72,7 +72,7 @@
  import net.minecraft.util.profiling.EmptyProfileResults;
  import net.minecraft.util.profiling.ProfileResults;
  import net.minecraft.util.profiling.ProfilerFiller;
-@@ -136,1624 +_,2116 @@
+@@ -136,1624 +_,2117 @@
  import net.minecraft.world.level.WorldDataConfiguration;
  import net.minecraft.world.level.biome.BiomeManager;
  import net.minecraft.world.level.block.Block;
@@ -1717,6 +1717,7 @@
 +        }
 +        // CraftBukkit end
 +        this.m_6988_();
++        Runtime.getRuntime().halt(0);
 +      }
 +
 +    }
