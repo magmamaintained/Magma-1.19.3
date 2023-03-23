@@ -90,7 +90,7 @@
  import net.minecraft.world.level.GameRules;
  import net.minecraft.world.level.GameType;
  import net.minecraft.world.level.Level;
-@@ -169,1559 +_,2875 @@
+@@ -169,1559 +_,2877 @@
  import net.minecraft.world.level.block.entity.JigsawBlockEntity;
  import net.minecraft.world.level.block.entity.SignBlockEntity;
  import net.minecraft.world.level.block.entity.StructureBlockEntity;
@@ -105,6 +105,7 @@
  import net.minecraft.world.phys.shapes.VoxelShape;
 +import org.bukkit.Location;
 +import org.bukkit.craftbukkit.v1_19_R3.CraftServer;
++import org.bukkit.craftbukkit.v1_19_R3.CraftWorld;
 +import org.bukkit.craftbukkit.v1_19_R3.entity.CraftPlayer;
 +import org.bukkit.craftbukkit.v1_19_R3.event.CraftEventFactory;
 +import org.bukkit.craftbukkit.v1_19_R3.inventory.CraftItemStack;
@@ -4499,10 +4500,11 @@
 +    return this.f_9743_;
 +  }
 +
-+  // Magma - stub
-+
-+  public void teleport(Location to) {
++  public void teleport(Location dest) {
++    this.f_9743_.m_143425_(((CraftWorld)dest.getWorld()).getHandle());
++    internalTeleport( dest.getX(), dest.getY(), dest.getZ(), dest.getYaw(), dest.getPitch(), Collections.emptySet(), true );
 +  }
++
 +
 +  @FunctionalInterface
 +  interface EntityInteraction {
