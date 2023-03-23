@@ -103,7 +103,7 @@
        ContainerHelper.m_18973_(p_187452_, this.f_58310_);
        CompoundTag compoundtag = new CompoundTag();
        this.f_58320_.forEach((p_187449_, p_187450_) -> {
-@@ -248,28 +_,49 @@
+@@ -248,28 +_,51 @@
           }
  
           int i = p_155017_.m_6893_();
@@ -145,9 +145,11 @@
 +            // CraftBukkit start
 +            if (recipe != null && p_155017_.f_58318_ == 0) {
 +               CraftItemStack source = CraftItemStack.asCraftMirror(p_155017_.f_58310_.get(0));
-+               CookingRecipe<?> cookingRecipe = (CookingRecipe<?>) recipe.toBukkitRecipe();
-+               FurnaceStartSmeltEvent event = new FurnaceStartSmeltEvent(CraftBlock.at(p_155014_, p_155015_), source, cookingRecipe);
++               CookingRecipe<?> recipeCR = (CookingRecipe<?>) recipe.toBukkitRecipe();
++
++               FurnaceStartSmeltEvent event = new FurnaceStartSmeltEvent(CraftBlock.at(p_155014_, p_155015_), source, recipeCR);
 +               p_155014_.getCraftServer().getPluginManager().callEvent(event);
++
 +               p_155017_.f_58319_ = event.getTotalCookTime();
 +            }
 +            // CraftBukkit end
