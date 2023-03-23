@@ -4,7 +4,7 @@
  import net.minecraft.world.level.Level;
  import net.minecraft.world.level.block.Blocks;
  import net.minecraft.world.level.block.state.BlockState;
-+import org.bukkit.craftbukkit.v1_19_R3.inventory.CraftInventoryView;
++import org.bukkit.craftbukkit.v1_19_R2.inventory.CraftInventoryView;
  
  public class SmithingMenu extends ItemCombinerMenu {
     private final Level f_40241_;
@@ -22,7 +22,7 @@
        List<UpgradeRecipe> list = this.f_40241_.m_7465_().m_44056_(RecipeType.f_44113_, this.f_39769_, this.f_40241_);
        if (list.isEmpty()) {
 -         this.f_39768_.m_6836_(0, ItemStack.f_41583_);
-+         org.bukkit.craftbukkit.v1_19_R3.event.CraftEventFactory.callPrepareSmithingEvent(getBukkitView(), ItemStack.f_41583_); // CraftBukkit
++         org.bukkit.craftbukkit.v1_19_R2.event.CraftEventFactory.callPrepareSmithingEvent(getBukkitView(), ItemStack.f_41583_); // CraftBukkit
        } else {
           UpgradeRecipe upgraderecipe = list.get(0);
           ItemStack itemstack = upgraderecipe.m_5874_(this.f_39769_);
@@ -31,7 +31,7 @@
              this.f_39768_.m_6029_(upgraderecipe);
 -            this.f_39768_.m_6836_(0, itemstack);
 +            // CraftBukkit start
-+            org.bukkit.craftbukkit.v1_19_R3.event.CraftEventFactory.callPrepareSmithingEvent(getBukkitView(), itemstack);
++            org.bukkit.craftbukkit.v1_19_R2.event.CraftEventFactory.callPrepareSmithingEvent(getBukkitView(), itemstack);
 +            // CraftBukkit end
           }
        }
@@ -48,7 +48,7 @@
 +         return bukkitEntity;
 +      }
 +
-+      org.bukkit.craftbukkit.v1_19_R3.inventory.CraftInventory inventory = new org.bukkit.craftbukkit.v1_19_R3.inventory.CraftInventorySmithing(
++      org.bukkit.craftbukkit.v1_19_R2.inventory.CraftInventory inventory = new org.bukkit.craftbukkit.v1_19_R2.inventory.CraftInventorySmithing(
 +              f_39770_.getLocation(), this.f_39769_, this.f_39768_);
 +      bukkitEntity = new CraftInventoryView(this.f_39771_.getBukkitEntity(), inventory, this);
 +      return bukkitEntity;

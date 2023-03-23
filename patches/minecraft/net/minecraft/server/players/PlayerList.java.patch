@@ -31,22 +31,23 @@
  import net.minecraft.sounds.SoundEvents;
  import net.minecraft.sounds.SoundSource;
  import net.minecraft.stats.ServerStatsCounter;
-@@ -101,761 +_,1171 @@
+@@ -101,761 +_,1173 @@
  import net.minecraft.world.scores.Objective;
  import net.minecraft.world.scores.PlayerTeam;
  import net.minecraft.world.scores.Team;
 +import org.bukkit.Location;
-+import org.bukkit.craftbukkit.v1_19_R3.CraftServer;
-+import org.bukkit.craftbukkit.v1_19_R3.CraftWorld;
-+import org.bukkit.craftbukkit.v1_19_R3.command.ColouredConsoleSender;
-+import org.bukkit.craftbukkit.v1_19_R3.command.ConsoleCommandCompleter;
-+import org.bukkit.craftbukkit.v1_19_R3.entity.CraftPlayer;
-+import org.bukkit.craftbukkit.v1_19_R3.util.CraftChatMessage;
++import org.bukkit.craftbukkit.v1_19_R2.CraftServer;
++import org.bukkit.craftbukkit.v1_19_R2.CraftWorld;
++import org.bukkit.craftbukkit.v1_19_R2.command.ColouredConsoleSender;
++import org.bukkit.craftbukkit.v1_19_R2.command.ConsoleCommandCompleter;
++import org.bukkit.craftbukkit.v1_19_R2.entity.CraftPlayer;
++import org.bukkit.craftbukkit.v1_19_R2.util.CraftChatMessage;
 +import org.bukkit.event.player.PlayerChangedWorldEvent;
 +import org.bukkit.event.player.PlayerJoinEvent;
 +import org.bukkit.event.player.PlayerLoginEvent;
 +import org.bukkit.event.player.PlayerQuitEvent;
 +import org.bukkit.event.player.PlayerRespawnEvent;
++import org.magmafoundation.magma.forge.ForgeInject;
  import org.slf4j.Logger;
  
  public abstract class PlayerList {
@@ -185,6 +186,7 @@
 +    p_203842_.reader.addCompleter(new ConsoleCommandCompleter(p_203842_.server));
 +    // CraftBukkit end
 +
++    ForgeInject.init(); //MAGMA - Forge Inject - Initialize
 +    this.f_11195_ = p_203842_;
 +    this.f_243858_ = p_251844_;
 +    this.f_256838_ =
@@ -298,7 +300,7 @@
 +    joinMessage = playerJoinEvent.getJoinMessage();
 +
 +    if (joinMessage != null && joinMessage.length() > 0) {
-+      for (Component line : org.bukkit.craftbukkit.v1_19_R3.util.CraftChatMessage.fromString(joinMessage)) {
++      for (Component line : org.bukkit.craftbukkit.v1_19_R2.util.CraftChatMessage.fromString(joinMessage)) {
 +        f_11195_.m_6846_().m_240416_(line, false);
 +      }
 +    }

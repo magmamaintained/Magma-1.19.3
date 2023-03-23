@@ -80,7 +80,7 @@
                    }
  
 -                  if (flag) {
-+                  if (flag && !org.bukkit.craftbukkit.v1_19_R3.event.CraftEventFactory.callEntityChangeBlockEvent(Bee.this, blockpos, blockstate.m_61124_(integerproperty, (Integer) blockstate.m_61143_(integerproperty) + 1)).isCancelled()) { // Spigot
++                  if (flag && !org.bukkit.craftbukkit.v1_19_R2.event.CraftEventFactory.callEntityChangeBlockEvent(Bee.this, blockpos, blockstate.m_61124_(integerproperty, (Integer) blockstate.m_61143_(integerproperty) + 1)).isCancelled()) { // Spigot
                       Bee.this.f_19853_.m_46796_(2005, blockpos, 0);
                       Bee.this.f_19853_.m_46597_(blockpos, blockstate.m_61124_(integerproperty, Integer.valueOf(blockstate.m_61143_(integerproperty) + 1)));
                       Bee.this.m_27871_();

@@ -22,7 +22,7 @@
              BlockState blockstate = levelaccessor.m_8055_(blockpos);
              if (InfestedBlock.m_54195_(blockstate)) {
 +               // CraftBukkit start
-+               if (org.bukkit.craftbukkit.v1_19_R3.event.CraftEventFactory.callEntityChangeBlockEvent(this.f_25725_, blockpos, InfestedBlock.m_153430_(blockstate)).isCancelled()) {
++               if (org.bukkit.craftbukkit.v1_19_R2.event.CraftEventFactory.callEntityChangeBlockEvent(this.f_25725_, blockpos, InfestedBlock.m_153430_(blockstate)).isCancelled()) {
 +                  return;
 +               }
 +               // CraftBukkit end
@@ -35,7 +35,7 @@
                       if (block instanceof InfestedBlock) {
 -                        if (level.m_46469_().m_46207_(GameRules.f_46132_)) {
 +                        // CraftBukkit start
-+                        if (org.bukkit.craftbukkit.v1_19_R3.event.CraftEventFactory.callEntityChangeBlockEvent(this.f_33562_, blockpos1, net.minecraft.world.level.block.Blocks.f_50016_.m_49966_()).isCancelled()) {
++                        if (org.bukkit.craftbukkit.v1_19_R2.event.CraftEventFactory.callEntityChangeBlockEvent(this.f_33562_, blockpos1, net.minecraft.world.level.block.Blocks.f_50016_.m_49966_()).isCancelled()) {
 +                           continue;
 +                        }
 +                        // CraftBukkit end

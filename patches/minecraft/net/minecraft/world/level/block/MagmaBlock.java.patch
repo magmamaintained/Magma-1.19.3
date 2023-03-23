@@ -1,12 +1,20 @@
 --- a/net/minecraft/world/level/block/MagmaBlock.java
 +++ b/net/minecraft/world/level/block/MagmaBlock.java
+@@ -6,7 +_,6 @@
+ import net.minecraft.server.level.ServerLevel;
+ import net.minecraft.sounds.SoundEvents;
+ import net.minecraft.sounds.SoundSource;
+-import net.minecraft.tags.FluidTags;
+ import net.minecraft.util.RandomSource;
+ import net.minecraft.world.damagesource.DamageSource;
+ import net.minecraft.world.entity.Entity;
 @@ -27,7 +_,9 @@
  
     public void m_141947_(Level p_153777_, BlockPos p_153778_, BlockState p_153779_, Entity p_153780_) {
        if (!p_153780_.m_20161_() && p_153780_ instanceof LivingEntity && !EnchantmentHelper.m_44938_((LivingEntity)p_153780_)) {
-+         org.bukkit.craftbukkit.v1_19_R3.event.CraftEventFactory.blockDamage = p_153777_.getWorld().getBlockAt(p_153778_.m_123341_(), p_153778_.m_123342_(), p_153778_.m_123343_()); // CraftBukkit
++         org.bukkit.craftbukkit.v1_19_R2.event.CraftEventFactory.blockDamage = p_153777_.getWorld().getBlockAt(p_153778_.m_123341_(), p_153778_.m_123342_(), p_153778_.m_123343_()); // CraftBukkit
           p_153780_.m_6469_(DamageSource.f_19309_, 1.0F);
-+         org.bukkit.craftbukkit.v1_19_R3.event.CraftEventFactory.blockDamage = null; // CraftBukkit
++         org.bukkit.craftbukkit.v1_19_R2.event.CraftEventFactory.blockDamage = null; // CraftBukkit
        }
  
        super.m_141947_(p_153777_, p_153778_, p_153779_, p_153780_);
