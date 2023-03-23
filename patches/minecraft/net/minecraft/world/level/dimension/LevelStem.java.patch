@@ -1,0 +1,18 @@
+--- a/net/minecraft/world/level/dimension/LevelStem.java
++++ b/net/minecraft/world/level/dimension/LevelStem.java
+@@ -7,6 +_,9 @@
+ import net.minecraft.resources.ResourceKey;
+ import net.minecraft.resources.ResourceLocation;
+ import net.minecraft.world.level.chunk.ChunkGenerator;
++import org.bukkit.Keyed;
++import org.bukkit.NamespacedKey;
++import org.jetbrains.annotations.NotNull;
+ 
+ public record LevelStem(Holder<DimensionType> f_63975_, ChunkGenerator f_63976_) {
+    public static final Codec<LevelStem> f_63970_ = RecordCodecBuilder.create((p_63986_) -> {
+@@ -15,4 +_,5 @@
+    public static final ResourceKey<LevelStem> f_63971_ = ResourceKey.m_135785_(Registries.f_256862_, new ResourceLocation("overworld"));
+    public static final ResourceKey<LevelStem> f_63972_ = ResourceKey.m_135785_(Registries.f_256862_, new ResourceLocation("the_nether"));
+    public static final ResourceKey<LevelStem> f_63973_ = ResourceKey.m_135785_(Registries.f_256862_, new ResourceLocation("the_end"));
++
+ }

@@ -5,6 +5,6 @@
  
     boolean m_183595_();
 +
-+   org.bukkit.craftbukkit.v1_19_R3.inventory.CraftMerchant getCraftMerchant(); // CraftBukkit
++   org.bukkit.craftbukkit.v1_19_R2.inventory.CraftMerchant getCraftMerchant(); // CraftBukkit
 +
  }

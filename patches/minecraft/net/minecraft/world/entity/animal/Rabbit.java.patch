@@ -37,7 +37,7 @@
                 int i = blockstate.m_61143_(CarrotBlock.f_52244_);
                 if (i == 0) {
 +                  // CraftBukkit start
-+                  if (org.bukkit.craftbukkit.v1_19_R3.event.CraftEventFactory.callEntityChangeBlockEvent(this.f_29778_, f_25602_, Blocks.f_50016_.m_49966_()).isCancelled()) {
++                  if (org.bukkit.craftbukkit.v1_19_R2.event.CraftEventFactory.callEntityChangeBlockEvent(this.f_29778_, f_25602_, Blocks.f_50016_.m_49966_()).isCancelled()) {
 +                     return;
 +                  }
 +                  // CraftBukkit end
@@ -45,7 +45,7 @@
                    level.m_46953_(blockpos, true, this.f_29778_);
                 } else {
 +                  // CraftBukkit start
-+                  if (org.bukkit.craftbukkit.v1_19_R3.event.CraftEventFactory.callEntityChangeBlockEvent(
++                  if (org.bukkit.craftbukkit.v1_19_R2.event.CraftEventFactory.callEntityChangeBlockEvent(
 +                          this.f_29778_,
 +                          f_25602_,
 +                          blockstate.m_61124_(CarrotBlock.f_52244_, i - 1)

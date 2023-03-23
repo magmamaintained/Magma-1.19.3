@@ -12,8 +12,8 @@
  import net.minecraft.world.phys.shapes.CollisionContext;
  import net.minecraft.world.phys.shapes.Shapes;
  import net.minecraft.world.phys.shapes.VoxelShape;
-+import org.bukkit.craftbukkit.v1_19_R3.inventory.CraftBlockInventoryHolder;
-+import org.bukkit.craftbukkit.v1_19_R3.util.DummyGeneratorAccess;
++import org.bukkit.craftbukkit.v1_19_R2.inventory.CraftBlockInventoryHolder;
++import org.bukkit.craftbukkit.v1_19_R2.util.DummyGeneratorAccess;
  
  public class ComposterBlock extends Block implements WorldlyContainerHolder {
     public static final int f_153088_ = 8;
@@ -38,7 +38,7 @@
 +         // CraftBukkit start
 +         double rand = p_51931_.m_213780_().m_188500_();
 +         BlockState blockstate = addItem(p_51930_, DummyGeneratorAccess.INSTANCE, p_51933_, p_51932_, rand);
-+         if (p_51930_ == blockstate || org.bukkit.craftbukkit.v1_19_R3.event.CraftEventFactory.callEntityChangeBlockEvent(entity, p_51933_, blockstate).isCancelled()) {
++         if (p_51930_ == blockstate || org.bukkit.craftbukkit.v1_19_R2.event.CraftEventFactory.callEntityChangeBlockEvent(entity, p_51933_, blockstate).isCancelled()) {
 +            return p_51930_;
 +         }
 +         blockstate = addItem(p_51930_, (Level) p_51931_, p_51933_, p_51932_, rand);
@@ -55,7 +55,7 @@
 +   public static BlockState extractProduce(BlockState p_51999_, Level p_52000_, BlockPos p_52001_, Entity entity) { // CraftBukkit
 +      if (entity != null) {
 +         BlockState iblockdata1 = m_52002_(p_51999_, DummyGeneratorAccess.INSTANCE, p_52001_);
-+         if (org.bukkit.craftbukkit.v1_19_R3.event.CraftEventFactory.callEntityChangeBlockEvent(entity, p_52001_, iblockdata1).isCancelled()) {
++         if (org.bukkit.craftbukkit.v1_19_R2.event.CraftEventFactory.callEntityChangeBlockEvent(entity, p_52001_, iblockdata1).isCancelled()) {
 +            return p_51999_;
 +         }
 +      }

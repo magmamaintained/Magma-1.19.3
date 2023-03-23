@@ -12,13 +12,13 @@
 +      org.bukkit.World world = generatoraccessseed.getMinecraftWorld().getWorld();
 +      // only call when a populator is present (prevents unnecessary entity conversion)
 +      if (!world.getPopulators().isEmpty()) {
-+         org.bukkit.craftbukkit.v1_19_R3.generator.CraftLimitedRegion limitedRegion = new org.bukkit.craftbukkit.v1_19_R3.generator.CraftLimitedRegion(generatoraccessseed, ichunkaccess.m_7697_());
++         org.bukkit.craftbukkit.v1_19_R2.generator.CraftLimitedRegion limitedRegion = new org.bukkit.craftbukkit.v1_19_R2.generator.CraftLimitedRegion(generatoraccessseed, ichunkaccess.m_7697_());
 +         int x = ichunkaccess.m_7697_().f_45578_;
 +         int z = ichunkaccess.m_7697_().f_45579_;
 +         for (org.bukkit.generator.BlockPopulator populator : world.getPopulators()) {
 +            WorldgenRandom seededrandom = new WorldgenRandom(new net.minecraft.world.level.levelgen.LegacyRandomSource(generatoraccessseed.m_7328_()));
 +            seededrandom.m_64690_(generatoraccessseed.m_7328_(), x, z);
-+            populator.populate(world, new org.bukkit.craftbukkit.v1_19_R3.util.RandomSourceWrapper.RandomWrapper(seededrandom), x, z, limitedRegion);
++            populator.populate(world, new org.bukkit.craftbukkit.v1_19_R2.util.RandomSourceWrapper.RandomWrapper(seededrandom), x, z, limitedRegion);
 +         }
 +         limitedRegion.saveEntities();
 +         limitedRegion.breakLink();

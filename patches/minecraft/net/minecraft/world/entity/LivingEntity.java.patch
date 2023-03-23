@@ -51,10 +51,10 @@
  import net.minecraft.world.scores.PlayerTeam;
 +import net.minecraftforge.common.ForgeHooks;
 +import org.bukkit.Location;
-+import org.bukkit.craftbukkit.v1_19_R3.attribute.CraftAttributeMap;
-+import org.bukkit.craftbukkit.v1_19_R3.event.CraftEventFactory;
-+import org.bukkit.craftbukkit.v1_19_R3.CraftEquipmentSlot;
-+import org.bukkit.craftbukkit.v1_19_R3.inventory.CraftItemStack;
++import org.bukkit.craftbukkit.v1_19_R2.attribute.CraftAttributeMap;
++import org.bukkit.craftbukkit.v1_19_R2.event.CraftEventFactory;
++import org.bukkit.craftbukkit.v1_19_R2.CraftEquipmentSlot;
++import org.bukkit.craftbukkit.v1_19_R2.inventory.CraftItemStack;
 +import org.bukkit.event.entity.*;
 +import org.bukkit.event.player.PlayerItemConsumeEvent;
  import org.slf4j.Logger;
@@ -79,7 +79,7 @@
 +   public int expToDrop;
 +   public boolean forceDrops;
 +   public ArrayList<org.bukkit.inventory.ItemStack> drops = new ArrayList<org.bukkit.inventory.ItemStack>();
-+   public final org.bukkit.craftbukkit.v1_19_R3.attribute.CraftAttributeMap craftAttributes;
++   public final org.bukkit.craftbukkit.v1_19_R2.attribute.CraftAttributeMap craftAttributes;
 +   public boolean collides = true;
 +   public Set<UUID> collidableExemptions = new HashSet<>();
 +   public boolean bukkitPickUpLoot;
@@ -497,7 +497,7 @@
     public void m_21153_(float p_21154_) {
 +      // CraftBukkit start - Handle scaled health
 +      if (this instanceof ServerPlayer) {
-+         org.bukkit.craftbukkit.v1_19_R3.entity.CraftPlayer player = ((ServerPlayer) this).getBukkitEntity();
++         org.bukkit.craftbukkit.v1_19_R2.entity.CraftPlayer player = ((ServerPlayer) this).getBukkitEntity();
 +         // Squeeze
 +         if (p_21154_ < 0.0F) {
 +            player.setRealHealth(0.0D);
@@ -709,7 +709,7 @@
 -                  flag = true;
 +               if (this.f_19853_.m_46859_(blockpos) && blockstate.m_60710_(this.f_19853_, blockpos)) {
 +                  // CraftBukkit start - call EntityBlockFormEvent for Wither Rose
-+                  flag = org.bukkit.craftbukkit.v1_19_R3.event.CraftEventFactory.handleBlockFormEvent(this.f_19853_, blockpos, blockstate, 3, this);
++                  flag = org.bukkit.craftbukkit.v1_19_R2.event.CraftEventFactory.handleBlockFormEvent(this.f_19853_, blockpos, blockstate, 3, this);
 +                  // CraftBukkit end
                 }
              }

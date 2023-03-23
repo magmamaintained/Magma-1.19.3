@@ -588,7 +588,7 @@
 +    for (java.util.logging.Handler handler : global.getHandlers()) {
 +      global.removeHandler(handler);
 +    }
-+    global.addHandler(new org.bukkit.craftbukkit.v1_19_R3.util.ForwardLogHandler());
++    global.addHandler(new org.bukkit.craftbukkit.v1_19_R2.util.ForwardLogHandler());
 +
 +    final org.apache.logging.log4j.core.Logger logger =
 +        ((org.apache.logging.log4j.core.Logger) LogManager.getRootLogger());
@@ -599,7 +599,7 @@
 +    }
 +
 +
-+    new org.bukkit.craftbukkit.v1_19_R3.util.TerminalConsoleWriterThread(System.out, this.reader).start();
++    new org.bukkit.craftbukkit.v1_19_R2.util.TerminalConsoleWriterThread(System.out, this.reader).start();
 +    System.setOut(IoBuilder.forLogger(logger).setLevel(org.apache.logging.log4j.Level.INFO).buildPrintStream());
 +    System.setErr(IoBuilder.forLogger(logger).setLevel(org.apache.logging.log4j.Level.WARN).buildPrintStream());
 +    // CraftBukkit end
@@ -699,7 +699,7 @@
 +      if (dedicatedserverproperties.f_139747_) {
 +        f_139598_.info("Starting remote control listener");
 +        this.f_139603_ = RconThread.m_11615_(this);
-+        this.remoteConsole = new org.bukkit.craftbukkit.v1_19_R3.command.CraftRemoteConsoleCommandSender(
++        this.remoteConsole = new org.bukkit.craftbukkit.v1_19_R2.command.CraftRemoteConsoleCommandSender(
 +            this.f_139602_); // CraftBukkit
 +      }
 +

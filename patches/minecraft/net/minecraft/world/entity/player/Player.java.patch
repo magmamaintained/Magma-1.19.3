@@ -26,9 +26,9 @@
  import net.minecraft.world.scores.PlayerTeam;
  import net.minecraft.world.scores.Scoreboard;
 -import net.minecraft.world.scores.Team;
-+import org.bukkit.craftbukkit.v1_19_R3.entity.CraftHumanEntity;
-+import org.bukkit.craftbukkit.v1_19_R3.event.CraftEventFactory;
-+import org.bukkit.craftbukkit.v1_19_R3.util.CraftVector;
++import org.bukkit.craftbukkit.v1_19_R2.entity.CraftHumanEntity;
++import org.bukkit.craftbukkit.v1_19_R2.event.CraftEventFactory;
++import org.bukkit.craftbukkit.v1_19_R2.util.CraftVector;
 +import org.bukkit.entity.Item;
 +import org.bukkit.event.entity.EntityCombustByEntityEvent;
 +import org.bukkit.event.entity.EntityExhaustionEvent;
@@ -635,7 +635,7 @@
           this.m_183634_();
 -         this.m_20115_(7, false);
 +         // CraftBukkit start
-+         if (m_20291_(7) && !org.bukkit.craftbukkit.v1_19_R3.event.CraftEventFactory.callToggleGlideEvent(this, false).isCancelled()) {
++         if (m_20291_(7) && !org.bukkit.craftbukkit.v1_19_R2.event.CraftEventFactory.callToggleGlideEvent(this, false).isCancelled()) {
 +            this.m_20115_(7, false);
 +         }
 +         // CraftBukkit end
@@ -698,7 +698,7 @@
     public void m_36320_() {
 -      this.m_20115_(7, true);
 +      // CraftBukkit start
-+      if (!org.bukkit.craftbukkit.v1_19_R3.event.CraftEventFactory.callToggleGlideEvent(this, true).isCancelled()) {
++      if (!org.bukkit.craftbukkit.v1_19_R2.event.CraftEventFactory.callToggleGlideEvent(this, true).isCancelled()) {
 +         this.m_20115_(7, true);
 +      } else {
 +         // SPIGOT-5542: must toggle like below
@@ -712,7 +712,7 @@
 -      this.m_20115_(7, true);
 -      this.m_20115_(7, false);
 +      // CraftBukkit start
-+      if (!org.bukkit.craftbukkit.v1_19_R3.event.CraftEventFactory.callToggleGlideEvent(this, false).isCancelled()) {
++      if (!org.bukkit.craftbukkit.v1_19_R2.event.CraftEventFactory.callToggleGlideEvent(this, false).isCancelled()) {
 +         this.m_20115_(7, true);
 +         this.m_20115_(7, false);
 +      }

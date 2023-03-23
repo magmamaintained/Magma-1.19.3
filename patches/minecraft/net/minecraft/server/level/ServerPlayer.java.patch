@@ -48,7 +48,7 @@
  import net.minecraft.world.level.gameevent.GameEvent;
  import net.minecraft.world.level.portal.PortalInfo;
  import net.minecraft.world.level.storage.LevelData;
-@@ -142,1444 +_,2250 @@
+@@ -142,1444 +_,2249 @@
  import net.minecraft.world.phys.Vec3;
  import net.minecraft.world.scores.PlayerTeam;
  import net.minecraft.world.scores.Score;
@@ -58,14 +58,13 @@
 +import org.bukkit.Bukkit;
 +import org.bukkit.Location;
 +import org.bukkit.WeatherType;
-+import org.bukkit.World;
-+import org.bukkit.craftbukkit.v1_19_R3.CraftWorld;
-+import org.bukkit.craftbukkit.v1_19_R3.CraftWorldBorder;
-+import org.bukkit.craftbukkit.v1_19_R3.entity.CraftPlayer;
-+import org.bukkit.craftbukkit.v1_19_R3.event.CraftEventFactory;
-+import org.bukkit.craftbukkit.v1_19_R3.event.CraftPortalEvent;
-+import org.bukkit.craftbukkit.v1_19_R3.inventory.CraftItemStack;
-+import org.bukkit.craftbukkit.v1_19_R3.util.CraftDimensionUtil;
++import org.bukkit.craftbukkit.v1_19_R2.CraftWorld;
++import org.bukkit.craftbukkit.v1_19_R2.CraftWorldBorder;
++import org.bukkit.craftbukkit.v1_19_R2.entity.CraftPlayer;
++import org.bukkit.craftbukkit.v1_19_R2.event.CraftEventFactory;
++import org.bukkit.craftbukkit.v1_19_R2.event.CraftPortalEvent;
++import org.bukkit.craftbukkit.v1_19_R2.inventory.CraftItemStack;
++import org.bukkit.craftbukkit.v1_19_R2.util.CraftDimensionUtil;
 +import org.bukkit.event.player.PlayerBedLeaveEvent;
 +import org.bukkit.event.player.PlayerChangedMainHandEvent;
 +import org.bukkit.event.player.PlayerChangedWorldEvent;
@@ -1118,7 +1117,7 @@
 +      if (deathMessage.equals(deathmessage)) {
 +        component = this.m_21231_().m_19293_();
 +      } else {
-+        component = org.bukkit.craftbukkit.v1_19_R3.util.CraftChatMessage.fromStringOrNull(deathMessage);
++        component = org.bukkit.craftbukkit.v1_19_R2.util.CraftChatMessage.fromStringOrNull(deathMessage);
 +      }
 +      this.f_8906_.m_243119_(new ClientboundPlayerCombatKillPacket(this.m_21231_(), component),
 +          PacketSendListener.m_243073_(() -> {
@@ -1932,7 +1931,7 @@
 +    }
 +
 +    bedResult =
-+        org.bukkit.craftbukkit.v1_19_R3.event.CraftEventFactory.callPlayerBedEnterEvent(this, p_9115_, bedResult);
++        org.bukkit.craftbukkit.v1_19_R2.event.CraftEventFactory.callPlayerBedEnterEvent(this, p_9115_, bedResult);
 +    if (bedResult.left().isPresent()) {
 +      return bedResult;
 +    }
