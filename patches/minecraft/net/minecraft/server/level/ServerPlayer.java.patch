@@ -48,7 +48,7 @@
  import net.minecraft.world.level.gameevent.GameEvent;
  import net.minecraft.world.level.portal.PortalInfo;
  import net.minecraft.world.level.storage.LevelData;
-@@ -142,1444 +_,2183 @@
+@@ -142,1444 +_,2250 @@
  import net.minecraft.world.phys.Vec3;
  import net.minecraft.world.scores.PlayerTeam;
  import net.minecraft.world.scores.Score;
@@ -67,9 +67,12 @@
 +import org.bukkit.craftbukkit.v1_19_R3.inventory.CraftItemStack;
 +import org.bukkit.craftbukkit.v1_19_R3.util.CraftDimensionUtil;
 +import org.bukkit.event.player.PlayerBedLeaveEvent;
++import org.bukkit.event.player.PlayerChangedMainHandEvent;
 +import org.bukkit.event.player.PlayerChangedWorldEvent;
++import org.bukkit.event.player.PlayerLocaleChangeEvent;
 +import org.bukkit.event.player.PlayerPortalEvent;
 +import org.bukkit.event.player.PlayerTeleportEvent;
++import org.bukkit.inventory.MainHand;
  import org.slf4j.Logger;
  
  public class ServerPlayer extends Player {
@@ -328,7 +331,6 @@
 +
 +  // CraftBukkit start
 +  public String displayName;
-+  public Component listName;
 +  public org.bukkit.Location compassTarget;
 +  public int newExp = 0;
 +  public int newLevel = 0;
@@ -1586,10 +1588,12 @@
 +              serverlevel.get().m_46473_().m_6180_("placing");
 +              this.f_8927_ = true;
 +
-+              this.f_8906_.m_9829_(new ClientboundRespawnPacket(serverlevel.get().m_220362_(), serverlevel.get().m_46472_(),
-+                  BiomeManager.m_47877_(serverlevel.get().m_7328_()), this.f_8941_.m_9290_(),
-+                  this.f_8941_.m_9293_(), serverlevel.get().m_46659_(), serverlevel.get().m_8584_(), (byte) 3,
-+                  this.m_219759_()));
++              this.f_8906_.m_9829_(
++                  new ClientboundRespawnPacket(serverlevel.get().m_220362_(), serverlevel.get().m_46472_(),
++                      BiomeManager.m_47877_(serverlevel.get().m_7328_()), this.f_8941_.m_9290_(),
++                      this.f_8941_.m_9293_(), serverlevel.get().m_46659_(),
++                      serverlevel.get().m_8584_(), (byte) 3,
++                      this.m_219759_()));
 +              this.f_8906_.m_9829_(
 +                  new ClientboundChangeDifficultyPacket(serverlevel.get().m_6106_().m_5472_(),
 +                      serverlevel.get().m_6106_().m_5474_()));
@@ -1631,7 +1635,8 @@
 +            p_9180_.m_46472_());
 +
 +        // CraftBukkit start
-+        PlayerChangedWorldEvent changeEvent = new PlayerChangedWorldEvent(this.getBukkitEntity(), serverlevel.get().getWorld());
++        PlayerChangedWorldEvent changeEvent =
++            new PlayerChangedWorldEvent(this.getBukkitEntity(), serverlevel.get().getWorld());
 +        this.f_19853_.getCraftServer().getPluginManager().callEvent(changeEvent);
 +        // CraftBukkit end
 +      }
@@ -1642,16 +1647,20 @@
 +
 +  // CraftBukkit start
 +  @Override
-+  protected CraftPortalEvent callPortalEvent(Entity entity, ServerLevel exitServerLevel, BlockPos exitPosition, PlayerTeleportEvent.TeleportCause cause, int searchRadius, int creationRadius) {
++  protected CraftPortalEvent callPortalEvent(Entity entity, ServerLevel exitServerLevel, BlockPos exitPosition,
++                                             PlayerTeleportEvent.TeleportCause cause, int searchRadius,
++                                             int creationRadius) {
 +    Location enter = this.getBukkitEntity().getLocation();
-+    Location exit = new Location( exitServerLevel.getWorld(), exitPosition.m_123341_(), exitPosition.m_123342_(), exitPosition.m_123343_(), m_146908_(), m_146909_() );
++    Location exit =
++        new Location(exitServerLevel.getWorld(), exitPosition.m_123341_(), exitPosition.m_123342_(), exitPosition.m_123343_(),
++            m_146908_(), m_146909_());
 +    PlayerPortalEvent
-+        event = new PlayerPortalEvent( this.getBukkitEntity(), enter, exit, cause, searchRadius, true, creationRadius );
-+    Bukkit.getServer().getPluginManager().callEvent( event );
++        event = new PlayerPortalEvent(this.getBukkitEntity(), enter, exit, cause, searchRadius, true, creationRadius);
++    Bukkit.getServer().getPluginManager().callEvent(event);
 +    if (event.isCancelled() || event.getTo() == null || event.getTo().getWorld() == null) {
 +      return null;
 +    }
-+    return new CraftPortalEvent( event );
++    return new CraftPortalEvent(event);
 +  }
 +  // CraftBukkit end
 +
@@ -1671,13 +1680,17 @@
 +  }
 +
 +  //Magma start - add original method
-+  protected Optional<BlockUtil.FoundRectangle> m_183318_(ServerLevel p_184131_, BlockPos p_184132_, boolean p_184133_, WorldBorder p_184134_) {
++  protected Optional<BlockUtil.FoundRectangle> m_183318_(ServerLevel p_184131_, BlockPos p_184132_,
++                                                             boolean p_184133_, WorldBorder p_184134_) {
 +    Optional<BlockUtil.FoundRectangle> optional = super.m_183318_(p_184131_, p_184132_, p_184133_, p_184134_);
 +    if (optional.isPresent()) {
 +      return optional;
 +    } else {
-+      Direction.Axis direction$axis = this.f_19853_.m_8055_(this.f_19819_).m_61145_(NetherPortalBlock.f_54904_).orElse(Direction.Axis.X);
-+      Optional<BlockUtil.FoundRectangle> optional1 = p_184131_.m_8871_().m_77666_(p_184132_, direction$axis);
++      Direction.Axis direction$axis =
++          this.f_19853_.m_8055_(this.f_19819_).m_61145_(NetherPortalBlock.f_54904_)
++              .orElse(Direction.Axis.X);
++      Optional<BlockUtil.FoundRectangle> optional1 =
++          p_184131_.m_8871_().m_77666_(p_184132_, direction$axis);
 +         /*if (!optional1.isPresent()) {
 +            LOGGER.error("Unable to create a portal, likely target out of worldborder");
 +         }*/ //CraftBukkit commented this out for some reason, but I'm not sure why.
@@ -1687,13 +1700,20 @@
 +  }
 +  //Magma end
 +
-+  protected Optional<BlockUtil.FoundRectangle> getExitPortal(ServerLevel p_184131_, BlockPos p_184132_, boolean p_184133_, WorldBorder p_184134_, int searchRadius, boolean canCreatePortal, int createRadius) { // CraftBukkit
-+    Optional<BlockUtil.FoundRectangle> optional = super.getExitPortal( p_184131_, p_184132_, p_184133_, p_184134_, searchRadius, canCreatePortal, createRadius ); // CraftBukkit
++  protected Optional<BlockUtil.FoundRectangle> getExitPortal(ServerLevel p_184131_, BlockPos p_184132_,
++                                                             boolean p_184133_, WorldBorder p_184134_, int searchRadius,
++                                                             boolean canCreatePortal, int createRadius) { // CraftBukkit
++    Optional<BlockUtil.FoundRectangle> optional =
++        super.getExitPortal(p_184131_, p_184132_, p_184133_, p_184134_, searchRadius, canCreatePortal,
++            createRadius); // CraftBukkit
 +    if (optional.isPresent() || !canCreatePortal) { // CraftBukkit
 +      return optional;
 +    } else {
-+      Direction.Axis direction$axis = this.f_19853_.m_8055_( this.f_19819_ ).m_61145_( NetherPortalBlock.f_54904_ ).orElse( Direction.Axis.X );
-+      Optional<BlockUtil.FoundRectangle> optional1 = p_184131_.m_8871_().createPortal( p_184132_, direction$axis, this, createRadius );
++      Direction.Axis direction$axis =
++          this.f_19853_.m_8055_(this.f_19819_).m_61145_(NetherPortalBlock.f_54904_)
++              .orElse(Direction.Axis.X);
++      Optional<BlockUtil.FoundRectangle> optional1 =
++          p_184131_.m_8871_().createPortal(p_184132_, direction$axis, this, createRadius);
 +      // CraftBukkit start
 +            /*if (!optional1.isPresent()) {
 +                LOGGER.error( "Unable to create a portal, likely target out of worldborder" );
@@ -1729,7 +1749,8 @@
 -         return this.m_8954_() == this;
 +    }
 +
-+    if (maindimensionkey == Level.f_46429_ && maindimensionkey1 == Level.f_46428_ && this.f_8933_ != null) {
++    if (maindimensionkey == Level.f_46429_ && maindimensionkey1 == Level.f_46428_ &&
++        this.f_8933_ != null) {
 +      // CraftBukkit end
 +      CriteriaTriggers.f_10552_.m_186165_(this, this.f_8933_);
 +    }
@@ -1760,20 +1781,21 @@
 +    boolean force = startSleepInBed_force; //Magma
 +    startSleepInBed_force = false; //reset
 +
-+    Direction enumdirection = (Direction) this.f_19853_.m_8055_( p_9115_ ).m_61143_( HorizontalDirectionalBlock.f_54117_ );
++    Direction enumdirection = (Direction) this.f_19853_.m_8055_(p_9115_).m_61143_(HorizontalDirectionalBlock.f_54117_);
 +    Either<Player.BedSleepingProblem, Unit> bedResult = null;
 +
-+    java.util.Optional<BlockPos> optAt = java.util.Optional.of( p_9115_ );
-+    Player.BedSleepingProblem ret = net.minecraftforge.event.ForgeEventFactory.onPlayerSleepInBed( this, optAt );
-+    if (ret != null)
-+      bedResult = Either.left( ret );
++    java.util.Optional<BlockPos> optAt = java.util.Optional.of(p_9115_);
++    Player.BedSleepingProblem ret = net.minecraftforge.event.ForgeEventFactory.onPlayerSleepInBed(this, optAt);
++    if (ret != null) {
++      bedResult = Either.left(ret);
++    }
 +    if (!this.m_5803_() && this.m_6084_()) {
 +      if (!this.f_19853_.m_6042_().f_63858_()) {
-+        bedResult = Either.left( Player.BedSleepingProblem.NOT_POSSIBLE_HERE );
-+      } else if (!this.m_9116_( p_9115_, enumdirection )) {
-+        bedResult = Either.left( Player.BedSleepingProblem.TOO_FAR_AWAY );
-+      } else if (this.m_9191_( p_9115_, enumdirection )) {
-+        bedResult = Either.left( Player.BedSleepingProblem.OBSTRUCTED );
++        bedResult = Either.left(Player.BedSleepingProblem.NOT_POSSIBLE_HERE);
++      } else if (!this.m_9116_(p_9115_, enumdirection)) {
++        bedResult = Either.left(Player.BedSleepingProblem.TOO_FAR_AWAY);
++      } else if (this.m_9191_(p_9115_, enumdirection)) {
++        bedResult = Either.left(Player.BedSleepingProblem.OBSTRUCTED);
        } else {
 -         return this.m_5833_() ? false : super.m_6459_(p_9014_);
 -      }
@@ -1820,19 +1842,21 @@
 -
 -               ((ServerLevel)this.f_19853_).m_8878_();
 -               return either;
-+        this.m_9158_( this.f_19853_.m_46472_(), p_9115_, this.m_146908_(), false, true );
-+        if (!net.minecraftforge.event.ForgeEventFactory.fireSleepingTimeCheck( this, optAt )) {
-+          bedResult = Either.left( Player.BedSleepingProblem.NOT_POSSIBLE_NOW );
++        this.m_9158_(this.f_19853_.m_46472_(), p_9115_, this.m_146908_(), false, true);
++        if (!net.minecraftforge.event.ForgeEventFactory.fireSleepingTimeCheck(this, optAt)) {
++          bedResult = Either.left(Player.BedSleepingProblem.NOT_POSSIBLE_NOW);
 +        } else {
 +          if (!this.m_7500_()) {
 +            double d0 = 8.0D;
 +            double d1 = 5.0D;
-+            Vec3 vec3 = Vec3.m_82539_( p_9115_ );
-+            List<Monster> list = this.f_19853_.m_6443_( Monster.class, new AABB( vec3.m_7096_() - 8.0D, vec3.m_7098_() - 5.0D, vec3.m_7094_() - 8.0D, vec3.m_7096_() + 8.0D, vec3.m_7098_() + 5.0D, vec3.m_7094_() + 8.0D ), (p_9062_) -> {
-+              return p_9062_.m_6935_( this );
-+            } );
++            Vec3 vec3 = Vec3.m_82539_(p_9115_);
++            List<Monster> list = this.f_19853_.m_6443_(Monster.class,
++                new AABB(vec3.m_7096_() - 8.0D, vec3.m_7098_() - 5.0D, vec3.m_7094_() - 8.0D, vec3.m_7096_() + 8.0D, vec3.m_7098_() + 5.0D,
++                    vec3.m_7094_() + 8.0D), (p_9062_) -> {
++                  return p_9062_.m_6935_(this);
++                });
 +            if (!list.isEmpty()) {
-+              bedResult = Either.left( Player.BedSleepingProblem.NOT_SAFE );
++              bedResult = Either.left(Player.BedSleepingProblem.NOT_SAFE);
              }
 -         }
 -      } else {
@@ -1890,34 +1914,36 @@
 -      super.m_8127_();
 +          }
 +
-+          if (bedResult == null)
-+            bedResult = Either.right( Unit.INSTANCE );
++          if (bedResult == null) {
++            bedResult = Either.right(Unit.INSTANCE);
++          }
 +        }
 +      }
 +    } else {
-+      bedResult = Either.left( Player.BedSleepingProblem.OTHER_PROBLEM );
++      bedResult = Either.left(Player.BedSleepingProblem.OTHER_PROBLEM);
 +    }
 +
-+    if (bedResult.left().orElse( null ) == Player.BedSleepingProblem.OTHER_PROBLEM) {
++    if (bedResult.left().orElse(null) == Player.BedSleepingProblem.OTHER_PROBLEM) {
 +      return bedResult; // return immediately if the result is not bypassable by plugins
 +    }
 +
 +    if (force) {
-+      bedResult = Either.right( Unit.INSTANCE );
++      bedResult = Either.right(Unit.INSTANCE);
 +    }
 +
-+    bedResult = org.bukkit.craftbukkit.v1_19_R3.event.CraftEventFactory.callPlayerBedEnterEvent( this, p_9115_, bedResult );
++    bedResult =
++        org.bukkit.craftbukkit.v1_19_R3.event.CraftEventFactory.callPlayerBedEnterEvent(this, p_9115_, bedResult);
 +    if (bedResult.left().isPresent()) {
 +      return bedResult;
 +    }
 +
 +
-+    Either<Player.BedSleepingProblem, Unit> either = super.m_7720_( p_9115_ ).ifRight( (unit) -> {
-+      this.m_36220_( Stats.f_12969_ );
-+      CriteriaTriggers.f_10583_.m_222618_( this );
-+    } );
++    Either<Player.BedSleepingProblem, Unit> either = super.m_7720_(p_9115_).ifRight((unit) -> {
++      this.m_36220_(Stats.f_12969_);
++      CriteriaTriggers.f_10583_.m_222618_(this);
++    });
 +    if (!this.m_9236_().m_143333_()) {
-+      this.m_5661_(Component.m_237115_( "sleep.not_possible" ), true );
++      this.m_5661_(Component.m_237115_("sleep.not_possible"), true);
 +    }
 +
 +    ((ServerLevel) this.f_19853_).m_8878_();
@@ -1949,7 +1975,9 @@
 +  }
 +
 +  public void m_6145_(boolean p_9165_, boolean p_9166_) {
-+    if (!this.m_5803_()) return; // CraftBukkit - Can't leave bed if not in one!
++    if (!this.m_5803_()) {
++      return; // CraftBukkit - Can't leave bed if not in one!
++    }
 +    // CraftBukkit start - fire PlayerBedLeaveEvent
 +    CraftPlayer player = this.getBukkitEntity();
 +    BlockPos bedPosition = this.m_21257_().orElse(null);
@@ -2288,11 +2316,14 @@
 +
 +        return OptionalInt.empty();
 +      } else {
++        // CraftBukkit start
++        this.f_36096_ = abstractcontainermenu;
++        this.m_143399_(abstractcontainermenu);
 +        this.f_8906_.m_9829_(
 +            new ClientboundOpenScreenPacket(abstractcontainermenu.f_38840_, abstractcontainermenu.m_6772_(),
-+                p_9033_.m_5446_()));
++                abstractcontainermenu.getTitle()));
++        // CraftBukkit end
 +        this.m_143399_(abstractcontainermenu);
-+        this.f_36096_ = abstractcontainermenu;
 +        net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(
 +            new net.minecraftforge.event.entity.player.PlayerContainerEvent.Open(this, this.f_36096_));
 +        return OptionalInt.of(this.f_8940_);
@@ -2306,14 +2337,26 @@
 +  }
 +
 +  public void m_6658_(AbstractHorse p_9059_, Container p_9060_) {
++    // CraftBukkit start - Inventory open hook
++    this.m_9217_();
++    AbstractContainerMenu container =
++        new HorseInventoryMenu(this.f_8940_, this.m_150109_(), p_9060_, p_9059_);
++    container.setTitle(p_9059_.m_5446_());
++    container = CraftEventFactory.callInventoryOpenEvent(this, container);
++
++    if (container == null) {
++      p_9060_.m_5785_(this);
++      return;
++    }
++    // CraftBukkit end
 +    if (this.f_36096_ != this.f_36095_) {
 +      this.m_6915_();
 +    }
 +
-+    this.m_9217_();
++    //this.nextContainerCounter(); // CraftBukkit - moved up
 +    this.f_8906_.m_9829_(
 +        new ClientboundHorseScreenOpenPacket(this.f_8940_, p_9060_.m_6643_(), p_9059_.m_19879_()));
-+    this.f_36096_ = new HorseInventoryMenu(this.f_8940_, this.m_150109_(), p_9060_, p_9059_);
++    this.f_36096_ = container; // CraftBukkit
 +    this.m_143399_(this.f_36096_);
 +    net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(
 +        new net.minecraftforge.event.entity.player.PlayerContainerEvent.Open(this, this.f_36096_));
@@ -2335,6 +2378,7 @@
 +  }
 +
 +  public void m_6915_() {
++    CraftEventFactory.handleInventoryCloseEvent(this); // CraftBukkit
 +    this.f_8906_.m_9829_(new ClientboundContainerClosePacket(this.f_36096_.f_38840_));
 +    this.m_9230_();
 +  }
@@ -2365,14 +2409,16 @@
 +
 +  public void m_6278_(Stat<?> p_9026_, int p_9027_) {
 +    this.f_8910_.m_13023_(this, p_9026_, p_9027_);
-+    this.m_36329_().m_83427_(p_9026_, this.m_6302_(), (p_8996_) -> {
-+      p_8996_.m_83393_(p_9027_);
-+    });
++    this.f_19853_.getCraftServer().getScoreboardManager()
++        .getScoreboardScores(p_9026_, this.m_6302_(), (p_8996_) -> { // CraftBukkit - Get our scores instead
++          p_8996_.m_83393_(p_9027_);
++        });
 +  }
 +
 +  public void m_7166_(Stat<?> p_9024_) {
 +    this.f_8910_.m_6085_(this, p_9024_, 0);
-+    this.m_36329_().m_83427_(p_9024_, this.m_6302_(), Score::m_83401_);
++    this.f_19853_.getCraftServer().getScoreboardManager()
++        .getScoreboardScores(p_9024_, this.m_6302_(), Score::m_83401_); // CraftBukkit - Get our scores instead
 +  }
 +
 +  public int m_7281_(Collection<Recipe<?>> p_9129_) {
@@ -2413,6 +2459,7 @@
 +
 +  public void m_9233_() {
 +    this.f_8917_ = -1.0E8F;
++    this.f_8920_ = -1; // CraftBukkit - Added to reset
 +  }
 +
 +  public void m_5661_(Component p_9154_, boolean p_9155_) {
@@ -2512,11 +2559,6 @@
 +    }
 +
 +    CriteriaTriggers.f_10550_.m_149262_(this, (Entity) null);
-+  }
-+
-+  //Magma TODO - stub
-+  public void teleportTo(ServerLevel p139017, double p139018, double p139019, double p139020, float f, float f1,
-+                         PlayerTeleportEvent.TeleportCause command) {
 +  }
 +
 +
@@ -2863,6 +2905,19 @@
 +  }
 +
 +  public void m_9156_(ServerboundClientInformationPacket p_9157_) {
++    // CraftBukkit start
++    if (m_5737_() != p_9157_.f_133868_()) {
++      PlayerChangedMainHandEvent event = new PlayerChangedMainHandEvent(getBukkitEntity(),
++          m_5737_() == HumanoidArm.LEFT ? MainHand.LEFT : MainHand.RIGHT);
++      this.f_8924_.server.getPluginManager().callEvent(event);
++    }
++    if (!this.locale.equals(p_9157_.f_133863_())) {
++      PlayerLocaleChangeEvent event = new PlayerLocaleChangeEvent(getBukkitEntity(), p_9157_.f_133863_());
++      this.f_8924_.server.getPluginManager().callEvent(event);
++    }
++    this.locale = p_9157_.f_133863_();
++    this.clientViewDistance = p_9157_.f_133864_();
++    // CraftBukkit end
 +    this.f_8922_ = p_9157_.f_133865_();
 +    this.f_8923_ = p_9157_.f_133866_();
 +    this.f_143378_ = p_9157_.f_179550_();
@@ -2935,8 +2990,9 @@
 +    }
 +    if (entity != this.f_8926_) {
 +      this.f_8906_.m_9829_(new ClientboundSetCameraPacket(this.f_8926_));
-+      this.f_8906_.m_9774_(this.f_8926_.m_20185_(), this.f_8926_.m_20186_(), this.f_8926_.m_20189_(), this.m_146908_(),
-+          this.m_146909_());
++      this.f_8906_.teleport(this.f_8926_.m_20185_(), this.f_8926_.m_20186_(), this.f_8926_.m_20189_(), this.m_146908_(),
++          this.m_146909_(), PlayerTeleportEvent.TeleportCause.SPECTATE); // CraftBukkit
++
 +      this.f_8906_.m_9953_();
 +    }
 +
@@ -2990,6 +3046,13 @@
 +
 +  public void m_8999_(ServerLevel p_9000_, double p_9001_, double p_9002_, double p_9003_, float p_9004_,
 +                         float p_9005_) {
++    this.teleportTo(p_9000_, p_9001_, p_9002_, p_9003_, p_9004_, p_9005_,
++        org.bukkit.event.player.PlayerTeleportEvent.TeleportCause.UNKNOWN);
++  }
++
++  public void teleportTo(ServerLevel p_9000_, double p_9001_, double p_9002_, double p_9003_, float p_9004_,
++                         float p_9005_, org.bukkit.event.player.PlayerTeleportEvent.TeleportCause cause) {
++    // CraftBukkit end
 +    this.m_9213_(this);
 +    this.m_8127_();
 +    if (p_9000_ == this.f_19853_) {
@@ -3016,7 +3079,11 @@
 +      this.f_8924_.m_6846_().m_11292_(this);
 +      net.minecraftforge.event.ForgeEventFactory.firePlayerChangedDimensionEvent(this, serverlevel.m_46472_(),
 +          p_9000_.m_46472_());
++
 +    }
++    this.getBukkitEntity()
++        .teleport(new Location(p_9000_.getWorld(), p_9001_, p_9002_, p_9003_, p_9004_, p_9005_), cause);
++    // CraftBukkit end
 +
 +  }
 +
@@ -3390,7 +3457,7 @@
 +
 +  // We need this as tablistDisplayname may be null even if the event was fired.
 +  private boolean hasTabListName = false;
-+  private Component tabListDisplayName = null;
++  public Component tabListDisplayName = null;
 +
 +  /**
 +   * Force the name displayed in the tab list to refresh, by firing {@link net.minecraftforge.event.entity.player.PlayerEvent.TabListNameFormat}.
