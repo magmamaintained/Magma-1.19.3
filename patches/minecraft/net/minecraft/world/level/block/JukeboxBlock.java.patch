@@ -1,0 +1,17 @@
+--- a/net/minecraft/world/level/block/JukeboxBlock.java
++++ b/net/minecraft/world/level/block/JukeboxBlock.java
+@@ -60,7 +_,13 @@
+    public void m_238345_(@Nullable Entity p_238346_, LevelAccessor p_238347_, BlockPos p_238348_, BlockState p_238349_, ItemStack p_238350_) {
+       BlockEntity blockentity = p_238347_.m_7702_(p_238348_);
+       if (blockentity instanceof JukeboxBlockEntity jukeboxblockentity) {
+-         jukeboxblockentity.m_59517_(p_238350_.m_41777_());
++         // CraftBukkit start - There can only be one
++         p_238350_ = p_238350_.m_41777_();
++         if (!p_238350_.m_41619_()) {
++            p_238350_.m_41764_(1);
++         }
++         ((JukeboxBlockEntity) blockentity).m_59517_(p_238350_);
++         // CraftBukkit end
+          jukeboxblockentity.m_239936_();
+          p_238347_.m_7731_(p_238348_, p_238349_.m_61124_(f_54254_, Boolean.valueOf(true)), 2);
+          p_238347_.m_220407_(GameEvent.f_157792_, p_238348_, GameEvent.Context.m_223719_(p_238346_, p_238349_));
