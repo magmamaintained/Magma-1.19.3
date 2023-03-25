@@ -48,7 +48,7 @@
  import net.minecraft.world.level.gameevent.GameEvent;
  import net.minecraft.world.level.portal.PortalInfo;
  import net.minecraft.world.level.storage.LevelData;
-@@ -142,1444 +_,2249 @@
+@@ -142,1444 +_,2252 @@
  import net.minecraft.world.phys.Vec3;
  import net.minecraft.world.scores.PlayerTeam;
  import net.minecraft.world.scores.Score;
@@ -331,6 +331,7 @@
 +  // CraftBukkit start
 +  public String displayName;
 +  public org.bukkit.Location compassTarget;
++  public Component listName;
 +  public int newExp = 0;
 +  public int newLevel = 0;
 +  public int newTotalExp = 0;
@@ -3022,6 +3023,8 @@
 +    if (!this.hasTabListName) {
 +      this.tabListDisplayName = net.minecraftforge.event.ForgeEventFactory.getPlayerTabListDisplayName(this);
 +      this.hasTabListName = true;
++    } else {
++      this.tabListDisplayName = listName; // Magma
 +    }
 +    return this.tabListDisplayName;
 +  }
