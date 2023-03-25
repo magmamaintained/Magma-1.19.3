@@ -1617,14 +1617,33 @@ project(':forge') {
     }
 
     license {
+//        Uncomment to update forge headders
+//        header = file("$rootDir/LICENSE-header.txt")
+//
+//        include 'net/minecraftforge/'
+//        exclude 'net/minecraftforge/common/LenientUnboundedMapCodec.java'
+//
+//        tasks {
+//            main {
+//                files.from files("$rootDir/src/main/java")
+//            }
+//        }
+
         header = file("$rootDir/LICENSE-header.txt")
 
-        include 'net/minecraftforge/'
-        exclude 'net/minecraftforge/common/LenientUnboundedMapCodec.java'
+        ext {
+            year = new Date().format("yyyy")
+        }
+
+        include 'org/magmafoundation/magma/'
+        exclude 'net/minecraftforge/'
 
         tasks {
             main {
                 files.from files("$rootDir/src/main/java")
+            }
+            test {
+                files.from files("$rootDir/src/test/java")
             }
         }
     }
