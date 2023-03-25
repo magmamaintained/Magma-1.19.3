@@ -3261,29 +3261,29 @@
 +          this.m_247189_(p_9841_.f_133827_(), p_9841_.f_237950_(), p_9841_.f_241662_());
 +      if (optional.isPresent()) {
 +        // this.server.submit(() -> { // CraftBukkit - async chat
-+          PlayerChatMessage playerchatmessage;
-+          try {
-+            playerchatmessage = this.m_247340_(p_9841_, optional.get());
-+          } catch (SignedMessageChain.DecodeException signedmessagechain$decodeexception) {
-+            this.m_246889_(signedmessagechain$decodeexception);
-+            return;
-+          }
++        PlayerChatMessage playerchatmessage;
++        try {
++          playerchatmessage = this.m_247340_(p_9841_, optional.get());
++        } catch (SignedMessageChain.DecodeException signedmessagechain$decodeexception) {
++          this.m_246889_(signedmessagechain$decodeexception);
++          return;
++        }
 +
-+          CompletableFuture<FilteredText> completablefuture = this.m_243132_(playerchatmessage.m_245728_());
-+          CompletableFuture<Component> completablefuture1 =
-+              net.minecraftforge.common.ForgeHooks.getServerChatSubmittedDecorator()
-+                  .m_236961_(this.f_9743_, playerchatmessage.m_245692_());
-+          this.f_241681_.m_241849_((p_248212_) -> {
-+            return CompletableFuture.allOf(completablefuture, completablefuture1).thenAcceptAsync((p_248218_) -> {
-+              Component decoratedContent = completablefuture1.join();
-+              if (decoratedContent == null) {
-+                return; // Forge: ServerChatEvent was canceled if this is null.
-+              }
-+              PlayerChatMessage playerchatmessage1 =
-+                  playerchatmessage.m_241956_(decoratedContent).m_243072_(completablefuture.join().f_243010_());
-+              this.m_243086_(playerchatmessage1);
-+            }, this.f_9745_.chatExecutor);
-+          });
++        CompletableFuture<FilteredText> completablefuture = this.m_243132_(playerchatmessage.m_245728_());
++        CompletableFuture<Component> completablefuture1 =
++            net.minecraftforge.common.ForgeHooks.getServerChatSubmittedDecorator()
++                .m_236961_(this.f_9743_, playerchatmessage.m_245692_());
++        this.f_241681_.m_241849_((p_248212_) -> {
++          return CompletableFuture.allOf(completablefuture, completablefuture1).thenAcceptAsync((p_248218_) -> {
++            Component decoratedContent = completablefuture1.join();
++            if (decoratedContent == null) {
++              return; // Forge: ServerChatEvent was canceled if this is null.
++            }
++            PlayerChatMessage playerchatmessage1 =
++                playerchatmessage.m_241956_(decoratedContent).m_243072_(completablefuture.join().f_243010_());
++            this.m_243086_(playerchatmessage1);
++          }, this.f_9745_.chatExecutor);
++        });
 +        // }); // CraftBukkit - async chat
 +      }
 +
@@ -3816,13 +3816,13 @@
 +                return onInteractEntityAtResult;
 +              }
 +              return p_143687_.m_7111_(p_143686_, p_143683_, p_143688_);
-+              }, new PlayerInteractAtEntityEvent(getCraftPlayer(), entity.getBukkitEntity(), new org.bukkit.util.Vector(p_143683_.f_82479_, p_143683_.f_82480_, p_143683_.f_82481_), (p_143682_ == InteractionHand.OFF_HAND) ? EquipmentSlot.OFF_HAND : EquipmentSlot.HAND)); // CraftBukkit
++            }, new PlayerInteractAtEntityEvent(getCraftPlayer(), entity.getBukkitEntity(), new org.bukkit.util.Vector(p_143683_.f_82479_, p_143683_.f_82480_, p_143683_.f_82481_), (p_143682_ == InteractionHand.OFF_HAND) ? EquipmentSlot.OFF_HAND : EquipmentSlot.HAND)); // CraftBukkit
 +
 +          }
 +
 +          public void m_141994_() {
-+             // CraftBukkit
-+             if (!(entity instanceof ItemEntity) && !(entity instanceof ExperienceOrb) && !(entity instanceof Arrow) && (entity != ServerGamePacketListenerImpl.this.f_9743_ || f_9743_.m_5833_())) {
++            // CraftBukkit
++            if (!(entity instanceof ItemEntity) && !(entity instanceof ExperienceOrb) && !(entity instanceof Arrow) && (entity != ServerGamePacketListenerImpl.this.f_9743_ || f_9743_.m_5833_())) {
 +
 +              ItemStack itemstack = ServerGamePacketListenerImpl.this.f_9743_.m_21120_(InteractionHand.MAIN_HAND);
 +              if (itemstack.m_246617_(serverlevel.m_246046_())) {
@@ -3905,7 +3905,7 @@
 +              this.f_9743_.f_36096_.f_38839_.size());
 +        } else {
 +          boolean flag = p_9856_.m_182741_() != this.f_9743_.f_36096_.m_182424_();
-+          
++
 +          this.f_9743_.f_36096_.m_150443_();
 +          //this.player.containerMenu.clicked(i, p_9856_.getButtonNum(), p_9856_.getClickType(), this.player);
 +
@@ -4187,7 +4187,7 @@
 +            }
 +          }
 +          // CraftBukkit end
-+          
++
 +          for (Int2ObjectMap.Entry<ItemStack> entry : Int2ObjectMaps.fastIterable(p_9856_.m_179582_())) {
 +            this.f_9743_.f_36096_.m_182414_(entry.getIntKey(), entry.getValue());
 +          }

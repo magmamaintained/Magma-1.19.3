@@ -1,5 +1,14 @@
 --- a/net/minecraft/world/level/chunk/storage/ChunkSerializer.java
 +++ b/net/minecraft/world/level/chunk/storage/ChunkSerializer.java
+@@ -91,7 +_,7 @@
+       ChunkSource chunksource = p_188231_.m_7726_();
+       LevelLightEngine levellightengine = chunksource.m_7827_();
+       Registry<Biome> registry = p_188231_.m_8891_().m_175515_(Registries.f_256952_);
+-      Codec<PalettedContainerRO<Holder<Biome>>> codec = m_188260_(registry);
++      Codec<PalettedContainer<Holder<Biome>>> codec = makeBiomeCodecRW(registry);
+       boolean flag2 = false;
+ 
+       for(int j = 0; j < listtag.size(); ++j) {
 @@ -108,9 +_,9 @@
                 palettedcontainer = new PalettedContainer<>(Block.f_49791_, Blocks.f_50016_.m_49966_(), PalettedContainer.Strategy.f_188137_);
              }
@@ -20,7 +29,7 @@
        } else {
           ProtoChunkTicks<Block> protochunkticks = ProtoChunkTicks.m_193302_(p_188234_.m_128437_("block_ticks", 10), (p_258992_) -> {
              return BuiltInRegistries.f_256975_.m_6612_(ResourceLocation.m_135820_(p_258992_));
-@@ -182,7 +_,7 @@
+@@ -182,12 +_,19 @@
           boolean flag3 = chunkstatus.m_62427_(ChunkStatus.f_62323_) || belowzeroretrogen != null && belowzeroretrogen.m_188466_().m_62427_(ChunkStatus.f_62323_);
           if (!flag && flag3) {
              for(BlockPos blockpos : BlockPos.m_121976_(p_188233_.m_45604_(), p_188231_.m_141937_(), p_188233_.m_45605_(), p_188233_.m_45608_(), p_188231_.m_151558_() - 1, p_188233_.m_45609_())) {
@@ -29,6 +38,18 @@
                    protochunk.m_63277_(blockpos);
                 }
              }
+          }
+       }
++      // CraftBukkit start - load chunk persistent data from nbt - SPIGOT-6814: Already load PDC here to account for 1.17 to 1.18 chunk upgrading.
++      net.minecraft.nbt.Tag persistentBase = p_188234_.m_128423_("ChunkBukkitValues");
++      if (persistentBase instanceof CompoundTag) {
++         ((ChunkAccess) chunkaccess).persistentDataContainer.putAll((CompoundTag) persistentBase);
++      }
++      // CraftBukkit end
++
+ 
+       chunkaccess.m_8094_(flag);
+       CompoundTag compoundtag2 = p_188234_.m_128469_("Heightmaps");
 @@ -221,6 +_,7 @@
        }
  
@@ -45,11 +66,23 @@
           return protochunk1;
        }
     }
-@@ -364,6 +_,15 @@
-          }
+@@ -269,6 +_,12 @@
+       return PalettedContainer.m_238418_(p_188261_.m_206115_(), p_188261_.m_206110_(), PalettedContainer.Strategy.f_188138_, p_188261_.m_246971_(Biomes.f_48202_));
+    }
+ 
++   // CraftBukkit start - read/write
++   private static Codec<PalettedContainer<Holder<Biome>>> makeBiomeCodecRW(Registry<Biome> iregistry) {
++      return PalettedContainer.m_238371_(iregistry.m_206115_(), iregistry.m_206110_(), PalettedContainer.Strategy.f_188138_, iregistry.m_246971_(Biomes.f_48202_));
++   }
++   // CraftBukkit end
++
+    public static CompoundTag m_63454_(ServerLevel p_63455_, ChunkAccess p_63456_) {
+       ChunkPos chunkpos = p_63456_.m_7697_();
+       CompoundTag compoundtag = new CompoundTag();
+@@ -365,6 +_,15 @@
  
           compoundtag.m_128365_("CarvingMasks", compoundtag4);
-+      }
+       }
 +      else {
 +          LevelChunk levelChunk = (LevelChunk) p_63456_;
 +          try {
@@ -58,6 +91,19 @@
 +          } catch (Exception exception) {
 +              f_63449_.error("A capability provider has thrown an exception trying to write state. It will not persist. Report this to the mod author", exception);
 +          }
-       }
++      }
  
        m_188235_(p_63455_, compoundtag, p_63456_.m_183568_());
+       compoundtag.m_128365_("PostProcessing", m_63490_(p_63456_.m_6720_()));
+@@ -378,6 +_,11 @@
+ 
+       compoundtag.m_128365_("Heightmaps", compoundtag2);
+       compoundtag.m_128365_("structures", m_188249_(StructurePieceSerializationContext.m_192770_(p_63455_), chunkpos, p_63456_.m_6633_(), p_63456_.m_62769_()));
++      // CraftBukkit start - store chunk persistent data in nbt
++      if (!p_63456_.persistentDataContainer.isEmpty()) { // SPIGOT-6814: Always save PDC to account for 1.17 to 1.18 chunk upgrading.
++         compoundtag.m_128365_("ChunkBukkitValues", p_63456_.persistentDataContainer.toTagCompound());
++      }
++      // CraftBukkit end
+       return compoundtag;
+    }
+ 

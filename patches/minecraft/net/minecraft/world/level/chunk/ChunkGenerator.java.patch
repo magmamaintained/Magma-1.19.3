@@ -1,9 +1,13 @@
 --- a/net/minecraft/world/level/chunk/ChunkGenerator.java
 +++ b/net/minecraft/world/level/chunk/ChunkGenerator.java
-@@ -265,6 +_,28 @@
+@@ -264,6 +_,31 @@
+          return false;
        }
     }
- 
++   public void addVanillaDecorations(WorldGenLevel generatoraccessseed, ChunkAccess ichunkaccess, StructureManager structuremanager) {
++      applyBiomeDecoration(generatoraccessseed, ichunkaccess, structuremanager, true);
++   }
++
 +   // CraftBukkit start
 +   public void applyBiomeDecoration(WorldGenLevel generatoraccessseed, ChunkAccess ichunkaccess, StructureManager structuremanager, boolean vanilla) {
 +      if (vanilla) {
@@ -25,7 +29,6 @@
 +      }
 +   }
 +   // CraftBukkit end
-+
+ 
     public void m_213609_(WorldGenLevel p_223087_, ChunkAccess p_223088_, StructureManager p_223089_) {
        ChunkPos chunkpos = p_223088_.m_7697_();
-       if (!SharedConstants.m_183707_(chunkpos)) {
