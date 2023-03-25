@@ -73,7 +73,12 @@ tasks.withType(JavaCompile) {
 license {
     header = rootProject.file('LICENSE-header.txt')
 
-    include 'net/minecraftforge/'
+    ext {
+        year = new Date().format("yyyy")
+    }
+
+    exclude 'net/minecraftforge/'
+    exclude 'io/izzel'
 }
 
 artifacts {
