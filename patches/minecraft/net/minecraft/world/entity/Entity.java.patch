@@ -954,7 +954,7 @@
     }
  
     public boolean m_7306_(Entity p_20356_) {
-@@ -2279,32 +_,71 @@
+@@ -2279,32 +_,74 @@
  
     @Nullable
     public Entity m_5489_(ServerLevel p_20118_) {
@@ -965,9 +965,12 @@
 +      // CraftBukkit start
 +      return teleportTo(p_20118_, null, teleporter);
 +   }
-+
 +   @Nullable
-+   public Entity teleportTo(ServerLevel p_20118_, Position location, net.minecraftforge.common.util.ITeleporter teleporter) {
++   public Entity teleportTo(ServerLevel p_20118_, PositionImpl location) {
++      return teleportTo(p_20118_, location, p_20118_.m_8871_());
++   }
++      @Nullable
++   public Entity teleportTo(ServerLevel p_20118_, PositionImpl location, net.minecraftforge.common.util.ITeleporter teleporter) {
 +      // CraftBukkit end
 +      if (!net.minecraftforge.common.ForgeHooks.onTravelToDimension(this, p_20118_.m_46472_())) return null;
        if (this.f_19853_ instanceof ServerLevel && !this.m_213877_()) {
@@ -1312,10 +1315,11 @@
        this.f_146795_ = null;
     }
  
-@@ -3131,8 +_,110 @@
+@@ -3130,6 +_,103 @@
+    public boolean m_142265_(Level p_146843_, BlockPos p_146844_) {
        return true;
     }
- 
++
 +   /* ================================== Forge Start =====================================*/
 +
 +   private boolean canUpdate = true;
@@ -1412,14 +1416,6 @@
 +
 +   /* ================================== Forge End =====================================*/
 +
-+
+ 
     public Level m_9236_() {
        return this.f_19853_;
-+   }
-+
-+   // Magma - stub
-+   public void teleportTo(ServerLevel handle, PositionImpl position){
-+
-    }
- 
-    @FunctionalInterface
