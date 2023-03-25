@@ -16,6 +16,15 @@
  
     protected AbstractHorse(EntityType<? extends AbstractHorse> p_30531_, Level p_30532_) {
        super(p_30531_, p_30532_);
+@@ -291,7 +_,7 @@
+ 
+    public void m_30625_() {
+       SimpleContainer simplecontainer = this.f_30520_;
+-      this.f_30520_ = new SimpleContainer(this.m_7506_());
++      this.f_30520_ = new SimpleContainer(this.m_7506_(), (org.bukkit.entity.AbstractHorse) this.getBukkitEntity()); // CraftBukkit
+       if (simplecontainer != null) {
+          simplecontainer.m_19181_(this);
+          int i = Math.min(simplecontainer.m_6643_(), this.f_30520_.m_6643_());
 @@ -306,6 +_,7 @@
  
        this.f_30520_.m_19164_(this);
