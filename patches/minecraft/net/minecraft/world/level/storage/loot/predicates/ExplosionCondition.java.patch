@@ -1,0 +1,24 @@
+--- a/net/minecraft/world/level/storage/loot/predicates/ExplosionCondition.java
++++ b/net/minecraft/world/level/storage/loot/predicates/ExplosionCondition.java
+@@ -4,6 +_,8 @@
+ import com.google.gson.JsonDeserializationContext;
+ import com.google.gson.JsonObject;
+ import com.google.gson.JsonSerializationContext;
++
++import java.util.Random;
+ import java.util.Set;
+ import net.minecraft.util.RandomSource;
+ import net.minecraft.world.level.storage.loot.LootContext;
+@@ -27,9 +_,10 @@
+    public boolean test(LootContext p_81659_) {
+       Float f = p_81659_.m_78953_(LootContextParams.f_81464_);
+       if (f != null) {
+-         RandomSource randomsource = p_81659_.m_230907_();
++         RandomSource random = p_81659_.m_230907_();
+          float f1 = 1.0F / f;
+-         return randomsource.m_188501_() <= f1;
++         // CraftBukkit - <= to < to allow for plugins to completely disable block drops from explosions
++         return random.m_188501_() < f1;
+       } else {
+          return true;
+       }
