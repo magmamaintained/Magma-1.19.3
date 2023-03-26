@@ -78,7 +78,7 @@ ext {
     COMMONS_IO_VERSION = '2.11.0'
 
     GIT_INFO = gradleutils.gitInfo
-    FORGE_VERSION = '43.2.1'
+    FORGE_VERSION = '44.1.23'
     MAGMA_VERSION = "1.19.3-$FORGE_VERSION-" + versioning.info.commit.substring(0, 8) // Use 8 characters for the commit hash
     VERSION = "1.19.3-$FORGE_VERSION"
 
