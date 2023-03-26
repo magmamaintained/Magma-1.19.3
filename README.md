@@ -1,7 +1,7 @@
 <div align="center">
 <img src="https://i.imgur.com/zTCTCWG.png" alt="Magma logo" align="middle"></img>
 
-[![](https://img.shields.io/badge/Minecraft%20Forge-1.19.3%20--%2044.0.37%20--%20dbf1c8f1-orange.svg)](https://files.minecraftforge.net/net/minecraftforge/forge/index_1.19.3.html)
+[![](https://img.shields.io/badge/Minecraft%20Forge-1.19.3%20--%2044.1.23%20--%201f44339d-orange.svg)](https://files.minecraftforge.net/net/minecraftforge/forge/index_1.19.3.html)
 [![](https://img.shields.io/badge/Bukkit-1.19%20r2-blue)](https://hub.spigotmc.org/stash/projects/SPIGOT/repos/bukkit/browse)
 [![](https://img.shields.io/badge/CraftBukkit-Build%20c810c3ed878-orange)](https://hub.spigotmc.org/stash/projects/SPIGOT/repos/craftbukkit/browse?at=refs%2Fheads%2Fversion%2F1.19.3)
 [![](https://img.shields.io/badge/Spigot-Build%20NA-yellow)](https://hub.spigotmc.org/stash/projects/SPIGOT/repos/spigot/browse)

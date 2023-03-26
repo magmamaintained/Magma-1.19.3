@@ -1,13 +1,5 @@
 --- a/net/minecraft/world/level/block/StemBlock.java
 +++ b/net/minecraft/world/level/block/StemBlock.java
-@@ -4,7 +_,6 @@
- import net.minecraft.core.BlockPos;
- import net.minecraft.core.Direction;
- import net.minecraft.server.level.ServerLevel;
--import net.minecraft.tags.BlockTags;
- import net.minecraft.util.Mth;
- import net.minecraft.util.RandomSource;
- import net.minecraft.world.item.Item;
 @@ -19,6 +_,7 @@
  import net.minecraft.world.level.block.state.properties.IntegerProperty;
  import net.minecraft.world.phys.shapes.CollisionContext;
@@ -37,7 +29,7 @@
 -               if (p_222539_.m_8055_(blockpos).m_60795_() && (blockstate.m_60713_(Blocks.f_50093_) || blockstate.m_204336_(BlockTags.f_144274_))) {
 -                  p_222539_.m_46597_(blockpos, this.f_57015_.m_49966_());
 +               Block block = blockstate.m_60734_();
-+               if (p_222539_.m_46859_(blockpos) && (blockstate.canSustainPlant(p_222539_, blockpos.m_7495_(), Direction.UP, this) || block == Blocks.f_50093_ || block == Blocks.f_50493_ || block == Blocks.f_50546_ || block == Blocks.f_50599_ || block == Blocks.f_50440_)) {
++               if (p_222539_.m_46859_(blockpos) && (blockstate.canSustainPlant(p_222539_, blockpos.m_7495_(), Direction.UP, this.f_57015_) || blockstate.m_60713_(Blocks.f_50093_) || blockstate.m_204336_(BlockTags.f_144274_))) {
 +                  // CraftBukkit start
 +                  if (!CraftEventFactory.handleBlockGrowEvent(p_222539_, blockpos, this.f_57015_.m_49966_())) {
 +                     return;

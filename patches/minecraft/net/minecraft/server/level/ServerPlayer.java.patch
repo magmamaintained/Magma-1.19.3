@@ -48,7 +48,7 @@
  import net.minecraft.world.level.gameevent.GameEvent;
  import net.minecraft.world.level.portal.PortalInfo;
  import net.minecraft.world.level.storage.LevelData;
-@@ -142,1444 +_,2252 @@
+@@ -142,1444 +_,2254 @@
  import net.minecraft.world.phys.Vec3;
  import net.minecraft.world.scores.PlayerTeam;
  import net.minecraft.world.scores.Score;
@@ -3535,6 +3535,8 @@
 +  public boolean m_182294_(boolean p_182295_) {
 +    Inventory inventory = this.m_150109_();
 +    ItemStack selected = inventory.m_36056_();
++    if (selected.m_41619_() || !selected.onDroppedByPlayer(this)) return false;
++    if (m_6117_() && m_7655_() == InteractionHand.MAIN_HAND && (p_182295_ || selected.m_41613_() == 1)) m_5810_(); // Forge: fix MC-231097 on the serverside
 +    if (selected.m_41619_() || !selected.onDroppedByPlayer(this)) {
 +      return false;
 +    }
