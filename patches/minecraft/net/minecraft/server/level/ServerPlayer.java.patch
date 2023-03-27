@@ -48,7 +48,7 @@
  import net.minecraft.world.level.gameevent.GameEvent;
  import net.minecraft.world.level.portal.PortalInfo;
  import net.minecraft.world.level.storage.LevelData;
-@@ -142,1444 +_,2254 @@
+@@ -142,1444 +_,2258 @@
  import net.minecraft.world.phys.Vec3;
  import net.minecraft.world.scores.PlayerTeam;
  import net.minecraft.world.scores.Score;
@@ -3057,6 +3057,14 @@
 +    // CraftBukkit end
 +    this.m_9213_(this);
 +    this.m_8127_();
++
++    //Magma start - use bukkit teleporting if not caused by a mod calling teleportTo
++    if (cause != PlayerTeleportEvent.TeleportCause.UNKNOWN) {
++      this.getBukkitEntity().teleport(new Location(p_9000_.getWorld(), p_9001_, p_9002_, p_9003_, p_9004_, p_9005_), cause);
++      return;
++    }
++    //Magma end
++
 +    if (p_9000_ == this.f_19853_) {
 +      this.f_8906_.m_9774_(p_9001_, p_9002_, p_9003_, p_9004_, p_9005_);
 +    } else if (net.minecraftforge.common.ForgeHooks.onTravelToDimension(this, p_9000_.m_46472_())) {
@@ -3081,11 +3089,7 @@
 +      this.f_8924_.m_6846_().m_11292_(this);
 +      net.minecraftforge.event.ForgeEventFactory.firePlayerChangedDimensionEvent(this, serverlevel.m_46472_(),
 +          p_9000_.m_46472_());
-+
 +    }
-+    this.getBukkitEntity()
-+        .teleport(new Location(p_9000_.getWorld(), p_9001_, p_9002_, p_9003_, p_9004_, p_9005_), cause);
-+    // CraftBukkit end
 +
 +  }
 +
