@@ -19,7 +19,7 @@ We hope to eliminate all issues with craftbukkit forge servers. In the end, we e
 
 ## 🌐 BungeeCord/Velocity
 
-Magma 1.18 is **not** compatible with [Velocity](https://velocitypowered.com/downloads) or any [BungeeCord](https://github.com/SpigotMC/BungeeCord) fork.
+Magma 1.19 is **not** compatible with [Velocity](https://velocitypowered.com/downloads) or any [BungeeCord](https://github.com/SpigotMC/BungeeCord) fork.
 
 This is **caused by Forge** and not a fault of Magma. We cannot fix this ourselves without modifying the client.
 
@@ -38,8 +38,9 @@ You might be able to use the Waterfall fork called [Lightfall](https://github.co
    1. Or Download the latest jar from [Magma Site](https://magmafoundation.org/)
 2. Make a new directory(folder) for the server
 3. Move the jar that you downloaded into the new directory
-4. Run the jar with your command prompt or terminal, going to your directory and entering `java -jar Magma-[version]-installer.jar --installServer`. Change [version] to your Magma version number.
-5. This will generate another jar `forge-[version].jar` run this as normal `java -jar forge-[version].jar`
+4. Run the jar with your command prompt or terminal, going to your directory and entering `java -jar Magma-[version]-server.jar`. Change [version] to your Magma version.
+
+**NOTE** - Magma does NOT have a gui, you cannot open the server jar directly by double clicking it!
 
 ### Building the sources
 
@@ -48,7 +49,7 @@ You might be able to use the Waterfall fork called [Lightfall](https://github.co
         - `git clone http://git.magmafoundation.org/magmafoundation/Magma-1-19-x.git`
 - Building
     - First you want to run the build command
-        - `./gradlew setup installerJar`
+        - `./gradlew setup magmaJar`
     - Now go and get a drink this may take some time
     - Navigate to `projects/magma/build/libs` directory of the compiled source code
     - Copy the Jar to a new server directory (see Installation)
