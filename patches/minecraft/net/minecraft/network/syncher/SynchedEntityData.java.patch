@@ -9,6 +9,15 @@
  import net.minecraft.world.entity.Entity;
  import org.apache.commons.lang3.ObjectUtils;
  import org.slf4j.Logger;
+@@ -28,7 +_,7 @@
+    private static final int f_179843_ = 254;
+    private final Entity f_135344_;
+    private final Int2ObjectMap<SynchedEntityData.DataItem<?>> f_135345_ = new Int2ObjectOpenHashMap<>();
+-   private final ReadWriteLock f_135346_ = new ReentrantReadWriteLock();
++   // private final ReadWriteLock lock = new ReentrantReadWriteLock(); // Spigot - not required
+    private boolean f_135348_;
+ 
+    public SynchedEntityData(Entity p_135351_) {
 @@ -36,11 +_,13 @@
     }
  
@@ -25,6 +34,58 @@
              }
           } catch (ClassNotFoundException classnotfoundexception) {
           }
+@@ -72,7 +_,10 @@
+       }
+    }
+ 
++   public boolean registrationLocked; // Spigot
+    public <T> void m_135372_(EntityDataAccessor<T> p_135373_, T p_135374_) {
++      if (this.registrationLocked)
++         throw new IllegalStateException("Registering datawatcher object after entity initialization"); // Spigot
+       int i = p_135373_.m_135015_();
+       if (i > 254) {
+          throw new IllegalArgumentException("Data value id is too big with " + i + "! (Max is 254)");
+@@ -87,27 +_,32 @@
+ 
+    private <T> void m_135385_(EntityDataAccessor<T> p_135386_, T p_135387_) {
+       SynchedEntityData.DataItem<T> dataitem = new SynchedEntityData.DataItem<>(p_135386_, p_135387_);
+-      this.f_135346_.writeLock().lock();
++      // this.lock.writeLock().lock(); // Spigot - not required
+       this.f_135345_.put(p_135386_.m_135015_(), dataitem);
+-      this.f_135346_.writeLock().unlock();
++      // this.lock.writeLock().unlock(); // Spigot - not required
+    }
+ 
+    private <T> SynchedEntityData.DataItem<T> m_135379_(EntityDataAccessor<T> p_135380_) {
+-      this.f_135346_.readLock().lock();
++      // Spigot start
++      /*
++      this.lock.readLock().lock();
+ 
+       SynchedEntityData.DataItem<T> dataitem;
+       try {
+-         dataitem = (SynchedEntityData.DataItem<T>)this.f_135345_.get(p_135380_.m_135015_());
++         dataitem = (SynchedEntityData.DataItem<T>)this.itemsById.get(p_135380_.getId());
+       } catch (Throwable throwable) {
+-         CrashReport crashreport = CrashReport.m_127521_(throwable, "Getting synched entity data");
+-         CrashReportCategory crashreportcategory = crashreport.m_127514_("Synched entity data");
+-         crashreportcategory.m_128159_("Data ID", p_135380_);
++         CrashReport crashreport = CrashReport.forThrowable(throwable, "Getting synched entity data");
++         CrashReportCategory crashreportcategory = crashreport.addCategory("Synched entity data");
++         crashreportcategory.setDetail("Data ID", p_135380_);
+          throw new ReportedException(crashreport);
+       } finally {
+-         this.f_135346_.readLock().unlock();
++         this.lock.readLock().unlock();
+       }
+ 
+       return dataitem;
++      */
++      return (SynchedEntityData.DataItem) this.f_135345_.get(p_135380_.m_135015_());
++      // Spigot end
+    }
+ 
+    public <T> T m_135370_(EntityDataAccessor<T> p_135371_) {
 @@ -125,6 +_,13 @@
  
     }
@@ -38,6 +99,57 @@
 +
     public boolean m_135352_() {
        return this.f_135348_;
+    }
+@@ -133,7 +_,7 @@
+    public List<SynchedEntityData.DataValue<?>> m_135378_() {
+       List<SynchedEntityData.DataValue<?>> list = null;
+       if (this.f_135348_) {
+-         this.f_135346_.readLock().lock();
++         // this.lock.readLock().lock(); // Spigot - not required
+ 
+          for(SynchedEntityData.DataItem<?> dataitem : this.f_135345_.values()) {
+             if (dataitem.m_135406_()) {
+@@ -146,7 +_,7 @@
+             }
+          }
+ 
+-         this.f_135346_.readLock().unlock();
++         // this.lock.readLock().unlock(); // Spigot - not required
+       }
+ 
+       this.f_135348_ = false;
+@@ -156,7 +_,7 @@
+    @Nullable
+    public List<SynchedEntityData.DataValue<?>> m_252804_() {
+       List<SynchedEntityData.DataValue<?>> list = null;
+-      this.f_135346_.readLock().lock();
++      // this.lock.readLock().lock(); // Spigot - not required
+ 
+       for(SynchedEntityData.DataItem<?> dataitem : this.f_135345_.values()) {
+          if (!dataitem.m_252838_()) {
+@@ -168,12 +_,12 @@
+          }
+       }
+ 
+-      this.f_135346_.readLock().unlock();
++      // this.lock.readLock().unlock(); // Spigot - not required
+       return list;
+    }
+ 
+    public void m_135356_(List<SynchedEntityData.DataValue<?>> p_135357_) {
+-      this.f_135346_.writeLock().lock();
++      // this.lock.writeLock().lock(); // Spigot - not required
+ 
+       try {
+          for(SynchedEntityData.DataValue<?> datavalue : p_135357_) {
+@@ -184,7 +_,7 @@
+             }
+          }
+       } finally {
+-         this.f_135346_.writeLock().unlock();
++         // this.lock.writeLock().unlock(); // Spigot - not required
+       }
+ 
     }
 @@ -200,6 +_,17 @@
     public boolean m_135388_() {

@@ -1,5 +1,19 @@
 --- a/net/minecraft/network/Connection.java
 +++ b/net/minecraft/network/Connection.java
+@@ -71,7 +_,12 @@
+    private final PacketFlow f_129466_;
+    private final Queue<Connection.PacketHolder> f_129467_ = Queues.newConcurrentLinkedQueue();
+    private Channel f_129468_;
+-   private SocketAddress f_129469_;
++   public SocketAddress f_129469_;
++   // Spigot Start
++   public java.util.UUID spoofedUUID;
++   public com.mojang.authlib.properties.Property[] spoofedProfile;
++   public boolean preparing = true;
++   // Spigot End
+    private PacketListener f_129470_;
+    private Component f_129471_;
+    private boolean f_129472_;
 @@ -82,6 +_,8 @@
     private float f_129477_;
     private int f_129478_;
@@ -9,14 +23,25 @@
  
     public Connection(PacketFlow p_129482_) {
        this.f_129466_ = p_129482_;
-@@ -91,6 +_,7 @@
+@@ -91,6 +_,10 @@
        super.channelActive(p_129525_);
        this.f_129468_ = p_129525_.channel();
        this.f_129469_ = this.f_129468_.remoteAddress();
++      // Spigot Start
++      this.preparing = false;
++      // Spigot End
 +      if (activationHandler != null) activationHandler.accept(this);
  
        try {
           this.m_129498_(ConnectionProtocol.HANDSHAKING);
+@@ -138,6 +_,7 @@
+ 
+          }
+       }
++      if (net.minecraft.server.MinecraftServer.getServer().isDebugging()) p_129534_.printStackTrace(); // Spigot
+    }
+ 
+    protected void channelRead0(ChannelHandlerContext p_129487_, Packet<?> p_129488_) {
 @@ -186,7 +_,7 @@
        ++this.f_129475_;
        if (connectionprotocol1 != connectionprotocol) {
@@ -26,9 +51,13 @@
        }
  
        if (this.f_129468_.eventLoop().inEventLoop()) {
-@@ -273,7 +_,7 @@
+@@ -272,8 +_,11 @@
+    }
  
     public void m_129507_(Component p_129508_) {
++      // Spigot Start
++      this.preparing = false;
++      // Spigot End
        if (this.f_129468_.isOpen()) {
 -         this.f_129468_.close().awaitUninterruptibly();
 +         this.f_129468_.close();  // We can't wait as this may be called from an event loop.
@@ -53,18 +82,38 @@
        (new Bootstrap()).group(f_129464_.m_13971_()).handler(new ChannelInitializer<Channel>() {
           protected void initChannel(Channel p_129557_) {
              p_129557_.pipeline().addLast("packet_handler", connection);
-@@ -404,6 +_,14 @@
+@@ -393,6 +_,7 @@
+             } else if (this.m_129538_() != null) {
+                this.m_129538_().m_7026_(Component.m_237115_("multiplayer.disconnect.generic"));
+             }
++            this.f_129467_.clear(); // Free up packet queue.
+          }
  
-    public float m_129543_() {
+       }
+@@ -406,6 +_,14 @@
        return this.f_129477_;
-+   }
-+
+    }
+ 
 +   public Channel channel() {
 +      return f_129468_;
 +   }
 +
 +   public PacketFlow getDirection() {
 +      return this.f_129466_;
-    }
- 
++   }
++
     static class PacketHolder {
+       final Packet<?> f_129558_;
+       @Nullable
+@@ -416,4 +_,11 @@
+          this.f_129559_ = p_243266_;
+       }
+    }
++
++   // Spigot Start
++   public SocketAddress getRawAddress()
++   {
++      return this.f_129468_.remoteAddress();
++   }
++   // Spigot End
+ }

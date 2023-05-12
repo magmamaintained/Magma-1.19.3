@@ -25,7 +25,7 @@
  import java.util.function.BooleanSupplier;
  import joptsimple.OptionParser;
  import joptsimple.OptionSet;
-@@ -55,200 +_,357 @@
+@@ -55,200 +_,356 @@
  import net.minecraft.world.level.storage.LevelSummary;
  import net.minecraft.world.level.storage.PrimaryLevelData;
  import net.minecraft.world.level.storage.WorldData;
@@ -223,13 +223,12 @@
 +      Eula eula = new Eula(path1);
 +
 +      // Spigot Start
-+      boolean eulaAgreed = Boolean.getBoolean("com.mojang.eula.agree");
-+      if (eulaAgreed) {
-+        System.err.println("You have used the Spigot command line EULA agreement flag.");
-+        System.err.println(
-+            "By using this setting you are indicating your agreement to Mojang's EULA (https://account.mojang.com/documents/minecraft_eula).");
-+        System.err.println(
-+            "If you do not agree to the above EULA please stop your server and remove this flag immediately.");
++      boolean eulaAgreed = Boolean.getBoolean( "com.mojang.eula.agree" );
++      if ( eulaAgreed )
++      {
++        System.err.println( "You have used the Spigot command line EULA agreement flag." );
++        System.err.println( "By using this setting you are indicating your agreement to Mojang's EULA (https://account.mojang.com/documents/minecraft_eula)." );
++        System.err.println( "If you do not agree to the above EULA please stop your server and remove this flag immediately." );
 +      }
 +      // Spigot End
 +      if (!eula.m_135944_() && !eulaAgreed) { // Spigot

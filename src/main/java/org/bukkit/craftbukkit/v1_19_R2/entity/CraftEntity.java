@@ -4,6 +4,7 @@ import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Predicates;
 import com.google.common.collect.Lists;
+import net.md_5.bungee.api.chat.BaseComponent;
 import net.minecraft.core.PositionImpl;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
@@ -437,6 +438,7 @@ public abstract class CraftEntity implements org.bukkit.entity.Entity {
     @Override
     public List<org.bukkit.entity.Entity> getNearbyEntities(double x, double y, double z) {
         Preconditions.checkState(!entity.generation, "Cannot get nearby entities during world generation");
+        org.spigotmc.AsyncCatcher.catchOp("getNearbyEntities"); // Spigot
 
         List<Entity> notchEntityList = entity.level.getEntities(entity, entity.getBoundingBox().inflate(x, y, z), Predicates.alwaysTrue());
         List<org.bukkit.entity.Entity> bukkitEntityList = new java.util.ArrayList<org.bukkit.entity.Entity>(notchEntityList.size());
@@ -1000,4 +1002,34 @@ public abstract class CraftEntity implements org.bukkit.entity.Entity {
         }
         return perm;
     }
+
+    // Spigot start
+    private final org.bukkit.entity.Entity.Spigot spigot = new org.bukkit.entity.Entity.Spigot()
+    {
+        @Override
+        public void sendMessage(net.md_5.bungee.api.chat.BaseComponent component)
+        {
+        }
+
+        @Override
+        public void sendMessage(net.md_5.bungee.api.chat.BaseComponent... components)
+        {
+        }
+
+        @Override
+        public void sendMessage(UUID sender, BaseComponent... components)
+        {
+        }
+
+        @Override
+        public void sendMessage(UUID sender, BaseComponent component)
+        {
+        }
+    };
+
+    public org.bukkit.entity.Entity.Spigot spigot()
+    {
+        return spigot;
+    }
+    // Spigot end
 }

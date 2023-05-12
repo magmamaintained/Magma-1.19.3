@@ -184,7 +184,7 @@
     protected void m_6153_() {
        if (this.f_31073_ != null) {
           this.f_31073_.m_64096_(this);
-@@ -502,15 +_,21 @@
+@@ -502,19 +_,41 @@
           this.f_19853_.m_7106_(ParticleTypes.f_123812_, this.m_20185_() + (double)f, this.m_20186_() + 2.0D + (double)f1, this.m_20189_() + (double)f2, 0.0D, 0.0D, 0.0D);
        }
  
@@ -210,6 +210,27 @@
           }
  
           if (this.f_31084_ == 1 && !this.m_20067_()) {
+-            this.f_19853_.m_6798_(1028, this.m_20183_(), 0);
++            // CraftBukkit start - Use relative location for far away sounds
++            int viewDistance = ((ServerLevel) this.f_19853_).getCraftServer().getViewDistance() * 16;
++            for (net.minecraft.server.level.ServerPlayer player : this.f_19853_.m_7654_().m_6846_().f_11196_) {
++               double deltaX = this.m_20185_() - player.m_20185_();
++               double deltaZ = this.m_20189_() - player.m_20189_();
++               double distanceSquared = deltaX * deltaX + deltaZ * deltaZ;
++               if ( f_19853_.spigotConfig.dragonDeathSoundRadius > 0 && distanceSquared > f_19853_.spigotConfig.dragonDeathSoundRadius * f_19853_.spigotConfig.dragonDeathSoundRadius ) continue; // Spigot
++               if (distanceSquared > viewDistance * viewDistance) {
++                  double deltaLength = Math.sqrt(distanceSquared);
++                  double relativeX = player.m_20185_() + (deltaX / deltaLength) * viewDistance;
++                  double relativeZ = player.m_20189_() + (deltaZ / deltaLength) * viewDistance;
++                  player.f_8906_.m_9829_(new net.minecraft.network.protocol.game.ClientboundLevelEventPacket(1028, new BlockPos((int) relativeX, (int) this.m_20186_(), (int) relativeZ), 0, true));
++               } else {
++                  player.f_8906_.m_9829_(new net.minecraft.network.protocol.game.ClientboundLevelEventPacket(1028, new BlockPos((int) this.m_20185_(), (int) this.m_20186_(), (int) this.m_20189_()), 0, true));
++               }
++            }
++            // CraftBukkit end
+          }
+       }
+ 
 @@ -522,8 +_,9 @@
        this.m_146922_(this.m_146908_() + 20.0F);
        this.f_20883_ = this.m_146908_();

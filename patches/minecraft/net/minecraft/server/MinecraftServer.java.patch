@@ -72,7 +72,7 @@
  import net.minecraft.util.profiling.EmptyProfileResults;
  import net.minecraft.util.profiling.ProfileResults;
  import net.minecraft.util.profiling.ProfilerFiller;
-@@ -136,1624 +_,2116 @@
+@@ -136,1624 +_,2183 @@
  import net.minecraft.world.level.WorldDataConfiguration;
  import net.minecraft.world.level.biome.BiomeManager;
  import net.minecraft.world.level.block.Block;
@@ -105,6 +105,7 @@
 +import org.bukkit.Bukkit;
 +import org.bukkit.craftbukkit.v1_19_R2.CraftServer;
 +import org.bukkit.craftbukkit.Main;
++import org.bukkit.craftbukkit.v1_19_R2.SpigotTimings;
 +import org.bukkit.craftbukkit.v1_19_R2.util.CraftChatMessage;
 +import org.bukkit.craftbukkit.v1_19_R2.util.LazyPlayerSet;
 +import org.bukkit.event.player.AsyncPlayerChatPreviewEvent;
@@ -260,7 +261,7 @@
 +  @Nullable
 +  private MinecraftServer.TimeProfiler f_177876_;
 +  private boolean f_177877_;
-+  private final ServerConnectionListener f_129755_;
++  private ServerConnectionListener f_129755_;
 +  public final ChunkProgressListenerFactory f_129756_;
 +  private final ServerStatus f_129757_ = new ServerStatus();
 +  private final RandomSource f_129758_ = RandomSource.m_216327_();
@@ -325,6 +326,12 @@
 +  public Commands vanillaCommandDispatcher;
 +  private boolean forceTicks;
 +  // CraftBukkit end
++  // Spigot start
++  public static final int TPS = 20;
++  public static final int TICK_TIME = 1000000000 / TPS;
++  private static final int SAMPLE_INTERVAL = 100;
++  public final double[] recentTps = new double[ 3 ];
++  // Spigot end
 +
 +
 +  // Magma start
@@ -377,7 +384,7 @@
 +        p_236729_.f_214336_().m_143974_(this);
 +      }
 +
-+      this.f_129755_ = new ServerConnectionListener(this);
++      // this.connection = new ServerConnectionListener(this); // Spigot
 +      this.f_129756_ = p_236730_;
 +      this.f_129744_ = p_236724_;
 +      this.f_129745_ = p_236724_.m_78301_();
@@ -1385,6 +1392,12 @@
 +    } catch (IOException ioexception) {
 +      f_129750_.error("Failed to unlock level {}", this.f_129744_.m_78277_(), ioexception);
 +    }
++    // Spigot start
++    if (org.spigotmc.SpigotConfig.saveUserCacheOnStopOnly) {
++      f_129750_.info("Saving usercache.json");
++      this.m_129927_().m_11006_();
++    }
++    // Spigot end
 +
 +  }
 +
@@ -1412,6 +1425,12 @@
 +
 +  }
 +
++  // Spigot Start
++  private static double calcTps(double avg, double exp, double tps) {
++    return (avg * exp) + (tps * (1 - exp));
++  }
++  // Spigot End
++
 +  protected void m_130011_() {
 +    try {
 +      if (!this.m_7038_()) {
@@ -1426,8 +1445,11 @@
 +      this.f_129757_.m_242958_(this.m_214005_());
 +      this.m_129878_(this.f_129757_);
 +
++      // Spigot start
++      Arrays.fill( recentTps, 20 );
++      long curTime, tickSection = Util.m_137550_(), tickCount = 1;
 +      while (this.f_129764_) {
-+        long i = Util.m_137550_() - this.f_129726_;
++        long i =  (curTime = Util.m_137550_()) - this.f_129726_;
 +        if (i > 5000L && this.f_129726_ - this.f_129718_ >= 30000L) { // CraftBukkit
 +          long j = i / 50L;
 +
@@ -1438,6 +1460,15 @@
 +          this.f_129726_ += j * 50L;
 +          this.f_129718_ = this.f_129726_;
 +        }
++
++        if (tickCount++ % SAMPLE_INTERVAL == 0) {
++          double currentTps = 1E3 / (curTime - tickSection) * SAMPLE_INTERVAL;
++          recentTps[0] = calcTps(recentTps[0], 0.92, currentTps); // 1/exp(5sec/1min)
++          recentTps[1] = calcTps(recentTps[1], 0.9835, currentTps); // 1/exp(5sec/5min)
++          recentTps[2] = calcTps(recentTps[2], 0.9945, currentTps); // 1/exp(5sec/15min)
++          tickSection = curTime;
++        }
++        // Spigot end
 +
 +        if (this.f_177877_) {
 +          this.f_177877_ = false;
@@ -1476,6 +1507,11 @@
 +      this.m_7268_(crashreport);
 +    } catch (Throwable throwable1) {
 +      f_129750_.error("Encountered an unexpected exception", throwable1);
++      // Spigot Start
++      if (throwable1.getCause() != null) {
++        MinecraftServer.f_129750_.error("\tCause of unexpected exception was", throwable1.getCause());
++      }
++      // Spigot End
 +      CrashReport crashreport = m_206568_(throwable1);
 +      this.m_177935_(crashreport.m_178626_());
 +      File file1 = new File(new File(this.m_6237_(), "crash-reports"),
@@ -1709,6 +1745,7 @@
 +        }
 +
 +        net.minecraftforge.server.ServerLifecycleHooks.handleServerStopped(this);
++        org.spigotmc.WatchdogThread.doStop(); // Spigot
 +        // CraftBukkit start - Restore terminal to original settings
 +        try {
 +          reader.getTerminal().restore();
@@ -1988,6 +2025,7 @@
 +  }
 +
 +  public void m_5705_(BooleanSupplier p_129871_) {
++    SpigotTimings.serverTickTimer.startTiming(); // Spigot
 +    long i = Util.m_137569_();
 +    net.minecraftforge.event.ForgeEventFactory.onPreServerTick(p_129871_, this);
 +    ++this.f_129766_;
@@ -2015,11 +2053,13 @@
 +    }
 +
 +    if (autosavePeriod > 0 && this.f_129766_ % autosavePeriod == 0) { // CraftBukkit
++      SpigotTimings.worldSaveTimer.startTiming(); // Spigot
 +      f_129750_.debug("Autosave started");
 +      this.f_129754_.m_6180_("save");
 +      this.m_195514_(true, false, false);
 +      this.f_129754_.m_7238_();
 +      f_129750_.debug("Autosave finished");
++      SpigotTimings.worldSaveTimer.stopTiming(); // Spigot
 +    }
 +
 +    this.f_129754_.m_6180_("tallying");
@@ -2028,21 +2068,31 @@
 +    long i1 = Util.m_137569_();
 +    this.f_129735_.m_13755_(i1 - i);
 +    this.f_129754_.m_7238_();
++    org.spigotmc.WatchdogThread.tick(); // Spigot
 +    net.minecraftforge.event.ForgeEventFactory.onPostServerTick(p_129871_, this);
++    SpigotTimings.serverTickTimer.stopTiming(); // Spigot
++    org.spigotmc.CustomTimingsHandler.tick(); // Spigot
 +  }
 +
 +  public void m_5703_(BooleanSupplier p_129954_) {
++    SpigotTimings.schedulerTimer.startTiming(); // Spigot
 +    this.server.getScheduler().mainThreadHeartbeat(this.f_129766_); // CraftBukkit
++    SpigotTimings.schedulerTimer.stopTiming(); // Spigot
 +    this.f_129754_.m_6180_("commandFunctions");
++    SpigotTimings.commandFunctionsTimer.startTiming(); // Spigot
 +    this.m_129890_().m_136128_();
++    SpigotTimings.commandFunctionsTimer.stopTiming(); // Spigot
 +    this.f_129754_.m_6182_("levels");
 +
 +    // CraftBukkit start
 +    // Run tasks that are waiting on processing
++    SpigotTimings.processQueueTimer.startTiming(); // Spigot
 +    while (!processQueue.isEmpty()) {
 +      processQueue.remove().run();
 +    }
++    SpigotTimings.processQueueTimer.stopTiming(); // Spigot
 +
++    SpigotTimings.timeUpdateTimer.startTiming(); // Spigot
 +    for (ServerLevel serverlevel : this.getWorldArray()) {
 +      long tickStart = Util.m_137569_();
 +      this.f_129754_.m_6521_(() -> {
@@ -2055,14 +2105,24 @@
 +            serverlevel.m_46469_().m_46207_(GameRules.f_46140_)), serverlevel.m_46472_());
 +        this.f_129754_.m_7238_();
 +      }
++      SpigotTimings.timeUpdateTimer.stopTiming(); // Spigot
 +
 +      this.f_129754_.m_6180_("tick");
 +      net.minecraftforge.event.ForgeEventFactory.onPreLevelTick(serverlevel, p_129954_);
 +
 +      try {
++        serverlevel.timings.doTick.startTiming(); // Spigot
 +        serverlevel.m_8793_(p_129954_);
++        serverlevel.timings.doTick.stopTiming(); // Spigot
 +      } catch (Throwable throwable) {
-+        CrashReport crashreport = CrashReport.m_127521_(throwable, "Exception ticking world");
++        // Spigot Start
++        CrashReport crashreport;
++        try {
++          crashreport = CrashReport.m_127521_(throwable, "Exception ticking world");
++        } catch (Throwable t) {
++          throw new RuntimeException("Error generating crash report", t);
++        }
++        // Spigot End
 +        serverlevel.m_6026_(crashreport);
 +        throw new ReportedException(crashreport);
 +      }
@@ -2074,19 +2134,26 @@
 +          Util.m_137569_() - tickStart;
 +    }
 +
++
 +    this.f_129754_.m_6182_("connection");
++    SpigotTimings.connectionTimer.startTiming(); // Spigot
 +    this.m_129919_().m_9721_();
++    SpigotTimings.connectionTimer.stopTiming(); // Spigot
 +    this.f_129754_.m_6182_("players");
++    SpigotTimings.playerListTimer.startTiming(); // Spigot
 +    this.f_129763_.m_11288_();
++    SpigotTimings.playerListTimer.stopTiming(); // Spigot
 +    if (net.minecraftforge.gametest.ForgeGameTestHooks.isGametestEnabled()) {
 +      GameTestTicker.f_177648_.m_127790_();
 +    }
 +
 +    this.f_129754_.m_6182_("server gui refresh");
 +
++    SpigotTimings.tickablesTimer.startTiming(); // Spigot
 +    for (int i = 0; i < this.f_129752_.size(); ++i) {
 +      this.f_129752_.get(i).run();
 +    }
++    SpigotTimings.tickablesTimer.stopTiming(); // Spigot
 +
 +    this.f_129754_.m_7238_();
 +  }
@@ -2146,7 +2213,7 @@
 +
 +  @DontObfuscate
 +  public String m_130001_() {
-+    return server.getName(); // Craftbukkit
++    return "Magma";
 +  }
 +
 +  public SystemReport m_177935_(SystemReport p_177936_) {
@@ -2618,7 +2685,7 @@
 +
 +  @Nullable
 +  public ServerConnectionListener m_129919_() {
-+    return this.f_129755_;
++    return this.f_129755_ == null ? this.f_129755_ = new ServerConnectionListener(this) : this.f_129755_; // Spigot
 +  }
 +
 +  public boolean m_129920_() {

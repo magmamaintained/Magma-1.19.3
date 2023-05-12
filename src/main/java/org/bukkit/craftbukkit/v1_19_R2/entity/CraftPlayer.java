@@ -8,6 +8,7 @@ import com.mojang.datafixers.util.Pair;
 import io.netty.buffer.Unpooled;
 import it.unimi.dsi.fastutil.shorts.ShortArraySet;
 import it.unimi.dsi.fastutil.shorts.ShortSet;
+import net.md_5.bungee.api.chat.BaseComponent;
 import net.minecraft.advancements.AdvancementProgress;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
@@ -304,6 +305,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
 
     @Override
     public void kickPlayer(String message) {
+        org.spigotmc.AsyncCatcher.catchOp("player kick"); // Spigot
         if (getHandle().connection == null) return;
 
         getHandle().connection.disconnect(message == null ? "" : message);
@@ -1637,7 +1639,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
             throw new IllegalStateException("Cannot set scoreboard yet");
         }
         if (playerConnection.isDisconnected()) {
-            throw new IllegalStateException("Cannot set scoreboard for invalid CraftPlayer");
+            // throw new IllegalStateException("Cannot set scoreboard for invalid CraftPlayer"); // Spigot - remove this as Mojang's semi asynchronous Netty implementation can lead to races
         }
 
         this.server.getScoreboardManager().setPlayerBoard(this, scoreboard);
@@ -1718,7 +1720,15 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
             }
         }
         net.minecraft.world.entity.ai.attributes.AttributeInstance dummy = new net.minecraft.world.entity.ai.attributes.AttributeInstance(net.minecraft.world.entity.ai.attributes.Attributes.MAX_HEALTH, (attribute) -> { });
-        dummy.setBaseValue(scaledHealth ? healthScale : getMaxHealth());
+        // Spigot start
+        double healthMod = scaledHealth ? healthScale : getMaxHealth();
+        if ( healthMod >= Float.MAX_VALUE || healthMod <= 0 )
+        {
+            healthMod = 20; // Reset health
+            getServer().getLogger().warning( getName() + " tried to crash the server with a large health attribute" );
+        }
+        dummy.setBaseValue(healthMod);
+        // Spigot end
         collection.add(dummy);
     }
 
@@ -1887,4 +1897,89 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
     public boolean isAllowingServerListings() {
         return getHandle().allowsListing();
     }
+
+    // Spigot start
+    private final Player.Spigot spigot = new Player.Spigot()
+    {
+        @Override
+        public InetSocketAddress getRawAddress()
+        {
+            return (InetSocketAddress) getHandle().connection.connection.getRawAddress();
+        }
+
+        @Override
+        public boolean getCollidesWithEntities() {
+            return CraftPlayer.this.isCollidable();
+        }
+
+        @Override
+        public void setCollidesWithEntities(boolean collides) {
+            CraftPlayer.this.setCollidable(collides);
+        }
+
+        @Override
+        public void respawn() {
+            if (getHealth() <= 0 && isOnline()) {
+                server.getServer().getPlayerList().respawn(getHandle(), false);
+            }
+        }
+
+        @Override
+        public Set<Player> getHiddenPlayers() {
+            Set<Player> ret = new HashSet<>();
+            for (Player p : getServer().getOnlinePlayers()) {
+                if (!CraftPlayer.this.canSee(p)) {
+                    ret.add(p);
+                }
+            }
+            return java.util.Collections.unmodifiableSet(ret);
+        }
+
+        @Override
+        public void sendMessage(BaseComponent component) {
+            sendMessage( new BaseComponent[] { component } );
+        }
+
+        @Override
+        public void sendMessage(BaseComponent... components) {
+            this.sendMessage(net.md_5.bungee.api.ChatMessageType.SYSTEM, components);
+        }
+
+        @Override
+        public void sendMessage(UUID sender, BaseComponent component) {
+            this.sendMessage(net.md_5.bungee.api.ChatMessageType.CHAT, sender, component);
+        }
+
+        @Override
+        public void sendMessage(UUID sender, BaseComponent... components) {
+            this.sendMessage(net.md_5.bungee.api.ChatMessageType.CHAT, sender, components);
+        }
+
+        @Override
+        public void sendMessage(net.md_5.bungee.api.ChatMessageType position, BaseComponent component) {
+            sendMessage( position, new BaseComponent[] { component } );
+        }
+
+        @Override
+        public void sendMessage(net.md_5.bungee.api.ChatMessageType position, BaseComponent... components) {
+            this.sendMessage(position, null, components);
+        }
+
+        @Override
+        public void sendMessage(net.md_5.bungee.api.ChatMessageType position, UUID sender, BaseComponent component) {
+            sendMessage( position, sender, new BaseComponent[] { component } );
+        }
+
+        @Override
+        public void sendMessage(net.md_5.bungee.api.ChatMessageType position, UUID sender, BaseComponent... components) {
+            if ( getHandle().connection == null ) return;
+            getHandle().connection.send(new net.minecraft.network.protocol.game.ClientboundSystemChatPacket(components, position == net.md_5.bungee.api.ChatMessageType.ACTION_BAR));
+        }
+    };
+
+    public Player.Spigot spigot()
+    {
+        return spigot;
+    }
+    // Spigot end
 }

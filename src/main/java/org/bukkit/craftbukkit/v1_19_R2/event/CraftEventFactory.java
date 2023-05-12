@@ -516,6 +516,23 @@ public class CraftEventFactory {
                 return true;
             }
             event = CraftEventFactory.callLightningStrikeEvent((LightningStrike) entity.getBukkitEntity(), cause);
+            // Spigot start
+        } else if (entity instanceof net.minecraft.world.entity.ExperienceOrb) {
+            net.minecraft.world.entity.ExperienceOrb xp = (net.minecraft.world.entity.ExperienceOrb) entity;
+            double radius = world.spigotConfig.expMerge;
+            if (radius > 0) {
+                List<Entity> entities = world.getEntities(entity, entity.getBoundingBox().inflate(radius, radius, radius));
+                for (Entity e : entities) {
+                    if (e instanceof net.minecraft.world.entity.ExperienceOrb) {
+                        net.minecraft.world.entity.ExperienceOrb loopItem = (net.minecraft.world.entity.ExperienceOrb) e;
+                        if (!loopItem.isRemoved()) {
+                            xp.value += loopItem.value;
+                            loopItem.discard();
+                        }
+                    }
+                }
+            }
+            // Spigot end
         } else if (!(entity instanceof ServerPlayer)) {
             event = CraftEventFactory.callEntitySpawnEvent(entity);
         }
@@ -1377,6 +1394,21 @@ public class CraftEventFactory {
         PrepareSmithingEvent event = new PrepareSmithingEvent(view, CraftItemStack.asCraftMirror(item).clone());
         event.getView().getPlayer().getServer().getPluginManager().callEvent(event);
         event.getInventory().setItem(2, event.getResult());
+        return event;
+    }
+
+    /**
+     * Mob spawner event.
+     */
+    public static SpawnerSpawnEvent callSpawnerSpawnEvent(Entity spawnee, BlockPos pos) {
+        org.bukkit.craftbukkit.v1_19_R2.entity.CraftEntity entity = spawnee.getBukkitEntity();
+        BlockState state = entity.getWorld().getBlockAt(pos.getX(), pos.getY(), pos.getZ()).getState();
+        if (!(state instanceof org.bukkit.block.CreatureSpawner)) {
+            state = null;
+        }
+
+        SpawnerSpawnEvent event = new SpawnerSpawnEvent(entity, (org.bukkit.block.CreatureSpawner) state);
+        entity.getServer().getPluginManager().callEvent(event);
         return event;
     }
 

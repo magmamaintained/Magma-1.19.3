@@ -16,6 +16,24 @@
  import net.minecraft.server.level.ServerLevel;
  import net.minecraft.util.Mth;
  import net.minecraft.world.effect.MobEffectInstance;
+@@ -149,6 +_,17 @@
+       this.f_19687_ = p_19735_;
+    }
+ 
++   // Spigot start - copied from below
++   @Override
++   public void inactiveTick() {
++      super.inactiveTick();
++      if (this.f_19797_ >= this.f_19688_ + this.f_19687_) {
++         this.m_146870_();
++         return;
++      }
++   }
++   // Spigot end
++
+    public void m_8119_() {
+       super.m_8119_();
+       boolean flag = this.m_19747_();
 @@ -423,5 +_,16 @@
  
     public EntityDimensions m_6972_(Pose p_19721_) {
