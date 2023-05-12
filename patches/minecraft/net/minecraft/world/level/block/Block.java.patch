@@ -184,7 +184,7 @@
     /** @deprecated */
     @Deprecated
     public Holder.Reference<Block> m_204297_() {
-@@ -499,6 +_,12 @@
+@@ -499,6 +_,24 @@
        }
  
     }
@@ -194,6 +194,18 @@
 +      return 0;
 +   }
 +   // CraftBukkit end
++
++   // Spigot start
++   public static float range(float min, float value, float max) {
++      if (value < min) {
++         return min;
++      }
++      if (value > max) {
++         return max;
++      }
++      return value;
++   }
++   // Spigot end
  
     public static final class BlockStatePairKey {
        private final BlockState f_49980_;

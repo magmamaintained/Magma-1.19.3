@@ -25,7 +25,7 @@
  import net.minecraft.world.level.entity.EntityAccess;
  import net.minecraft.world.level.entity.EntityInLevelCallback;
  import net.minecraft.world.level.gameevent.DynamicGameEventListener;
-@@ -116,9 +_,54 @@
+@@ -116,9 +_,55 @@
  import net.minecraft.world.phys.shapes.VoxelShape;
  import net.minecraft.world.scores.PlayerTeam;
  import net.minecraft.world.scores.Team;
@@ -50,8 +50,10 @@
 +import org.bukkit.event.vehicle.VehicleExitEvent;
 +import org.bukkit.plugin.PluginManager;
  import org.slf4j.Logger;
- 
+-
 -public abstract class Entity implements Nameable, EntityAccess, CommandSource {
++import org.spigotmc.CustomTimingsHandler;
++
 +public abstract class Entity extends net.minecraftforge.common.capabilities.CapabilityProvider<Entity> implements Nameable, EntityAccess, CommandSource, net.minecraftforge.common.extensions.IForgeEntity {
 +
 +   // CraftBukkit start
@@ -99,7 +101,8 @@
     protected final RandomSource f_19796_ = RandomSource.m_216327_();
     public int f_19797_;
     public int f_19831_ = -this.m_6101_();
-    protected boolean f_19798_;
+-   protected boolean f_19798_;
++   public boolean f_19798_;
 +   @Deprecated // Forge: Use forgeFluidTypeHeight instead
     protected Object2DoubleMap<TagKey<Fluid>> f_19799_ = new Object2DoubleArrayMap<>(2);
     protected boolean f_19800_;
@@ -107,7 +110,7 @@
     private final Set<TagKey<Fluid>> f_19801_ = new HashSet<>();
     public int f_19802_;
     protected boolean f_19803_ = true;
-@@ -230,7 +_,31 @@
+@@ -230,13 +_,52 @@
     @Nullable
     private BlockState f_185934_ = null;
  
@@ -120,6 +123,14 @@
 +   public boolean lastDamageCancelled; // SPIGOT-5339, SPIGOT-6252, SPIGOT-6777: Keep track if the event was canceled
 +   public boolean persistentInvisibility = false;
 +   public BlockPos lastLavaContact;
++   public CustomTimingsHandler tickTimer = org.bukkit.craftbukkit.v1_19_R2.SpigotTimings.getEntityTimings(this); // Spigot
++
++   // Spigot start
++   public final org.spigotmc.ActivationRange.ActivationType activationType = org.spigotmc.ActivationRange.initializeEntityActivationType(this);
++   public final boolean defaultActivationState;
++   public long activatedTick = Integer.MIN_VALUE;
++   public void inactiveTick() { }
++   // Spigot end
 +
 +   public float getBukkitYaw() {
 +      return this.f_19857_;
@@ -139,9 +150,24 @@
        this.f_19847_ = p_19870_;
        this.f_19853_ = p_19871_;
        this.f_19815_ = p_19870_.m_20680_();
-@@ -248,7 +_,11 @@
+       this.f_19825_ = Vec3.f_82478_;
+       this.f_19826_ = BlockPos.f_121853_;
+       this.f_185933_ = ChunkPos.f_186419_;
++      // Spigot start
++      if (p_19871_ != null) {
++         this.defaultActivationState = org.spigotmc.ActivationRange.initializeEntityActivationState(this, p_19871_.spigotConfig);
++      } else {
++         this.defaultActivationState = false;
++      }
++      // Spigot end
+       this.f_19804_ = new SynchedEntityData(this);
+       this.f_19804_.m_135372_(f_19805_, (byte)0);
+       this.f_19804_.m_135372_(f_19832_, this.m_6062_());
+@@ -247,8 +_,13 @@
+       this.f_19804_.m_135372_(f_19806_, Pose.STANDING);
        this.f_19804_.m_135372_(f_146800_, 0);
        this.m_8097_();
++      this.m_20088_().registrationLocked = true; // Spigot
        this.m_6034_(0.0D, 0.0D, 0.0D);
 -      this.f_19816_ = this.m_6380_(Pose.STANDING, this.f_19815_);
 +      net.minecraftforge.event.entity.EntityEvent.Size sizeEvent = net.minecraftforge.event.ForgeEventFactory.getEntitySizeForge(this, Pose.STANDING, this.f_19815_, this.m_6380_(Pose.STANDING, this.f_19815_));
@@ -289,6 +315,14 @@
        int i = p_20255_ * 20;
        if (this instanceof LivingEntity) {
           i = ProtectionEnchantment.m_45138_((LivingEntity)this, i);
+@@ -552,6 +_,7 @@
+    }
+ 
+    public void m_6478_(MoverType p_19973_, Vec3 p_19974_) {
++      org.bukkit.craftbukkit.v1_19_R2.SpigotTimings.entityMoveTimer.startTiming(); // Spigot
+       if (this.f_19794_) {
+          this.m_6034_(this.m_20185_() + p_19974_.f_82479_, this.m_20186_() + p_19974_.f_82480_, this.m_20189_() + p_19974_.f_82481_);
+       } else {
 @@ -614,6 +_,28 @@
                 block.m_5548_(this.f_19853_, this);
              }
@@ -327,7 +361,7 @@
                 boolean flag1 = blockstate.m_204336_(BlockTags.f_13082_) || blockstate.m_60713_(Blocks.f_152499_);
                 if (!flag1) {
                    d2 = 0.0D;
-@@ -662,25 +_,23 @@
+@@ -662,26 +_,25 @@
  
              this.m_146872_();
              float f2 = this.m_6041_();
@@ -365,8 +399,10 @@
 +
 +         this.f_19853_.m_46473_().m_7238_();
        }
++      org.bukkit.craftbukkit.v1_19_R2.SpigotTimings.entityMoveTimer.stopTiming(); // Spigot
     }
  
+    protected boolean m_196406_(Vec3 p_196625_) {
 @@ -736,10 +_,10 @@
        int j = Mth.m_14107_(this.f_19825_.f_82480_ - (double)p_216987_);
        int k = Mth.m_14107_(this.f_19825_.f_82481_);
@@ -555,7 +591,7 @@
           p_20241_.m_128365_("Rotation", this.m_20065_(this.m_146908_(), this.m_146909_()));
           p_20241_.m_128350_("FallDistance", this.f_19789_);
           p_20241_.m_128376_("Fire", (short)this.f_19831_);
-@@ -1470,6 +_,24 @@
+@@ -1470,6 +_,25 @@
           p_20241_.m_128379_("Invulnerable", this.f_19840_);
           p_20241_.m_128405_("PortalCooldown", this.f_19839_);
           p_20241_.m_128362_("UUID", this.m_20148_());
@@ -575,6 +611,7 @@
 +         if (maxAirTicks != getDefaultMaxAirSupply()) {
 +            p_20241_.m_128405_("Bukkit.MaxAirSupply", m_6062_());
 +         }
++         p_20241_.m_128405_("Spigot.ticksLived", this.f_19797_);
 +         // CraftBukkit end
 +
           Component component = this.m_7770_();
@@ -623,11 +660,16 @@
                 if (p_20259_.m_128425_("Tags", 9)) {
                    this.f_19841_.clear();
                    ListTag listtag3 = p_20259_.m_128437_("Tags", 8);
-@@ -1606,6 +_,43 @@
+@@ -1606,6 +_,48 @@
           } else {
              throw new IllegalStateException("Entity has invalid position");
           }
 +
++         // Spigot start
++         if (this instanceof LivingEntity) {
++            this.f_19797_ = p_20259_.m_128451_("Spigot.ticksLived");
++         }
++         // Spigot end
 +         // CraftBukkit start
 +         this.persist = !p_20259_.m_128441_("Bukkit.persist") || p_20259_.m_128471_("Bukkit.persist");
 +         // SPIGOT-6907: re-implement LivingEntity#setMaximumAir()
@@ -727,7 +769,7 @@
        }
  
     }
-@@ -1807,13 +_,33 @@
+@@ -1807,13 +_,43 @@
        this.m_6038_();
     }
  
@@ -736,6 +778,16 @@
        if (p_20349_.m_20202_() != this) {
           throw new IllegalStateException("Use x.startRiding(y), not y.addPassenger(x)");
        } else {
++         // Spigot start
++         org.spigotmc.event.entity.EntityMountEvent eventMount = new org.spigotmc.event.entity.EntityMountEvent(p_20349_.getBukkitEntity(), this.getBukkitEntity());
++         // Suppress during worldgen
++         if (this.valid) {
++            Bukkit.getPluginManager().callEvent(eventMount);
++         }
++         if (eventMount.isCancelled()) {
++            return false;
++         }
++         // Spigot end
           if (this.f_19823_.isEmpty()) {
              this.f_19823_ = ImmutableList.of(p_20349_);
           } else {
@@ -762,7 +814,7 @@
              List<Entity> list = Lists.newArrayList(this.f_19823_);
              if (!this.f_19853_.f_46443_ && p_20349_ instanceof Player && !(this.m_6688_() instanceof Player)) {
                 list.add(0, p_20349_);
-@@ -1825,15 +_,35 @@
+@@ -1825,15 +_,45 @@
           }
  
        }
@@ -774,6 +826,16 @@
        if (p_20352_.m_20202_() == this) {
           throw new IllegalStateException("Use x.stopRiding(y), not y.removePassenger(x)");
        } else {
++         // Spigot start
++         org.spigotmc.event.entity.EntityDismountEvent eventDis = new org.spigotmc.event.entity.EntityDismountEvent(p_20352_.getBukkitEntity(), this.getBukkitEntity());
++         // Suppress during worldgen
++         if (this.valid) {
++            Bukkit.getPluginManager().callEvent(eventDis);
++         }
++         if (eventDis.isCancelled()) {
++            return false;
++         }
++         // Spigot end
           if (this.f_19823_.size() == 1 && this.f_19823_.get(0) == p_20352_) {
              this.f_19823_ = ImmutableList.of();
           } else {

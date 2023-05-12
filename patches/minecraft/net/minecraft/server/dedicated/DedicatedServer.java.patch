@@ -22,7 +22,7 @@
  import net.minecraft.server.WorldStem;
  import net.minecraft.server.gui.MinecraftServerGui;
  import net.minecraft.server.level.ServerLevel;
-@@ -51,477 +_,621 @@
+@@ -51,477 +_,636 @@
  import net.minecraft.world.level.Level;
  import net.minecraft.world.level.block.entity.SkullBlockEntity;
  import net.minecraft.world.level.storage.LevelStorageSource;
@@ -30,6 +30,7 @@
 +import org.apache.logging.log4j.io.IoBuilder;
 +import org.bukkit.command.CommandSender;
 +import org.bukkit.craftbukkit.Main;
++import org.bukkit.craftbukkit.v1_19_R2.SpigotTimings;
 +import org.bukkit.event.server.RemoteServerCommandEvent;
 +import org.bukkit.event.server.ServerCommandEvent;
 +import org.magmafoundation.magma.protect.InjectProtect;
@@ -623,6 +624,12 @@
 +      this.m_129913_(dedicatedserverproperties.f_139730_);
 +    }
 +
++    // Spigot start
++    this.m_129823_(new DedicatedPlayerList(this, this.m_247573_(), this.f_129745_));
++    org.spigotmc.SpigotConfig.init((java.io.File) options.valueOf("spigot-settings"));
++    org.spigotmc.SpigotConfig.registerCommands();
++    // Spigot end
++
 +    this.m_129997_(dedicatedserverproperties.f_139733_);
 +    this.m_129999_(dedicatedserverproperties.f_139734_);
 +    this.m_129989_(dedicatedserverproperties.f_139736_);
@@ -653,7 +660,7 @@
 +    }
 +
 +    // CraftBukkit start
-+    this.m_129823_(new DedicatedPlayerList(this, this.m_247573_(), this.f_129745_));
++    // this.setPlayerList(new DedicatedPlayerList(this, this.registries(), this.playerDataStorage)); // Spigot - moved up
 +    server.loadPlugins();
 +    server.enablePlugins(org.bukkit.plugin.PluginLoadOrder.STARTUP);
 +    // CraftBukkit end
@@ -661,8 +668,14 @@
 +    if (!this.m_129797_()) {
 +      f_139598_.warn("**** SERVER IS RUNNING IN OFFLINE/INSECURE MODE!");
 +      f_139598_.warn("The server will make no attempt to authenticate usernames. Beware.");
-+      f_139598_.warn(
-+          "While this makes the game possible to play without internet access, it also opens up the ability for hackers to connect with any username they choose.");
++      // Spigot start
++      if (org.spigotmc.SpigotConfig.bungee) {
++        DedicatedServer.f_139598_.warn("Whilst this makes it possible to use BungeeCord, unless access to your server is properly restricted, it also opens up the ability for hackers to connect with any username they choose.");
++        DedicatedServer.f_139598_.warn("Please see http://www.spigotmc.org/wiki/firewall-guide/ for further information.");
++      } else {
++        DedicatedServer.f_139598_.warn("While this makes the game possible to play without internet access, it also opens up the ability for hackers to connect with any username they choose.");
++      }
++      // Spigot end
 +      f_139598_.warn("To change this, set \"online-mode\" to \"true\" in the server.properties file.");
 +    }
 +
@@ -703,7 +716,7 @@
 +            this.f_139602_); // CraftBukkit
 +      }
 +
-+      if (this.m_139669_() > 0L) {
++      if (false && this.m_139669_() > 0L) {  // Spigot - disable
 +        Thread thread1 = new Thread(new ServerWatchdog(this));
 +        thread1.setUncaughtExceptionHandler(new DefaultUncaughtExceptionHandlerWithName(f_139598_));
 +        thread1.setName("Server Watchdog");
@@ -816,6 +829,7 @@
 +  }
 +
 +  public void m_139665_() {
++    SpigotTimings.serverCommandTimer.startTiming(); // Spigot
 +    while (!this.f_139600_.isEmpty()) {
 +      ConsoleInput consoleinput = this.f_139600_.remove(0);
 +      // CraftBukkit start - ServerCommand for preprocessing
@@ -829,6 +843,7 @@
 +      server.dispatchServerCommand(console, consoleinput);
 +      // CraftBukkit end
 +    }
++    SpigotTimings.serverCommandTimer.stopTiming(); // Spigot
 +
 +  }
 +

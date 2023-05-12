@@ -21,6 +21,7 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.SortedArraySet;
 import net.minecraft.util.Unit;
+import net.minecraft.world.entity.LightningBolt;
 import net.minecraft.world.entity.item.FallingBlockEntity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.level.ChunkPos;
@@ -208,6 +209,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
 
     @Override
     public boolean unloadChunkRequest(int x, int z) {
+        org.spigotmc.AsyncCatcher.catchOp("chunk unload"); // Spigot
         if (isChunkLoaded(x, z)) {
             world.getChunkSource().removeRegionTicket(TicketType.PLUGIN, new ChunkPos(x, z), 1, Unit.INSTANCE);
         }
@@ -216,6 +218,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
     }
 
     private boolean unloadChunk0(int x, int z, boolean save) {
+        org.spigotmc.AsyncCatcher.catchOp("chunk unload"); // Spigot
         if (!isChunkLoaded(x, z)) {
             return true;
         }
@@ -230,6 +233,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
 
     @Override
     public boolean regenerateChunk(int x, int z) {
+        org.spigotmc.AsyncCatcher.catchOp("chunk regenerate"); // Spigot
         throw new UnsupportedOperationException("Not supported in this Minecraft version! Unless you can fix it, this is not a bug :)");
         /*
         if (!unloadChunk0(x, z, false)) {
@@ -282,6 +286,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
 
     @Override
     public boolean loadChunk(int x, int z, boolean generate) {
+        org.spigotmc.AsyncCatcher.catchOp("chunk load"); // Spigot
         ChunkAccess chunk = world.getChunkSource().getChunk(x, z, generate ? ChunkStatus.FULL : ChunkStatus.EMPTY, true);
 
         // If generate = false, but the chunk already exists, we will get this back.
@@ -781,6 +786,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
 
     @Override
     public Collection<Entity> getNearbyEntities(BoundingBox boundingBox, Predicate<Entity> filter) {
+        org.spigotmc.AsyncCatcher.catchOp("getNearbyEntities"); // Spigot
         Validate.notNull(boundingBox, "Bounding box is null!");
 
         AABB bb = new AABB(boundingBox.getMinX(), boundingBox.getMinY(), boundingBox.getMinZ(), boundingBox.getMaxX(), boundingBox.getMaxY(), boundingBox.getMaxZ());
@@ -935,6 +941,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
 
     @Override
     public void save() {
+        org.spigotmc.AsyncCatcher.catchOp("world save"); // Spigot
         this.server.checkSaveState();
         boolean oldSave = world.noSave;
 
@@ -1851,4 +1858,47 @@ public class CraftWorld extends CraftRegionAccessor implements World {
             this.persistentDataContainer.putAll((CompoundTag) c);
         }
     }
+
+    // Spigot start
+    @Override
+    public int getViewDistance() {
+        return world.spigotConfig.viewDistance;
+    }
+
+    @Override
+    public int getSimulationDistance() {
+        return world.spigotConfig.simulationDistance;
+    }
+    // Spigot end
+
+    // Spigot start
+    private final org.bukkit.World.Spigot spigot = new org.bukkit.World.Spigot()
+    {
+        @Override
+        public LightningStrike strikeLightning(Location loc, boolean isSilent)
+        {
+            LightningBolt lightning = net.minecraft.world.entity.EntityType.LIGHTNING_BOLT.create( world );
+            lightning.moveTo( loc.getX(), loc.getY(), loc.getZ() );
+            lightning.isSilent = isSilent;
+            world.strikeLightning( lightning, LightningStrikeEvent.Cause.CUSTOM );
+            return (LightningStrike) lightning.getBukkitEntity();
+        }
+
+        @Override
+        public LightningStrike strikeLightningEffect(Location loc, boolean isSilent)
+        {
+            LightningBolt lightning = net.minecraft.world.entity.EntityType.LIGHTNING_BOLT.create( world );
+            lightning.moveTo( loc.getX(), loc.getY(), loc.getZ() );
+            lightning.visualOnly = true;
+            lightning.isSilent = isSilent;
+            world.strikeLightning( lightning, LightningStrikeEvent.Cause.CUSTOM );
+            return (LightningStrike) lightning.getBukkitEntity();
+        }
+    };
+
+    public org.bukkit.World.Spigot spigot()
+    {
+        return spigot;
+    }
+    // Spigot end
 }
