@@ -2,7 +2,7 @@ package org.bukkit.craftbukkit.v1_19_R2.entity;
 
 import org.bukkit.craftbukkit.v1_19_R2.CraftServer;
 import org.bukkit.entity.Drowned;
-import org.bukkit.entity.EntityType;
+
 
 public class CraftDrowned extends CraftZombie implements Drowned {
 
@@ -18,10 +18,5 @@ public class CraftDrowned extends CraftZombie implements Drowned {
     @Override
     public String toString() {
         return "CraftDrowned";
-    }
-
-    @Override
-    public EntityType getType() {
-        return EntityType.DROWNED;
     }
 }

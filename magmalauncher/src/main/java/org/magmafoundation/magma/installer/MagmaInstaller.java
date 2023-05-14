@@ -106,9 +106,8 @@ public class MagmaInstaller extends AbstractMagmaInstaller {
                         new ArrayList<>(Arrays.asList("--task", "BUNDLER_EXTRACT", "--input", minecraft_server.getAbsolutePath(), "--output", LIB_PATH, "--libraries")),
                         stringToUrl(loadedLibsPaths));
 
-                //TODO: Replace with our own implementation
-                /*//Delete brigadier, we have our own implementation
-                deleteLib("com/mojang/brigadier");*/
+                //Delete brigadier, we have our own implementation
+                deleteLib("com/mojang/brigadier");
                 //Delete datafixers, we have our own implementation
                 deleteLib("com/mojang/datafixerupper");
                 System.out.println();

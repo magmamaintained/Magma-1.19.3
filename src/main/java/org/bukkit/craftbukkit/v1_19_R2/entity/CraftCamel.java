@@ -2,7 +2,6 @@ package org.bukkit.craftbukkit.v1_19_R2.entity;
 
 import org.bukkit.craftbukkit.v1_19_R2.CraftServer;
 import org.bukkit.entity.Camel;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Horse;
 
 public class CraftCamel extends CraftAbstractHorse implements Camel {
@@ -19,11 +18,6 @@ public class CraftCamel extends CraftAbstractHorse implements Camel {
     @Override
     public String toString() {
         return "CraftCamel";
-    }
-
-    @Override
-    public EntityType getType() {
-        return EntityType.CAMEL;
     }
 
     @Override

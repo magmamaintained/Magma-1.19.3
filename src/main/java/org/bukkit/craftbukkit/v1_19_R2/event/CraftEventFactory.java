@@ -53,6 +53,7 @@ import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
+import net.minecraftforge.common.util.FakePlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -110,8 +111,10 @@ import org.bukkit.event.world.EntitiesUnloadEvent;
 import org.bukkit.event.world.LootGenerateEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.InventoryView;
+import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.potion.PotionEffect;
+import org.magmafoundation.magma.craftbukkit.entity.CraftCustomEntity;
 
 import javax.annotation.Nullable;
 import java.net.InetAddress;
@@ -261,6 +264,7 @@ public class CraftEventFactory {
         CraftServer craftServer = world.getCraftServer();
 
         Player player = (Player) who.getBukkitEntity();
+        PlayerInventory inventory = player.getInventory();
 
         Block blockClicked = craftWorld.getBlockAt(clickedX, clickedY, clickedZ);
         Block placedBlock = replacedBlockState.getBlock();
@@ -269,12 +273,17 @@ public class CraftEventFactory {
 
         org.bukkit.inventory.ItemStack item;
         EquipmentSlot equipmentSlot;
-        if (hand == InteractionHand.MAIN_HAND) {
-            item = player.getInventory().getItemInMainHand();
-            equipmentSlot = EquipmentSlot.HAND;
-        } else {
-            item = player.getInventory().getItemInOffHand();
-            equipmentSlot = EquipmentSlot.OFF_HAND;
+
+        try { //Magma - catch NPE for non-bukkit inventories [Fixes PlantUtil.tryPlant]
+            if (hand == InteractionHand.MAIN_HAND) {
+                item = inventory.getItemInMainHand();
+                equipmentSlot = EquipmentSlot.HAND;
+            } else {
+                item = inventory.getItemInOffHand();
+                equipmentSlot = EquipmentSlot.OFF_HAND;
+            }
+        } catch (NullPointerException e) {
+            return null;
         }
 
         BlockPlaceEvent event = new BlockPlaceEvent(placedBlock, replacedBlockState, blockClicked, item, player, canBuild, equipmentSlot);
@@ -567,7 +576,13 @@ public class CraftEventFactory {
      * CreatureSpawnEvent
      */
     public static CreatureSpawnEvent callCreatureSpawnEvent(LivingEntity entityliving, SpawnReason spawnReason) {
-        org.bukkit.entity.LivingEntity entity = (org.bukkit.entity.LivingEntity) entityliving.getBukkitEntity();
+        //Magma start - fix ClassCastException
+        CraftEntity bukkitEntity = entityliving.getBukkitEntity();
+        org.bukkit.entity.LivingEntity entity;
+        if (bukkitEntity instanceof CraftCustomEntity craftCustomEntity)
+            entity = craftCustomEntity.asLivingEntity();
+        else entity = (org.bukkit.entity.LivingEntity) bukkitEntity;
+        //Magma end
         CraftServer craftServer = (CraftServer) entity.getServer();
 
         CreatureSpawnEvent event = new CreatureSpawnEvent(entity, spawnReason);
@@ -784,8 +799,28 @@ public class CraftEventFactory {
             Entity damager = source.getEntity();
             DamageCause cause = (source.isSweep()) ? DamageCause.ENTITY_SWEEP_ATTACK : DamageCause.ENTITY_ATTACK;
 
+            //Magma start - custom event in case of a FakePlayer interaction
+            if (damager instanceof FakePlayer) {
+                EntityDamageEvent event = new EntityDamageByBlockEvent(null, entity.getBukkitEntity(), cause, modifiers, modifierFunctions);
+                event.setCancelled(cancelled);
+                callEvent(event);
+                if (!event.isCancelled()) {
+                    event.getEntity().setLastDamageCause(event);
+                } else {
+                    entity.lastDamageCancelled = true;
+                }
+                return event;
+            }
+            //Magma end
+
             if (source instanceof IndirectEntityDamageSource) {
                 damager = ((IndirectEntityDamageSource) source).getProximateDamageSource();
+
+                //Magma start - assume that if proximate damage source is null, that the damage source is our damagee
+                if (damager == null)
+                    damager = entity;
+                //Magma end
+
                 if (damager.getBukkitEntity() instanceof org.bukkit.entity.ThrownPotion) {
                     cause = DamageCause.MAGIC;
                 } else if (damager.getBukkitEntity() instanceof Projectile) {
@@ -1170,6 +1205,11 @@ public class CraftEventFactory {
             hitEntity = ((EntityHitResult) position).getEntity().getBukkitEntity();
         }
 
+        //Magma start - Fix ClassCastException on custom projectiles
+        if (!(entity.getBukkitEntity() instanceof Projectile))
+            return null;
+        //Magma end
+
         ProjectileHitEvent event = new ProjectileHitEvent((Projectile) entity.getBukkitEntity(), hitEntity, hitBlock, hitFace);
         entity.level.getCraftServer().getPluginManager().callEvent(event);
         return event;
@@ -1360,9 +1400,17 @@ public class CraftEventFactory {
                 event = new PlayerStatisticIncrementEvent(player, stat, current, newValue);
             } else if (stat.getType() == Type.ENTITY) {
                 EntityType entityType = CraftStatistic.getEntityTypeFromStatistic((net.minecraft.stats.Stat<net.minecraft.world.entity.EntityType<?>>) statistic);
+
+                if (stat.isInjected() && entityType == null) //Magma
+                    return null;
+
                 event = new PlayerStatisticIncrementEvent(player, stat, current, newValue, entityType);
             } else {
                 Material material = CraftStatistic.getMaterialFromStatistic(statistic);
+
+                if (stat.isInjected() && material == null) //Magma
+                    return null;
+
                 event = new PlayerStatisticIncrementEvent(player, stat, current, newValue, material);
             }
         }
@@ -1572,7 +1620,12 @@ public class CraftEventFactory {
     public static LootGenerateEvent callLootGenerateEvent(Container inventory, LootTable lootTable, LootContext lootInfo, List<ItemStack> loot, boolean plugin) {
         CraftWorld world = lootInfo.getLevel().getWorld();
         Entity entity = lootInfo.getParamOrNull(LootContextParams.THIS_ENTITY);
-        NamespacedKey key = CraftNamespacedKey.fromMinecraft(world.getHandle().getServer().getLootTables().getKey(lootTable));
+
+        ResourceLocation lt = world.getHandle().getServer().getLootTables().getKey(lootTable);
+        if (lt == null)
+            return null; //Magma - Don't fire event for unregistered loot tables
+
+        NamespacedKey key = CraftNamespacedKey.fromMinecraft(lt);
         CraftLootTable craftLootTable = new CraftLootTable(key, lootTable);
         List<org.bukkit.inventory.ItemStack> bukkitLoot = loot.stream().map(CraftItemStack::asCraftMirror).collect(Collectors.toCollection(ArrayList::new));
 

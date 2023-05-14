@@ -40,6 +40,7 @@ import net.minecraft.world.entity.projectile.FireworkRocketEntity;
 import net.minecraft.world.entity.projectile.FishingHook;
 import net.minecraft.world.entity.vehicle.*;
 import net.minecraft.world.phys.AABB;
+import net.minecraftforge.common.util.FakePlayer;
 import org.bukkit.*;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.PistonMoveReaction;
@@ -62,12 +63,14 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.NumberConversions;
 import org.bukkit.util.Vector;
+import org.magmafoundation.magma.Magma;
+import org.magmafoundation.magma.configuration.MagmaConfig;
+import org.magmafoundation.magma.craftbukkit.entity.*;
+import org.magmafoundation.magma.forge.ForgeInject;
 
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-import org.magmafoundation.magma.craftbukkit.entity.CraftCustomEntity;
-import org.magmafoundation.magma.forge.ForgeInject;
 
 public abstract class CraftEntity implements org.bukkit.entity.Entity {
     private static PermissibleBase perm;
@@ -93,8 +96,14 @@ public abstract class CraftEntity implements org.bukkit.entity.Entity {
         if (entity instanceof LivingEntity) {
             // Players
             if (entity instanceof net.minecraft.world.entity.player.Player) {
-                if (entity instanceof ServerPlayer) { return new CraftPlayer(server, (ServerPlayer) entity); }
-                else { return new CraftHumanEntity(server, (net.minecraft.world.entity.player.Player) entity); }
+                if (entity instanceof ServerPlayer) {
+                    if (entity instanceof FakePlayer) {
+                        return new CraftFakePlayer(server, (FakePlayer) entity);
+                    }
+                    return new CraftPlayer(server, (ServerPlayer) entity);
+                } else {
+                    return new CraftHumanEntity(server, (net.minecraft.world.entity.player.Player) entity);
+                }
             }
             // Water Animals
             else if (entity instanceof WaterAnimal) {
@@ -126,6 +135,7 @@ public abstract class CraftEntity implements org.bukkit.entity.Entity {
                         if (entity instanceof net.minecraft.world.entity.animal.Wolf) { return new CraftWolf(server, (net.minecraft.world.entity.animal.Wolf) entity); }
                         else if (entity instanceof net.minecraft.world.entity.animal.Cat) { return new CraftCat(server, (net.minecraft.world.entity.animal.Cat) entity); }
                         else if (entity instanceof net.minecraft.world.entity.animal.Parrot) { return new CraftParrot(server, (net.minecraft.world.entity.animal.Parrot) entity); }
+                        else return new CraftCustomTamable(server, (TamableAnimal) entity);
                     }
                     else if (entity instanceof net.minecraft.world.entity.animal.Sheep) { return new CraftSheep(server, (net.minecraft.world.entity.animal.Sheep) entity); }
                     else if (entity instanceof net.minecraft.world.entity.animal.horse.AbstractHorse) {
@@ -134,10 +144,12 @@ public abstract class CraftEntity implements org.bukkit.entity.Entity {
                             else if (entity instanceof net.minecraft.world.entity.animal.horse.Mule) { return new CraftMule(server, (net.minecraft.world.entity.animal.horse.Mule) entity); }
                             else if (entity instanceof net.minecraft.world.entity.animal.horse.TraderLlama) { return new CraftTraderLlama(server, (net.minecraft.world.entity.animal.horse.TraderLlama) entity); }
                             else if (entity instanceof net.minecraft.world.entity.animal.horse.Llama) { return new CraftLlama(server, (net.minecraft.world.entity.animal.horse.Llama) entity); }
+                            else { return new CraftCustomChestedHorse(server, (net.minecraft.world.entity.animal.horse.AbstractChestedHorse) entity); }
                         } else if (entity instanceof net.minecraft.world.entity.animal.horse.Horse) { return new CraftHorse(server, (net.minecraft.world.entity.animal.horse.Horse) entity); }
                         else if (entity instanceof net.minecraft.world.entity.animal.horse.SkeletonHorse) { return new CraftSkeletonHorse(server, (net.minecraft.world.entity.animal.horse.SkeletonHorse) entity); }
                         else if (entity instanceof net.minecraft.world.entity.animal.horse.ZombieHorse) { return new CraftZombieHorse(server, (net.minecraft.world.entity.animal.horse.ZombieHorse) entity); }
                         else if (entity instanceof net.minecraft.world.entity.animal.camel.Camel) { return new CraftCamel(server, (net.minecraft.world.entity.animal.camel.Camel) entity); }
+                        else { return new CraftCustomAbstractHorse(server, (net.minecraft.world.entity.animal.horse.AbstractHorse) entity); }
                     }
                     else if (entity instanceof net.minecraft.world.entity.animal.Rabbit) { return new CraftRabbit(server, (net.minecraft.world.entity.animal.Rabbit) entity); }
                     else if (entity instanceof net.minecraft.world.entity.animal.PolarBear) { return new CraftPolarBear(server, (net.minecraft.world.entity.animal.PolarBear) entity); }
@@ -170,6 +182,7 @@ public abstract class CraftEntity implements org.bukkit.entity.Entity {
                         if (entity instanceof net.minecraft.world.entity.monster.Stray) { return new CraftStray(server, (net.minecraft.world.entity.monster.Stray) entity); }
                         else if (entity instanceof net.minecraft.world.entity.monster.WitherSkeleton) { return new CraftWitherSkeleton(server, (net.minecraft.world.entity.monster.WitherSkeleton) entity); }
                         else if (entity instanceof net.minecraft.world.entity.monster.Skeleton){ return new CraftSkeleton(server, (net.minecraft.world.entity.monster.Skeleton) entity); }
+                        else { return new CraftCustomAbstractSkeleton(server, (net.minecraft.world.entity.monster.AbstractSkeleton) entity); }
                     }
                     else if (entity instanceof net.minecraft.world.entity.monster.Blaze) { return new CraftBlaze(server, (net.minecraft.world.entity.monster.Blaze) entity); }
                     else if (entity instanceof net.minecraft.world.entity.monster.Witch) { return new CraftWitch(server, (net.minecraft.world.entity.monster.Witch) entity); }
@@ -202,13 +215,14 @@ public abstract class CraftEntity implements org.bukkit.entity.Entity {
                     }
                     else if (entity instanceof net.minecraft.world.entity.monster.Zoglin) { return new CraftZoglin(server, (net.minecraft.world.entity.monster.Zoglin) entity); }
                     else if (entity instanceof Warden) { return new CraftWarden(server, (Warden) entity); }
-
+                    else if (entity instanceof net.minecraft.world.entity.raid.Raider) { return new CraftCustomRaider(server, (net.minecraft.world.entity.raid.Raider) entity); }
                     else  { return new CraftMonster(server, (net.minecraft.world.entity.monster.Monster) entity); }
                 }
                 else if (entity instanceof AbstractGolem) {
                     if (entity instanceof net.minecraft.world.entity.animal.SnowGolem) { return new CraftSnowman(server, (net.minecraft.world.entity.animal.SnowGolem) entity); }
                     else if (entity instanceof net.minecraft.world.entity.animal.IronGolem) { return new CraftIronGolem(server, (net.minecraft.world.entity.animal.IronGolem) entity); }
                     else if (entity instanceof net.minecraft.world.entity.monster.Shulker) { return new CraftShulker(server, (net.minecraft.world.entity.monster.Shulker) entity); }
+                    else { return new CraftCustomGolem(server, (AbstractGolem) entity); }
                 }
                 else if (entity instanceof AbstractVillager) {
                     if (entity instanceof Villager) { return new CraftVillager(server, (Villager) entity); }
@@ -300,9 +314,15 @@ public abstract class CraftEntity implements org.bukkit.entity.Entity {
         else if (entity instanceof net.minecraft.world.entity.projectile.EvokerFangs) { return new CraftEvokerFangs(server, (net.minecraft.world.entity.projectile.EvokerFangs) entity); }
         else if (entity instanceof net.minecraft.world.entity.projectile.LlamaSpit) { return new CraftLlamaSpit(server, (net.minecraft.world.entity.projectile.LlamaSpit) entity); }
         else if (entity instanceof Marker) { return new CraftMarker(server, (Marker) entity); }
+        else if (entity instanceof AbstractMinecart) { return new CraftCustomMinecart(server, (AbstractMinecart) entity); }
+        else if (entity instanceof AbstractMinecartContainer) { return new CraftCustomMinecartContainer(server, (AbstractMinecartContainer) entity); }
         // CHECKSTYLE:ON
 
         //Magma - instead of throwing an AssertionError we return a custom entity
+        if (MagmaConfig.instance.debugWarnOnUnknownEntity.getValues()) {
+            String superclass = entity.getClass().getSuperclass() == null ? "" : " (" + entity.getClass().getSuperclass().getName() + ")";
+            Magma.LOGGER.warn("Unknown entity type: " + entity.getClass().getName() + superclass);
+        }
         return new CraftCustomEntity(server, entity);
     }
 

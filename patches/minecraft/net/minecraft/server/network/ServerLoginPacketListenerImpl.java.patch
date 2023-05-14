@@ -40,7 +40,7 @@
     public Connection m_6198_() {
        return this.f_10013_;
     }
-@@ -92,14 +_,34 @@
+@@ -92,15 +_,36 @@
  
     }
  
@@ -78,8 +78,10 @@
 +         //this.disconnect(component);
 +         //CraftBukkit end
        } else {
++         s.resetBukkitEntity(); //Magma - fixes an issue where the CraftPlayer got initialized before actually getting valid data
           this.f_10019_ = ServerLoginPacketListenerImpl.State.ACCEPTED;
           if (this.f_10018_.m_6328_() >= 0 && !this.f_10013_.m_129531_()) {
+             this.f_10013_.m_243124_(new ClientboundLoginCompressionPacket(this.f_10018_.m_6328_()), PacketSendListener.m_243092_(() -> {
 @@ -112,7 +_,7 @@
           ServerPlayer serverplayer = this.f_10018_.m_6846_().m_11259_(this.f_10021_.getId());
  

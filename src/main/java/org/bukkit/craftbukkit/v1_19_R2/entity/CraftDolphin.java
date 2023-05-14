@@ -2,7 +2,7 @@ package org.bukkit.craftbukkit.v1_19_R2.entity;
 
 import org.bukkit.craftbukkit.v1_19_R2.CraftServer;
 import org.bukkit.entity.Dolphin;
-import org.bukkit.entity.EntityType;
+
 
 public class CraftDolphin extends CraftWaterMob implements Dolphin {
 
@@ -18,10 +18,5 @@ public class CraftDolphin extends CraftWaterMob implements Dolphin {
     @Override
     public String toString() {
         return "CraftDolphin";
-    }
-
-    @Override
-    public EntityType getType() {
-        return EntityType.DOLPHIN;
     }
 }
