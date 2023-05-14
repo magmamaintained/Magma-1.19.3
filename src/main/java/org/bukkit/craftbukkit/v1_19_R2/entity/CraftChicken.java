@@ -2,7 +2,7 @@ package org.bukkit.craftbukkit.v1_19_R2.entity;
 
 import org.bukkit.craftbukkit.v1_19_R2.CraftServer;
 import org.bukkit.entity.Chicken;
-import org.bukkit.entity.EntityType;
+
 
 public class CraftChicken extends CraftAnimals implements Chicken {
 
@@ -18,10 +18,5 @@ public class CraftChicken extends CraftAnimals implements Chicken {
     @Override
     public String toString() {
         return "CraftChicken";
-    }
-
-    @Override
-    public EntityType getType() {
-        return EntityType.CHICKEN;
     }
 }

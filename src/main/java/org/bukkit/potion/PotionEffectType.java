@@ -4,6 +4,8 @@ import com.google.common.base.Preconditions;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
+
 import org.bukkit.Color;
 import org.bukkit.Keyed;
 import org.bukkit.NamespacedKey;
@@ -187,6 +189,10 @@ public abstract class PotionEffectType implements Keyed {
 
     private final int id;
     private final NamespacedKey key;
+    public static final PotionEffectType[] byId = new PotionEffectType[1250];
+    public static final Map<String, PotionEffectType> byName = new HashMap<>();
+    public static final Map<NamespacedKey, PotionEffectType> byKey = new HashMap<>();
+    private static boolean acceptingNew = true;
 
     protected PotionEffectType(int id, @NotNull NamespacedKey key) {
         this.id = id;
@@ -281,12 +287,6 @@ public abstract class PotionEffectType implements Keyed {
         return "PotionEffectType[" + id + ", " + getName() + "]";
     }
 
-    private static final PotionEffectType[] byId = new PotionEffectType[34];
-    private static final Map<String, PotionEffectType> byName = new HashMap<String, PotionEffectType>();
-    private static final Map<NamespacedKey, PotionEffectType> byKey = new HashMap<NamespacedKey, PotionEffectType>();
-    // will break on updates.
-    private static boolean acceptingNew = true;
-
     /**
      * Gets the PotionEffectType at the specified key
      *
@@ -346,6 +346,10 @@ public abstract class PotionEffectType implements Keyed {
         byKey.put(type.key, type);
     }
 
+    public static void startAcceptingRegistrations() {
+        acceptingNew = true;
+    }
+
     /**
      * Stops accepting any effect type registrations.
      */
@@ -361,6 +365,6 @@ public abstract class PotionEffectType implements Keyed {
      */
     @NotNull
     public static PotionEffectType[] values() {
-        return Arrays.copyOfRange(byId, 1, byId.length);
+        return Arrays.stream(Arrays.copyOfRange(byId, 1, byId.length)).filter(Objects::nonNull).toArray(PotionEffectType[]::new);
     }
 }

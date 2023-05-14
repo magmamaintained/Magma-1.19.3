@@ -25,7 +25,7 @@
  import net.minecraft.world.level.entity.EntityAccess;
  import net.minecraft.world.level.entity.EntityInLevelCallback;
  import net.minecraft.world.level.gameevent.DynamicGameEventListener;
-@@ -116,9 +_,55 @@
+@@ -116,9 +_,75 @@
  import net.minecraft.world.phys.shapes.VoxelShape;
  import net.minecraft.world.scores.PlayerTeam;
  import net.minecraft.world.scores.Team;
@@ -36,6 +36,7 @@
 +import org.bukkit.command.CommandSender;
 +import org.bukkit.craftbukkit.v1_19_R2.CraftWorld;
 +import org.bukkit.craftbukkit.v1_19_R2.entity.CraftEntity;
++import org.bukkit.craftbukkit.v1_19_R2.entity.CraftHumanEntity;
 +import org.bukkit.craftbukkit.v1_19_R2.entity.CraftPlayer;
 +import org.bukkit.craftbukkit.v1_19_R2.event.CraftEventFactory;
 +import org.bukkit.craftbukkit.v1_19_R2.CraftServer;
@@ -70,6 +71,25 @@
 +      }
 +      return bukkitEntity;
 +   }
++
++   //Magma start - make it possible to reset the entity
++   public void resetBukkitEntity() {
++      CraftEntity temp = getBukkitEntity();
++
++      this.bukkitEntity = null;
++      getBukkitEntity();
++
++      if (bukkitEntity instanceof CraftPlayer player)
++         player.setFirstPlayed(((CraftPlayer) temp).getFirstPlayed());
++
++      if (bukkitEntity instanceof CraftHumanEntity human) //Keep perms on reset
++         human.setPerm(((CraftHumanEntity) temp).getPerm());
++   }
++
++   public void setBukkitEntity(CraftEntity bukkitEntity) {
++      this.bukkitEntity = bukkitEntity;
++   }
++   //Magma end
 +
 +   @Override
 +   public CommandSender getBukkitSender(CommandSourceStack wrapper) {

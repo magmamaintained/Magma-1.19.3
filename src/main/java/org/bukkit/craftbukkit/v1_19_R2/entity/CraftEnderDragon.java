@@ -9,7 +9,6 @@ import org.bukkit.craftbukkit.v1_19_R2.CraftServer;
 import org.bukkit.craftbukkit.v1_19_R2.boss.CraftDragonBattle;
 import org.bukkit.entity.ComplexEntityPart;
 import org.bukkit.entity.EnderDragon;
-import org.bukkit.entity.EntityType;
 
 import java.util.Set;
 
@@ -38,11 +37,6 @@ public class CraftEnderDragon extends CraftMob implements EnderDragon {
     @Override
     public String toString() {
         return "CraftEnderDragon";
-    }
-
-    @Override
-    public EntityType getType() {
-        return EntityType.ENDER_DRAGON;
     }
 
     @Override

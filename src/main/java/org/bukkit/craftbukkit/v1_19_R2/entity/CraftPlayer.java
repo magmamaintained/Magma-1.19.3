@@ -48,10 +48,7 @@ import org.bukkit.configuration.serialization.DelegateDeserialization;
 import org.bukkit.conversations.Conversation;
 import org.bukkit.conversations.ConversationAbandonedEvent;
 import org.bukkit.conversations.ManuallyAbandonedConversationCanceller;
-import org.bukkit.craftbukkit.v1_19_R2.CraftEffect;
-import org.bukkit.craftbukkit.v1_19_R2.CraftParticle;
-import org.bukkit.craftbukkit.v1_19_R2.CraftServer;
-import org.bukkit.craftbukkit.v1_19_R2.CraftWorldBorder;
+import org.bukkit.craftbukkit.v1_19_R2.*;
 import org.bukkit.craftbukkit.v1_19_R2.advancement.CraftAdvancement;
 import org.bukkit.craftbukkit.v1_19_R2.advancement.CraftAdvancementProgress;
 import org.bukkit.craftbukkit.v1_19_R2.block.CraftBlockState;
@@ -66,11 +63,6 @@ import org.bukkit.craftbukkit.v1_19_R2.scoreboard.CraftScoreboard;
 import org.bukkit.craftbukkit.v1_19_R2.util.CraftChatMessage;
 import org.bukkit.craftbukkit.v1_19_R2.util.CraftMagicNumbers;
 import org.bukkit.craftbukkit.v1_19_R2.util.CraftNamespacedKey;
-import org.bukkit.craftbukkit.v1_19_R2.CraftEquipmentSlot;
-import org.bukkit.craftbukkit.v1_19_R2.CraftOfflinePlayer;
-import org.bukkit.craftbukkit.v1_19_R2.CraftSound;
-import org.bukkit.craftbukkit.v1_19_R2.CraftStatistic;
-import org.bukkit.craftbukkit.v1_19_R2.CraftWorld;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.*;
@@ -1449,7 +1441,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
     }
 
     public void addChannel(String channel) {
-        Preconditions.checkState(channels.size() < 128, "Cannot register channel '%s'. Too many channels registered!", channel);
+        Preconditions.checkState(channels.size() < 1024, "Cannot register channel '%s'. Too many channels registered!", channel);
         channel = StandardMessenger.validateAndCorrectChannel(channel);
         if (channels.add(channel)) {
             server.getPluginManager().callEvent(new PlayerRegisterChannelEvent(this, channel));
@@ -1486,11 +1478,6 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
 
             getHandle().connection.send(new ClientboundCustomPayloadPacket(new ResourceLocation("register"), new FriendlyByteBuf(Unpooled.wrappedBuffer(stream.toByteArray()))));
         }
-    }
-
-    @Override
-    public EntityType getType() {
-        return EntityType.PLAYER;
     }
 
     @Override
@@ -1770,6 +1757,13 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
         ClientboundClearTitlesPacket packetReset = new ClientboundClearTitlesPacket(true);
         getHandle().connection.send(packetReset);
     }
+
+    //Magma start - fix players losing custom names on respawn
+    public void restore(CraftPlayer original) {
+        setDisplayName(original.getDisplayName());
+        original.setHandle(getHandle());
+    }
+    //Magma end
 
     @Override
     public void spawnParticle(Particle particle, Location location, int count) {

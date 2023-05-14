@@ -84,9 +84,8 @@ public class ServerInitHelper {
                     StringBuilder tmp = new StringBuilder();
 
                     for (String s : split) {
-                        //TODO: Add our own versions of these libraries
-                        /*if (s.startsWith("libraries/com/mojang/brigadier"))
-                            continue;*/
+                        if (s.startsWith("libraries/com/mojang/brigadier"))
+                            continue;
                         if (s.startsWith("libraries/com/mojang/datafixerupper"))
                             continue;
 

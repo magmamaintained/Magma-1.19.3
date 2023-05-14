@@ -72,6 +72,7 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.server.ServerLifecycleHooks;
 import org.jetbrains.annotations.Nullable;
+import org.magmafoundation.magma.craftbukkit.entity.CraftFakePlayer;
 
 /**
  * A basic fake server player implementation that can be used to simulate player actions.
@@ -82,6 +83,10 @@ public class FakePlayer extends ServerPlayer
     {
         super(level.getServer(), level, name);
         this.connection = new FakePlayerNetHandler(level.getServer(), this);
+    }
+
+    public CraftFakePlayer getBukkitEntity() {
+        return (CraftFakePlayer) super.getBukkitEntity();
     }
 
     @Override public void displayClientMessage(Component chatComponent, boolean actionBar) { }

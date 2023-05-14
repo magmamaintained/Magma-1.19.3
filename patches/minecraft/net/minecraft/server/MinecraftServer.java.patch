@@ -72,7 +72,7 @@
  import net.minecraft.util.profiling.EmptyProfileResults;
  import net.minecraft.util.profiling.ProfileResults;
  import net.minecraft.util.profiling.ProfilerFiller;
-@@ -136,1624 +_,2183 @@
+@@ -136,1624 +_,2184 @@
  import net.minecraft.world.level.WorldDataConfiguration;
  import net.minecraft.world.level.biome.BiomeManager;
  import net.minecraft.world.level.block.Block;
@@ -2825,6 +2825,7 @@
 +    }).thenAcceptAsync((p_248090_) -> {
 +      this.f_129740_.close();
 +      this.f_129740_ = p_248090_;
++      this.server.doSync(p_248090_.f_206585_().f_206847_); //Magma - sync forge commands
 +      this.f_129730_.m_10509_(p_129862_);
 +      WorldDataConfiguration worlddataconfiguration =
 +          new WorldDataConfiguration(m_129817_(this.f_129730_), this.f_129749_.m_247623_());

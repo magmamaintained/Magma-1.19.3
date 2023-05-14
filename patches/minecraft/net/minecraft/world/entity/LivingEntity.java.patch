@@ -35,7 +35,7 @@
  import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
  import net.minecraft.network.protocol.game.ClientboundAnimatePacket;
  import net.minecraft.network.protocol.game.ClientboundEntityEventPacket;
-@@ -74,8 +_,8 @@
+@@ -74,10 +_,11 @@
  import net.minecraft.world.entity.ai.attributes.Attributes;
  import net.minecraft.world.entity.ai.attributes.DefaultAttributes;
  import net.minecraft.world.entity.ai.targeting.TargetingConditions;
@@ -44,8 +44,11 @@
 -import net.minecraft.world.entity.animal.Wolf;
  import net.minecraft.world.entity.boss.wither.WitherBoss;
  import net.minecraft.world.entity.item.ItemEntity;
++import net.minecraft.world.entity.player.Inventory;
  import net.minecraft.world.entity.player.Player;
-@@ -117,14 +_,25 @@
+ import net.minecraft.world.entity.projectile.AbstractArrow;
+ import net.minecraft.world.food.FoodProperties;
+@@ -117,14 +_,26 @@
  import net.minecraft.world.phys.HitResult;
  import net.minecraft.world.phys.Vec3;
  import net.minecraft.world.scores.PlayerTeam;
@@ -58,6 +61,7 @@
 +import org.bukkit.craftbukkit.v1_19_R2.inventory.CraftItemStack;
 +import org.bukkit.event.entity.*;
 +import org.bukkit.event.player.PlayerItemConsumeEvent;
++import org.magmafoundation.magma.forge.ForgeInventoryHelper;
  import org.slf4j.Logger;
  
 -public abstract class LivingEntity extends Entity {
@@ -746,8 +750,19 @@
                 this.f_19853_.m_7967_(itementity);
              }
           }
-@@ -1309,30 +_,59 @@
+@@ -1307,32 +_,69 @@
+       }
+    }
  
++   //Magma start - rewrite
++   private Inventory forgeCaptures = null;
++
++   protected Inventory getForgeCaptures() {
++      Inventory temp = forgeCaptures;
++      forgeCaptures = null;
++      return temp;
++   }
++
     protected void m_6668_(DamageSource p_21192_) {
        Entity entity = p_21192_.m_7639_();
 -      int i;
@@ -767,19 +782,19 @@
           this.m_7625_(p_21192_, flag);
           this.m_7472_(p_21192_, i, flag);
        }
-+      // CraftBukkit start - Call death event
-+      CraftEventFactory.callEntityDeathEvent(this, this.drops);
-+      this.drops = new ArrayList<>();
-+      // CraftBukkit end
++      Collection<ItemEntity> drops = captureDrops(null);
++      this.expToDrop = this.getExpReward();
  
 -      this.m_5907_();
-+      // this.dropEquipment();// CraftBukkit - moved up
-       this.m_21226_();
-+
-+      Collection<ItemEntity> drops = captureDrops(null);
-+      if (!net.minecraftforge.common.ForgeHooks.onLivingDrops(this, p_21192_, drops, i, f_20889_ > 0))
-+         drops.forEach(e -> f_19853_.m_7967_(e));
+-      this.m_21226_();
++      ForgeInventoryHelper.capturePlayerInventory(this);
++      if (!net.minecraftforge.common.ForgeHooks.onLivingDrops(this, p_21192_, drops, i, f_20889_ > 0)) {
++         drops.forEach(drop -> this.drops.add(CraftItemStack.asCraftMirror(drop.m_32055_())));
++         CraftEventFactory.callEntityDeathEvent(this, this.drops);
++      }
++      forgeCaptures = ForgeInventoryHelper.restorePlayerInventory(this);
     }
++   //Magma end
  
     protected void m_5907_() {
     }
