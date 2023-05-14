@@ -29,7 +29,7 @@
  import net.minecraft.server.level.ServerPlayer;
  import net.minecraft.util.Mth;
  import net.minecraft.world.Container;
-@@ -29,6 +_,12 @@
+@@ -29,6 +_,13 @@
  import net.minecraft.world.item.ItemStack;
  import net.minecraft.world.level.block.Block;
  import net.minecraft.world.level.block.entity.BlockEntity;
@@ -39,22 +39,39 @@
 +import org.bukkit.event.inventory.InventoryDragEvent;
 +import org.bukkit.event.inventory.InventoryType;
 +import org.bukkit.inventory.InventoryView;
++import org.magmafoundation.magma.helpers.InventoryViewHelper;
  import org.slf4j.Logger;
  
  public abstract class AbstractContainerMenu {
-@@ -60,6 +_,27 @@
+@@ -60,6 +_,43 @@
     private ContainerSynchronizer f_150397_;
     private boolean f_150398_;
  
-+   // CraftBukkit start
++   //Magma - change this from CraftInventoryView to InventoryView
++   private InventoryView bukkitView = null;
 +   public boolean checkReachable = true;
-+   public abstract InventoryView getBukkitView();
++
++   //Magma - this should not be abstract
++   public InventoryView getBukkitView(){
++      if (bukkitView == null) {
++         bukkitView = InventoryViewHelper.createInvView((AbstractContainerMenu) (Object) this);
++      }
++      return bukkitView;
++   }
++
++   //Magma - catch npe if source or destination is null
 +   public void transferTo(AbstractContainerMenu other, org.bukkit.craftbukkit.v1_19_R2.entity.CraftHumanEntity player) {
 +      InventoryView source = this.getBukkitView(), destination = other.getBukkitView();
-+      ((CraftInventory) source.getTopInventory()).getInventory().onClose(player);
-+      ((CraftInventory) source.getBottomInventory()).getInventory().onClose(player);
-+      ((CraftInventory) destination.getTopInventory()).getInventory().onOpen(player);
-+      ((CraftInventory) destination.getBottomInventory()).getInventory().onOpen(player);
++      try {
++         if (source != null) {
++            ((CraftInventory) source.getTopInventory()).getInventory().onClose(player);
++            ((CraftInventory) source.getBottomInventory()).getInventory().onClose(player);
++         }
++         if (destination != null) {
++            ((CraftInventory) destination.getTopInventory()).getInventory().onOpen(player);
++            ((CraftInventory) destination.getBottomInventory()).getInventory().onOpen(player);
++         }
++      } catch (AbstractMethodError ignored) {}
 +   }
 +   private Component title;
 +   public final Component getTitle() {
