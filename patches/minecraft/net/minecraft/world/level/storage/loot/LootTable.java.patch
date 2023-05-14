@@ -61,7 +61,7 @@
        }
  
        for(int j = 0; j < this.f_79110_.length; ++j) {
-@@ -107,8 +_,23 @@
+@@ -107,8 +_,30 @@
     }
  
     public void m_79123_(Container p_79124_, LootContext p_79125_) {
@@ -74,14 +74,21 @@
        ObjectArrayList<ItemStack> objectarraylist = this.m_230922_(p_79125_);
        RandomSource randomsource = p_79125_.m_230907_();
 +
-+      // CraftBukkit start
-+      LootGenerateEvent event = CraftEventFactory.callLootGenerateEvent(p_79124_, this, p_79125_, objectarraylist, plugin);
-+      if (event.isCancelled()) {
-+         return;
-+      }
-+      objectarraylist = event.getLoot().stream().map(CraftItemStack::asNMSCopy).collect(ObjectArrayList.toList());
-+      // CraftBukkit end
++      //Magma start - don't fire event if loot context has empty params
++      if (!p_79125_.isEmptyParams()) {
++         // CraftBukkit start
++         LootGenerateEvent event = CraftEventFactory.callLootGenerateEvent(p_79124_, this, p_79125_, objectarraylist, plugin);
 +
++         if (event != null) {
++            if (event.isCancelled()) {
++               return;
++            }
++            objectarraylist = event.getLoot().stream().map(CraftItemStack::asNMSCopy).collect(ObjectArrayList.toList());
++         }
++
++         // CraftBukkit end
++      }
++      //Magma end
        List<Integer> list = this.m_230919_(p_79124_, randomsource);
        this.m_230924_(objectarraylist, list.size(), randomsource);
  
