@@ -29,8 +29,10 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiFunction;
 
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.stats.Stats;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.entity.Entity;
@@ -103,6 +105,8 @@ public class ForgeInject {
     addForgeVillagerProfessions();
     debug("Injecting Forge statistics into bukkit");
     addForgeStatistics();
+    debug("Injecting Forge Environments into bukkit");
+    addForgeEnvironment(MinecraftServer.getServerInstance().registries().compositeAccess().registryOrThrow(Registries.LEVEL_STEM));
 
     debug("Injecting Forge into Bukkit: DONE");
 
