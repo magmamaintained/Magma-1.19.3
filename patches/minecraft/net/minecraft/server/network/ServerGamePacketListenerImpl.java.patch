@@ -93,7 +93,7 @@
  import net.minecraft.world.level.GameRules;
  import net.minecraft.world.level.GameType;
  import net.minecraft.world.level.Level;
-@@ -169,1559 +_,2937 @@
+@@ -169,1559 +_,2940 @@
  import net.minecraft.world.level.block.entity.JigsawBlockEntity;
  import net.minecraft.world.level.block.entity.SignBlockEntity;
  import net.minecraft.world.level.block.entity.StructureBlockEntity;
@@ -3450,8 +3450,10 @@
 +          this.m_247189_(p_215225_.f_237922_(), p_215225_.f_237923_(), p_215225_.f_241638_());
 +      if (optional.isPresent()) {
 +        this.f_9745_.m_18707_(() -> {
-+          this.m_246958_(p_215225_, optional.get());
-+          this.detectRateSpam("/" + p_215225_.f_237922_()); // Spigot
++          String command = "/" + p_215225_.f_237922_();
++          this.handleCommand(command); //Magma
++          //this.performChatCommand(p_215225_, optional.get());
++          this.detectRateSpam(command); // Spigot
 +        });
 +      }
 +
@@ -3459,20 +3461,22 @@
 +  }
 +
 +  private void m_246958_(ServerboundChatCommandPacket p_251139_, LastSeenMessages p_250484_) {
-+    // CraftBukkit start
 +    String command = "/" + p_251139_.f_237922_();
 +    ServerGamePacketListenerImpl.f_9744_.info(this.f_9743_.m_6302_() + " issued server command: " + command);
++
 +    PlayerCommandPreprocessEvent event =
 +        new PlayerCommandPreprocessEvent(getCraftPlayer(), command, new LazyPlayerSet(f_9745_));
 +    this.cserver.getPluginManager().callEvent(event);
++
 +    if (event.isCancelled()) {
 +      return;
 +    }
 +    command = event.getMessage().substring(1);
++
 +    ParseResults<CommandSourceStack> parseresults = this.m_242658_(command);
-+    // CraftBukkit end
 +
 +    Map<String, PlayerChatMessage> map;
++
 +    try {
 +      map = (p_251139_.f_237922_().equals(command)) ?
 +          this.m_246206_(p_251139_, SignableCommand.m_246497_(parseresults), p_250484_) :
@@ -3483,9 +3487,8 @@
 +    }
 +
 +    CommandSigningContext commandsigningcontext = new CommandSigningContext.SignedArguments(map);
-+    parseresults = Commands.m_242611_(parseresults, (p_242749_) -> {
-+      return p_242749_.m_230893_(commandsigningcontext);
-+    });
++
++    parseresults = Commands.m_242611_(parseresults, (p_242749_) -> p_242749_.m_230893_(commandsigningcontext));
 +    this.f_9745_.m_129892_().m_242674_(parseresults, command); // CraftBukkit
 +  }
 +

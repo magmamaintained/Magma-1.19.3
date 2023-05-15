@@ -39,9 +39,9 @@ public class ShortenedStackTrace {
 
     public void print() {
         if (cause.getMessage() != null || !cause.getMessage().isEmpty())
-            System.out.println(cause.getMessage());
+            System.err.println(cause.getMessage());
         for (int i = 0; i < maxElements; i++) {
-            System.out.println(stackTrace[i]);
+            System.err.println(stackTrace[i]);
         }
     }
 }
