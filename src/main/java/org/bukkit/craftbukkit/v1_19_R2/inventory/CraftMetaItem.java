@@ -2,14 +2,8 @@ package org.bukkit.craftbukkit.v1_19_R2.inventory;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableMultimap;
-import com.google.common.collect.LinkedHashMultimap;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Multimap;
-import com.google.common.collect.SetMultimap;
-import com.google.common.collect.Sets;
+import com.google.common.collect.*;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -46,6 +40,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.BlockItem;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.EnumUtils;
+import org.apache.logging.log4j.LogManager;
 import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
@@ -286,6 +281,42 @@ class CraftMetaItem implements ItemMeta, Damageable, Repairable, BlockDataMeta {
 
     private int version = CraftMagicNumbers.INSTANCE.getDataVersion(); // Internal use only
 
+    //Magma start - this is a list of nbt tags that don't get removed when CraftItemStack.setItemMeta gets called, add things to this list to prevent them from getting removed
+    private static final Set<String> EXTEND_TAGS = ImmutableSet.of(
+            //EvilCraft
+            "Name",
+            //Create
+            "Items",
+            "Schedule",
+            //The rest
+            "map_is_scaling",
+            "map",
+            "CustomPotionEffects",
+            "Potion",
+            "CustomPotionColor",
+            "SkullOwner",
+            "SkullProfile",
+            "EntityTag",
+            "BlockEntityTag",
+            "title",
+            "author",
+            "pages",
+            "resolved",
+            "generation",
+            "Fireworks",
+            "StoredEnchantments",
+            "Explosion",
+            "Recipes",
+            "BucketVariantTag",
+            "Charged",
+            "ChargedProjectiles",
+            "Effects",
+            "LodestoneDimension",
+            "LodestonePos",
+            "LodestoneTracked"
+    );
+    //Magma end
+
     CraftMetaItem(CraftMetaItem meta) {
         if (meta == null) {
             return;
@@ -322,9 +353,22 @@ class CraftMetaItem implements ItemMeta, Damageable, Repairable, BlockDataMeta {
         }
 
         this.version = meta.version;
+
+        //Magma start
+        CompoundTag forgeCaps = meta.getForgeCaps();
+        if (forgeCaps != null) {
+            this.forgeCaps = forgeCaps.copy();
+        }
+        //Magma end
     }
 
     CraftMetaItem(CompoundTag tag) {
+        //Magma start
+        if (tag == null) {
+            tag = new CompoundTag();
+        }
+        //Magma end
+
         if (tag.contains(DISPLAY.NBT)) {
             CompoundTag display = tag.getCompound(DISPLAY.NBT);
 
@@ -384,6 +428,36 @@ class CraftMetaItem implements ItemMeta, Damageable, Repairable, BlockDataMeta {
             }
         }
     }
+
+    //Magma start - add forge caps and manage unhandled tags
+    private CompoundTag forgeCaps;
+
+    public void setForgeCaps(CompoundTag forgeCaps) {
+        this.forgeCaps = forgeCaps;
+    }
+
+    public CompoundTag getForgeCaps() {
+        return forgeCaps;
+    }
+
+    public void offerUnhandledTags(CompoundTag nbt) { //Code copied from Arclight
+        if (getClass().equals(CraftMetaItem.class)) {
+            for (String s : nbt.getAllKeys()) {
+                if (EXTEND_TAGS.contains(s)) {
+                    this.unhandledTags.put(s, nbt.get(s));
+                }
+            }
+        }
+    }
+
+    public void setUnhandledTags(Map<String, Tag> unhandledTags) {
+        this.unhandledTags.putAll(unhandledTags);
+    }
+
+    public Map<String, Tag> getUnhandledTags() {
+        return unhandledTags;
+    }
+    //Magma end
 
     static Map<Enchantment, Integer> buildEnchantments(CompoundTag tag, ItemMetaKey key) {
         if (!tag.contains(key.NBT)) {
@@ -522,7 +596,7 @@ class CraftMetaItem implements ItemMeta, Damageable, Repairable, BlockDataMeta {
                 deserializeInternal(internalTag, map);
                 Set<String> keys = internalTag.getAllKeys();
                 for (String key : keys) {
-                    if (!getHandledTags().contains(key)) {
+                    if (!forceDeserializeInternalTags(getHandledTags(), key)) { //Magma - forceDeserializeInternalTags
                         unhandledTags.put(key, internalTag.get(key));
                     }
                 }
@@ -535,7 +609,34 @@ class CraftMetaItem implements ItemMeta, Damageable, Repairable, BlockDataMeta {
         if (nbtMap != null) {
             this.persistentDataContainer.putAll((CompoundTag) CraftNBTTagConfigSerializer.deserialize(nbtMap));
         }
+
+        //Magma start
+        if (map.containsKey("forgeCaps")) {
+            Object forgeCaps = map.get("forgeCaps");
+            try {
+                ByteArrayInputStream buf = new ByteArrayInputStream(Base64.getDecoder().decode(forgeCaps.toString()));
+                this.forgeCaps = NbtIo.readCompressed(buf);
+            } catch (IOException e) {
+                LogManager.getLogger(getClass()).error("Reading forge caps", e);
+            }
+        }
+        //Magma end
     }
+
+    //Magma start - copied from Arclight
+    private boolean forceDeserializeInternalTags(Set<String> handledTags, Object key) {
+        if (this instanceof CraftMetaItem) {
+            // For mod items or vanilla items that usually don't depend on nbt tags,
+            // force internal tags to be deserialized into item nbt to avoid their vanilla tags being ignored by Bukkit.
+            // e.g. apotheosis:potion_charm{"Potion": "<effect id>"} or minecraft:bread{"Potion": "<effect id>"}
+            return false;
+        } else {
+            // For items that has corresponding ItemMeta representation in Bukkit,
+            // keep their behavior unchanged.
+            return handledTags.contains((String) key);
+        }
+    }
+    //Magma end
 
     void deserializeInternal(CompoundTag tag, Object context) {
         // SPIGOT-4576: Need to migrate from internal to proper data
@@ -741,6 +842,11 @@ class CraftMetaItem implements ItemMeta, Damageable, Repairable, BlockDataMeta {
 
     @Overridden
     boolean isEmpty() {
+        //Magma start
+        if (this.getForgeCaps() != null && !this.getForgeCaps().isEmpty()) {
+            return false;
+        }
+        //Magma end
         return !(hasDisplayName() || hasLocalizedName() || hasEnchants() || (lore != null) || hasCustomModelData() || hasBlockData() || hasRepairCost() || !unhandledTags.isEmpty() || !persistentDataContainer.isEmpty() || hideFlag != 0 || isUnbreakable() || hasDamage() || hasAttributeModifiers());
     }
 
@@ -1134,6 +1240,15 @@ class CraftMetaItem implements ItemMeta, Damageable, Repairable, BlockDataMeta {
      */
     @Overridden
     boolean equalsCommon(CraftMetaItem that) {
+        //Magma start
+        CompoundTag forgeCaps = that.getForgeCaps();
+        boolean ret;
+        if (this.getForgeCaps() == null)
+            ret = forgeCaps != null && forgeCaps.size() != 0;
+        else
+            ret = forgeCaps == null ? this.getForgeCaps().size() != 0 : !this.getForgeCaps().equals(forgeCaps);
+        if (ret) return false;
+        //Magma end
         return ((this.hasDisplayName() ? that.hasDisplayName() && this.displayName.equals(that.displayName) : !that.hasDisplayName()))
                 && (this.hasLocalizedName() ? that.hasLocalizedName() && this.locName.equals(that.locName) : !that.hasLocalizedName())
                 && (this.hasEnchants() ? that.hasEnchants() && this.enchantments.equals(that.enchantments) : !that.hasEnchants())
@@ -1182,6 +1297,7 @@ class CraftMetaItem implements ItemMeta, Damageable, Repairable, BlockDataMeta {
         hash = 61 * hash + (hasDamage() ? this.damage : 0);
         hash = 61 * hash + (hasAttributeModifiers() ? this.attributeModifiers.hashCode() : 0);
         hash = 61 * hash + version;
+        hash = 61 * hash + (this.forgeCaps != null ? this.forgeCaps.hashCode() : 0); //Magma
         return hash;
     }
 
@@ -1206,6 +1322,15 @@ class CraftMetaItem implements ItemMeta, Damageable, Repairable, BlockDataMeta {
             clone.unbreakable = this.unbreakable;
             clone.damage = this.damage;
             clone.version = this.version;
+
+            //Magma start
+            if (this.getUnhandledTags() != null)
+                clone.setUnhandledTags(getUnhandledTags());
+
+            if (this.getForgeCaps() != null)
+                clone.setForgeCaps(this.getForgeCaps().copy());
+            //Magma end
+
             return clone;
         } catch (CloneNotSupportedException e) {
             throw new Error(e);
@@ -1282,6 +1407,18 @@ class CraftMetaItem implements ItemMeta, Damageable, Repairable, BlockDataMeta {
         if (!persistentDataContainer.isEmpty()) { // Store custom tags, wrapped in their compound
             builder.put(BUKKIT_CUSTOM_TAG.BUKKIT, persistentDataContainer.serialize());
         }
+
+        //Magma start
+        if (this.forgeCaps != null) {
+            try {
+                ByteArrayOutputStream buf = new ByteArrayOutputStream();
+                NbtIo.writeCompressed(this.forgeCaps, buf);
+                builder.put("forgeCaps", Base64.getEncoder().encodeToString(buf.toByteArray()));
+            } catch (IOException e) {
+                Logger.getLogger(CraftMetaItem.class.getName()).log(Level.SEVERE, null, e);
+            }
+        }
+        //Magma end
 
         return builder;
     }
