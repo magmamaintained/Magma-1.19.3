@@ -4457,11 +4457,11 @@
 +  private static final ResourceKey CUSTOM_REGISTER = new ResourceKey(new ResourceLocation("minecraft"), new ResourceLocation("register"));
 +  private static final ResourceKey CUSTOM_UNREGISTER = new ResourceKey(new ResourceLocation("minecraft"), new ResourceLocation("unregister"));
 +  public void m_7423_(ServerboundCustomPayloadPacket p_9860_) {
-+    net.minecraftforge.network.NetworkHooks.onCustomPayload(p_9860_, this.f_9742_);
 +    PacketUtils.m_131359_(p_9860_, this, this.f_9743_.m_9236_());
-+    ByteBuf copy = p_9860_.m_179590_().copy();
-+    var buf = new byte[copy.readableBytes()];
-+    copy.readBytes(buf);
++    var readerIndex = p_9860_.f_133981_.readerIndex();
++    var buf = new byte[p_9860_.f_133981_.readableBytes()];
++    p_9860_.f_133981_.readBytes(buf);
++    p_9860_.f_133981_.readerIndex(readerIndex);
 +    ServerLifecycleHooks.getCurrentServer().m_201446_(() -> {
 +      if (ServerLifecycleHooks.getCurrentServer().hasStopped() || processedDisconnect)
 +        return;
@@ -4499,7 +4499,7 @@
 +        }
 +      }
 +    });
-+    net.minecraftforge.network.NetworkHooks.onCustomPayload( p_9860_, this.f_9742_ );
++    net.minecraftforge.network.NetworkHooks.onCustomPayload(p_9860_, this.f_9742_);
 +  }
 +
 +

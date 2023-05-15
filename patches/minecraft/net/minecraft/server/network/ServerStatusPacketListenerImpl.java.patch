@@ -24,13 +24,16 @@
  
  public class ServerStatusPacketListenerImpl implements ServerStatusPacketListener {
     private static final Component f_10081_ = Component.m_237115_("multiplayer.status.request_handled");
-@@ -33,6 +_,45 @@
+@@ -32,7 +_,47 @@
+          this.f_10083_.m_129507_(f_10081_);
        } else {
           this.f_10084_ = true;
-          this.f_10083_.m_129512_(new ClientboundStatusResponsePacket(this.f_10082_.m_129928_()));
+-         this.f_10083_.m_129512_(new ClientboundStatusResponsePacket(this.f_10082_.m_129928_()));
 +
 +         // CraftBukkit start
++         //this.connection.send(new ClientboundStatusResponsePacket(this.server.getStatus()));
 +         final Object[] players = f_10082_.m_6846_().f_11196_.toArray();
++
 +         ServerListPingEventImpl event = new ServerListPingEventImpl(f_10083_, f_10082_);
 +         this.f_10082_.server.getPluginManager().callEvent(event);
 +

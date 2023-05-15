@@ -72,7 +72,7 @@
  import net.minecraft.util.profiling.EmptyProfileResults;
  import net.minecraft.util.profiling.ProfileResults;
  import net.minecraft.util.profiling.ProfilerFiller;
-@@ -136,1624 +_,2184 @@
+@@ -136,1624 +_,2188 @@
  import net.minecraft.world.level.WorldDataConfiguration;
  import net.minecraft.world.level.biome.BiomeManager;
  import net.minecraft.world.level.block.Block;
@@ -1410,6 +1410,10 @@
 +  }
 +
 +  public boolean m_130010_() {
++    return this.f_129764_;
++  }
++
++  public boolean m_130009_() { //Magma - essentials is weird
 +    return this.f_129764_;
 +  }
 +

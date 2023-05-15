@@ -22,7 +22,7 @@
  import net.minecraft.server.WorldStem;
  import net.minecraft.server.gui.MinecraftServerGui;
  import net.minecraft.server.level.ServerLevel;
-@@ -51,477 +_,636 @@
+@@ -51,477 +_,641 @@
  import net.minecraft.world.level.Level;
  import net.minecraft.world.level.block.entity.SkullBlockEntity;
  import net.minecraft.world.level.storage.LevelStorageSource;
@@ -33,6 +33,7 @@
 +import org.bukkit.craftbukkit.v1_19_R2.SpigotTimings;
 +import org.bukkit.event.server.RemoteServerCommandEvent;
 +import org.bukkit.event.server.ServerCommandEvent;
++import org.magmafoundation.magma.configuration.MagmaConfig;
 +import org.magmafoundation.magma.protect.InjectProtect;
  import org.slf4j.Logger;
  
@@ -629,6 +630,10 @@
 +    org.spigotmc.SpigotConfig.init((java.io.File) options.valueOf("spigot-settings"));
 +    org.spigotmc.SpigotConfig.registerCommands();
 +    // Spigot end
++
++    // Magma start
++    MagmaConfig.instance.registerCommands();
++    // Magma end
 +
 +    this.m_129997_(dedicatedserverproperties.f_139733_);
 +    this.m_129999_(dedicatedserverproperties.f_139734_);
