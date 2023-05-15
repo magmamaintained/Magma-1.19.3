@@ -72,7 +72,7 @@
  import net.minecraft.util.profiling.EmptyProfileResults;
  import net.minecraft.util.profiling.ProfileResults;
  import net.minecraft.util.profiling.ProfilerFiller;
-@@ -136,1624 +_,2188 @@
+@@ -136,1624 +_,2189 @@
  import net.minecraft.world.level.WorldDataConfiguration;
  import net.minecraft.world.level.biome.BiomeManager;
  import net.minecraft.world.level.block.Block;
@@ -1413,8 +1413,9 @@
 +    return this.f_129764_;
 +  }
 +
-+  public boolean m_130009_() { //Magma - Essentials is weird
-+    return m_130010_();
++  //FIXME: Essentials does not detect this method
++  public boolean v() {
++    return this.f_129764_;
 +  }
 +
 +  public void m_7570_(boolean p_129884_) {
