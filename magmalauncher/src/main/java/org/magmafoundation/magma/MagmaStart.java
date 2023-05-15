@@ -82,11 +82,7 @@ public class MagmaStart {
         containsArg("-nojline"); //For some reason when passing -nojline to the console the whole thing crashes, remove this
 
         BetterUI.printTitle(NAME, BRAND, System.getProperty("java.version") + " (" + System.getProperty("java.vendor") + ")", VERSION, BUKKIT_VERSION, FORGE_VERSION);
-
-        //Temporary warning for people using the new server jar
-        //System.err.println("WARNING: The new server jar is still under development and will be unstable! If you experience any issues, please report them to the developers.");
-        //System.err.println("WARNING: If the server crashes while installing, try removing the libraries folder and launching the server again.");
-        //Temporary warning for people using the new server jar
+        System.out.println("If the server crashes while installing, try removing the libraries folder and launching the server again.");
 
         if(!BetterUI.checkEula(eula)) System.exit(0);
 
