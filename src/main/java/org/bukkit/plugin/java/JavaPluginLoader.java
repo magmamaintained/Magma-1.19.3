@@ -302,6 +302,32 @@ public final class JavaPluginLoader implements PluginLoader, JavaPluginLoaderBri
                 }
             }
 
+            final CustomTimingsHandler timings = new CustomTimingsHandler("Plugin: " + plugin.getDescription().getFullName() + " Event: " + listener.getClass().getName() + "::" + method.getName() + "(" + eventClass.getSimpleName() + ")", pluginParentTimer); // Spigot
+            EventExecutor executor = new EventExecutor() {
+                @Override
+                public void execute(@NotNull Listener listener, @NotNull Event event) throws EventException {
+                    try {
+                        if (!eventClass.isAssignableFrom(event.getClass())) {
+                            return;
+                        }
+                        // Spigot start
+                        boolean isAsync = event.isAsynchronous();
+                        if (!isAsync) timings.startTiming();
+                        method.invoke(listener, event);
+                        if (!isAsync) timings.stopTiming();
+                        // Spigot end
+                    } catch (InvocationTargetException ex) {
+                        throw new EventException(ex.getCause());
+                    } catch (Throwable t) {
+                        throw new EventException(t);
+                    }
+                }
+            };
+            if (false) { // Spigot - RL handles useTimings check now
+                eventSet.add(new TimedRegisteredListener(listener, executor, eh.priority(), plugin, eh.ignoreCancelled()));
+            } else {
+                eventSet.add(new RegisteredListener(listener, executor, eh.priority(), plugin, eh.ignoreCancelled()));
+            }
         }
         return ret;
     }

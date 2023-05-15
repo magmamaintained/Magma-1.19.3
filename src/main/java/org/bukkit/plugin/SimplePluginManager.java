@@ -567,11 +567,11 @@ public final class SimplePluginManager implements PluginManager {
             if (server.isPrimaryThread()) {
                 throw new IllegalStateException(event.getEventName() + " cannot be triggered asynchronously from primary server thread.");
             }
-        } else {
+        }/* else { //Magma - removed as mods will throw errors
             if (!server.isPrimaryThread()) {
                 throw new IllegalStateException(event.getEventName() + " cannot be triggered asynchronously from another thread.");
             }
-        }
+        }*/
 
         fireEvent(event);
     }
