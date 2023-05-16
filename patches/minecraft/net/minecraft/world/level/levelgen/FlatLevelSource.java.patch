@@ -1,6 +1,6 @@
 --- a/net/minecraft/world/level/levelgen/FlatLevelSource.java
 +++ b/net/minecraft/world/level/levelgen/FlatLevelSource.java
-@@ -31,19 +_,22 @@
+@@ -31,9 +_,12 @@
        return p_255577_.group(FlatLevelGeneratorSettings.f_70347_.fieldOf("settings").forGetter(FlatLevelSource::m_64191_)).apply(p_255577_, p_255577_.stable(FlatLevelSource::new));
     });
     private final FlatLevelGeneratorSettings f_64165_;
@@ -15,15 +15,11 @@
        this.f_64165_ = p_256337_;
     }
  
--   public ChunkGeneratorStructureState m_255169_(HolderLookup<StructureSet> p_256602_, RandomState p_255830_, long p_256355_) {
-+   public ChunkGeneratorStructureState createState(HolderLookup<StructureSet> p_256602_, RandomState p_255830_, long p_256355_, org.spigotmc.SpigotWorldConfig conf) { // Spigot
-       Stream<Holder<StructureSet>> stream = this.f_64165_.m_209810_().map(HolderSet::m_203614_).orElseGet(() -> {
-          return p_256602_.m_214062_().map((p_255579_) -> {
+@@ -43,6 +_,7 @@
              return p_255579_;
           });
        });
--      return ChunkGeneratorStructureState.m_255343_(p_255830_, p_256355_, this.f_62137_, stream);
-+      return ChunkGeneratorStructureState.createForFlat(p_255830_, p_256355_, this.f_62137_, stream, conf); // Spigot
++      ChunkGeneratorStructureState.prepareForCreation(createState_conf); //Magma - remove from createForFlat
+       return ChunkGeneratorStructureState.m_255343_(p_255830_, p_256355_, this.f_62137_, stream);
     }
  
-    protected Codec<? extends ChunkGenerator> m_6909_() {

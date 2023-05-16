@@ -1,16 +1,24 @@
 --- a/net/minecraft/world/level/chunk/ChunkGenerator.java
 +++ b/net/minecraft/world/level/chunk/ChunkGenerator.java
-@@ -99,8 +_,8 @@
+@@ -99,9 +_,18 @@
  
     protected abstract Codec<? extends ChunkGenerator> m_6909_();
  
--   public ChunkGeneratorStructureState m_255169_(HolderLookup<StructureSet> p_256405_, RandomState p_256101_, long p_256018_) {
--      return ChunkGeneratorStructureState.m_255081_(p_256101_, p_256018_, this.f_62137_, p_256405_);
-+   public ChunkGeneratorStructureState createState(HolderLookup<StructureSet> p_256405_, RandomState p_256101_, long p_256018_, org.spigotmc.SpigotWorldConfig conf) { // Spigot
-+      return ChunkGeneratorStructureState.createForNormal(p_256101_, p_256018_, this.f_62137_, p_256405_, conf); // Spigot
++   //Magma start - remove spigot config from createState
++   protected @Nullable org.spigotmc.SpigotWorldConfig createState_conf;
++
++   public void prepare_createState(org.spigotmc.SpigotWorldConfig conf) {
++      this.createState_conf = conf;
++   }
++
+    public ChunkGeneratorStructureState m_255169_(HolderLookup<StructureSet> p_256405_, RandomState p_256101_, long p_256018_) {
++      ChunkGeneratorStructureState.prepareForCreation(createState_conf);
+       return ChunkGeneratorStructureState.m_255081_(p_256101_, p_256018_, this.f_62137_, p_256405_);
     }
++   //Magma end
  
     public Optional<ResourceKey<Codec<? extends ChunkGenerator>>> m_187743_() {
+       return BuiltInRegistries.f_256914_.m_7854_(this.m_6909_());
 @@ -264,6 +_,31 @@
           return false;
        }
