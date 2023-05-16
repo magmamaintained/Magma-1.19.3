@@ -229,6 +229,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
             name = getName();
         }
         getHandle().tabListDisplayName = name.equals(getName()) ? null : CraftChatMessage.fromStringOrNull(name);
+        getHandle().hasTabListName = true;
         for (ServerPlayer player : (List<ServerPlayer>) server.getHandle().players) {
             if (player.getBukkitEntity().canSee(this)) {
                 player.connection.send(new ClientboundPlayerInfoUpdatePacket(ClientboundPlayerInfoUpdatePacket.Action.UPDATE_DISPLAY_NAME, getHandle()));
