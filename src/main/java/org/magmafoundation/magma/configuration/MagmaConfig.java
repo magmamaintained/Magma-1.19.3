@@ -26,6 +26,7 @@ import org.magmafoundation.magma.configuration.value.Value;
 import org.magmafoundation.magma.configuration.value.values.BooleanValue;
 import org.magmafoundation.magma.configuration.value.values.IntValue;
 import org.magmafoundation.magma.configuration.value.values.StringArrayValue;
+import org.magmafoundation.magma.configuration.value.values.StringValue;
 
 import java.io.File;
 import java.io.IOException;
@@ -46,6 +47,8 @@ public class MagmaConfig extends ConfigBase {
     public final BooleanValue forgeBukkitPermissionHandlerEnable = new BooleanValue(this, "forge.bukkitPermissionHandler.enable", true, "Let's Bukkit permission plugins handle forge/modded commands");
     public final BooleanValue forgeCommandsIgnoreBukkitPerms = new BooleanValue(this, "forge.commandsIgnoreBukkitPerms", true, "If true, forge/modded commands will ignore Bukkit permission plugins and use Forge permissions instead, disable this to control forge commands with permission plugins like LuckPerms");
     public final BooleanValue magmaAutoUpdater = new BooleanValue(this, "magma.auto-update", true, "Auto updates the Magma jar");
+    public final BooleanValue paperVelocityEnabled = new BooleanValue(this, "paper.velocity.enabled", false, "Enabled support for Velocity modern forwarding");
+    public final StringValue paperVelocitySecret = new StringValue(this, "paper.velocity.secret", "", "Velocity Secret Key for modern forwarding");
 
     public final StringArrayValue fakePlayerPermissions = new StringArrayValue(this, "fakeplayer.permissions", "", "A list of permissions that fake players should have");
 

@@ -22,7 +22,7 @@
  import net.minecraft.server.WorldStem;
  import net.minecraft.server.gui.MinecraftServerGui;
  import net.minecraft.server.level.ServerLevel;
-@@ -51,477 +_,641 @@
+@@ -51,477 +_,647 @@
  import net.minecraft.world.level.Level;
  import net.minecraft.world.level.block.entity.SkullBlockEntity;
  import net.minecraft.world.level.storage.LevelStorageSource;
@@ -122,7 +122,173 @@
 -         return false;
 -      }
 -
--      if (!this.m_129797_()) {
++  static final Logger f_139598_ = LogUtils.getLogger();
++  private static final int f_142864_ = 5000;
++  private static final int f_142865_ = 2;
++  public final List<ConsoleInput> f_139600_ = Collections.synchronizedList(Lists.newArrayList());
++  @Nullable
++  private QueryThreadGs4 f_139601_;
++  public final RconConsoleSource f_139602_;
++  @Nullable
++  private RconThread f_139603_;
++  public DedicatedServerSettings f_139604_;
++  @Nullable
++  private MinecraftServerGui f_139605_;
++  @Nullable
++  private final TextFilterClient f_139606_;
++
++  public DedicatedServer(joptsimple.OptionSet options, WorldLoader.DataLoadContext worldLoader, Thread p_214789_,
++                         LevelStorageSource.LevelStorageAccess p_214790_, PackRepository p_214791_, WorldStem p_214792_,
++                         DedicatedServerSettings p_214793_, DataFixer p_214794_, Services p_214795_,
++                         ChunkProgressListenerFactory p_214796_) {
++    super(options, worldLoader, p_214789_, p_214790_, p_214791_, p_214792_, Proxy.NO_PROXY, p_214794_, p_214795_,
++        p_214796_);
++    this.f_139604_ = p_214793_;
++    this.f_139602_ = new RconConsoleSource(this);
++    this.f_139606_ = TextFilterClient.m_143736_(p_214793_.m_139777_().f_139724_);
++  }
++
++  public boolean m_7038_() throws IOException {
++    Thread thread = new Thread("Server console handler") {
++      public void run() {
++        if (net.minecraftforge.server.console.TerminalHandler.handleCommands(DedicatedServer.this)) {
++          return;
++        }
++        // CraftBukkit start
++        if (!Main.useConsole) {
++          return;
++        }
++        jline.console.ConsoleReader bufferedreader = reader;
++        // MC-33041, SPIGOT-5538: if System.in is not valid due to javaw, then return
++        try {
++          System.in.available();
++        } catch (IOException ex) {
++          return;
++        }
++        // CraftBukkit end
++
++        String s1;
++        try {
++          // CraftBukkit start - JLine disabling compatibility
++          while (!DedicatedServer.this.m_129918_() && DedicatedServer.this.m_130010_()) {
++            if (Main.useJline) {
++              s1 = bufferedreader.readLine(">", null);
++            } else {
++              s1 = bufferedreader.readLine();
++            }
++
++            // SPIGOT-5220: Throttle if EOF (ctrl^d) or stdin is /dev/null
++            if (s1 == null) {
++              try {
++                Thread.sleep(50L);
++              } catch (InterruptedException ex) {
++                Thread.currentThread().interrupt();
++              }
++              continue;
++            }
++            if (s1.trim().length() > 0) { // Trim to filter lines which are just spaces
++              DedicatedServer.this.m_139645_(s1, DedicatedServer.this.m_129893_());
++            }
++            // CraftBukkit end
++          }
++        } catch (IOException ioexception1) {
++          DedicatedServer.f_139598_.error("Exception handling console input", (Throwable) ioexception1);
++        }
++
++      }
++    };
++
++    // CraftBukkit start - TODO: handle command-line logging arguments
++    java.util.logging.Logger global = java.util.logging.Logger.getLogger("");
++    global.setUseParentHandlers(false);
++    for (java.util.logging.Handler handler : global.getHandlers()) {
++      global.removeHandler(handler);
++    }
++    global.addHandler(new org.bukkit.craftbukkit.v1_19_R2.util.ForwardLogHandler());
++
++    final org.apache.logging.log4j.core.Logger logger =
++        ((org.apache.logging.log4j.core.Logger) LogManager.getRootLogger());
++    for (org.apache.logging.log4j.core.Appender appender : logger.getAppenders().values()) {
++      if (appender instanceof org.apache.logging.log4j.core.appender.ConsoleAppender) {
++        logger.removeAppender(appender);
++      }
++    }
++
++
++    new org.bukkit.craftbukkit.v1_19_R2.util.TerminalConsoleWriterThread(System.out, this.reader).start();
++    System.setOut(IoBuilder.forLogger(logger).setLevel(org.apache.logging.log4j.Level.INFO).buildPrintStream());
++    System.setErr(IoBuilder.forLogger(logger).setLevel(org.apache.logging.log4j.Level.WARN).buildPrintStream());
++    // CraftBukkit end
++
++    thread.setDaemon(true);
++    thread.setUncaughtExceptionHandler(new DefaultUncaughtExceptionHandler(f_139598_));
++    thread.start();
++    f_139598_.info("Starting minecraft server version {}", (Object) SharedConstants.m_183709_().getName());
++    if (Runtime.getRuntime().maxMemory() / 1024L / 1024L < 512L) {
++      f_139598_.warn(
++          "To start the server with more ram, launch it as \"java -Xmx1024M -Xms1024M -jar minecraft_server.jar\"");
++    }
++
++    f_139598_.info("Loading properties");
++    DedicatedServerProperties dedicatedserverproperties = this.f_139604_.m_139777_();
++    if (this.m_129792_()) {
++      this.m_129913_("127.0.0.1");
++    } else {
++      this.m_129985_(dedicatedserverproperties.f_139728_);
++      this.m_129993_(dedicatedserverproperties.f_139729_);
++      this.m_129913_(dedicatedserverproperties.f_139730_);
++    }
++
++    // Spigot start
++    this.m_129823_(new DedicatedPlayerList(this, this.m_247573_(), this.f_129745_));
++    org.spigotmc.SpigotConfig.init((java.io.File) options.valueOf("spigot-settings"));
++    org.spigotmc.SpigotConfig.registerCommands();
++    // Spigot end
++
++    // Magma start
++    MagmaConfig.instance.registerCommands();
++    // Magma end
++
++    this.m_129997_(dedicatedserverproperties.f_139733_);
++    this.m_129999_(dedicatedserverproperties.f_139734_);
++    this.m_129989_(dedicatedserverproperties.f_139736_);
++    super.m_7196_(dedicatedserverproperties.f_139725_.get());
++    this.m_130004_(dedicatedserverproperties.f_139738_);
++    this.f_129749_.m_5458_(dedicatedserverproperties.f_139740_);
++    f_139598_.info("Default game type: {}", (Object) dedicatedserverproperties.f_139740_);
++    InetAddress inetaddress = null;
++    if (!this.m_130009_().isEmpty()) {
++      inetaddress = InetAddress.getByName(this.m_130009_());
++    }
++
++    if (this.m_7010_() < 0) {
++      this.m_129801_(dedicatedserverproperties.f_139742_);
++    }
++
++    this.m_129793_();
++    f_139598_.info("Starting Minecraft server on {}:{}", this.m_130009_().isEmpty() ? "*" : this.m_130009_(),
++        this.m_7010_());
++
++    try {
++      this.m_129919_().m_9711_(inetaddress, this.m_7010_());
++    } catch (IOException ioexception) {
++      f_139598_.warn("**** FAILED TO BIND TO PORT!");
++      f_139598_.warn("The exception was: {}", (Object) ioexception.toString());
++      f_139598_.warn("Perhaps a server is already running on that port?");
++      return false;
++    }
++
++    // CraftBukkit start
++    // this.setPlayerList(new DedicatedPlayerList(this, this.registries(), this.playerDataStorage)); // Spigot - moved up
++    server.loadPlugins();
++    server.enablePlugins(org.bukkit.plugin.PluginLoadOrder.STARTUP);
++    // CraftBukkit end
++    // Paper start
++    boolean usingProxy = org.spigotmc.SpigotConfig.bungee || MagmaConfig.instance.paperVelocityEnabled.getValues();
++    String proxyFlavor = (MagmaConfig.instance.paperVelocityEnabled.getValues()) ? "Velocity" : "BungeeCord";
++    String proxyLink = (MagmaConfig.instance.paperVelocityEnabled.getValues()) ? "https://docs.papermc.io/velocity/security" : "http://www.spigotmc.org/wiki/firewall-guide/";
++    // Paper end
+       if (!this.m_129797_()) {
 -         f_139598_.warn("**** SERVER IS RUNNING IN OFFLINE/INSECURE MODE!");
 -         f_139598_.warn("The server will make no attempt to authenticate usernames. Beware.");
 -         f_139598_.warn("While this makes the game possible to play without internet access, it also opens up the ability for hackers to connect with any username they choose.");
@@ -508,175 +674,14 @@
 -   public Optional<MinecraftServer.ServerResourcePackInfo> m_214042_() {
 -      return this.f_139604_.m_139777_().f_214802_;
 -   }
-+  static final Logger f_139598_ = LogUtils.getLogger();
-+  private static final int f_142864_ = 5000;
-+  private static final int f_142865_ = 2;
-+  public final List<ConsoleInput> f_139600_ = Collections.synchronizedList(Lists.newArrayList());
-+  @Nullable
-+  private QueryThreadGs4 f_139601_;
-+  public final RconConsoleSource f_139602_;
-+  @Nullable
-+  private RconThread f_139603_;
-+  public DedicatedServerSettings f_139604_;
-+  @Nullable
-+  private MinecraftServerGui f_139605_;
-+  @Nullable
-+  private final TextFilterClient f_139606_;
-+
-+  public DedicatedServer(joptsimple.OptionSet options, WorldLoader.DataLoadContext worldLoader, Thread p_214789_,
-+                         LevelStorageSource.LevelStorageAccess p_214790_, PackRepository p_214791_, WorldStem p_214792_,
-+                         DedicatedServerSettings p_214793_, DataFixer p_214794_, Services p_214795_,
-+                         ChunkProgressListenerFactory p_214796_) {
-+    super(options, worldLoader, p_214789_, p_214790_, p_214791_, p_214792_, Proxy.NO_PROXY, p_214794_, p_214795_,
-+        p_214796_);
-+    this.f_139604_ = p_214793_;
-+    this.f_139602_ = new RconConsoleSource(this);
-+    this.f_139606_ = TextFilterClient.m_143736_(p_214793_.m_139777_().f_139724_);
-+  }
-+
-+  public boolean m_7038_() throws IOException {
-+    Thread thread = new Thread("Server console handler") {
-+      public void run() {
-+        if (net.minecraftforge.server.console.TerminalHandler.handleCommands(DedicatedServer.this)) {
-+          return;
-+        }
-+        // CraftBukkit start
-+        if (!Main.useConsole) {
-+          return;
-+        }
-+        jline.console.ConsoleReader bufferedreader = reader;
-+        // MC-33041, SPIGOT-5538: if System.in is not valid due to javaw, then return
-+        try {
-+          System.in.available();
-+        } catch (IOException ex) {
-+          return;
-+        }
-+        // CraftBukkit end
-+
-+        String s1;
-+        try {
-+          // CraftBukkit start - JLine disabling compatibility
-+          while (!DedicatedServer.this.m_129918_() && DedicatedServer.this.m_130010_()) {
-+            if (Main.useJline) {
-+              s1 = bufferedreader.readLine(">", null);
-+            } else {
-+              s1 = bufferedreader.readLine();
-+            }
-+
-+            // SPIGOT-5220: Throttle if EOF (ctrl^d) or stdin is /dev/null
-+            if (s1 == null) {
-+              try {
-+                Thread.sleep(50L);
-+              } catch (InterruptedException ex) {
-+                Thread.currentThread().interrupt();
-+              }
-+              continue;
-+            }
-+            if (s1.trim().length() > 0) { // Trim to filter lines which are just spaces
-+              DedicatedServer.this.m_139645_(s1, DedicatedServer.this.m_129893_());
-+            }
-+            // CraftBukkit end
-+          }
-+        } catch (IOException ioexception1) {
-+          DedicatedServer.f_139598_.error("Exception handling console input", (Throwable) ioexception1);
-+        }
-+
-+      }
-+    };
-+
-+    // CraftBukkit start - TODO: handle command-line logging arguments
-+    java.util.logging.Logger global = java.util.logging.Logger.getLogger("");
-+    global.setUseParentHandlers(false);
-+    for (java.util.logging.Handler handler : global.getHandlers()) {
-+      global.removeHandler(handler);
-+    }
-+    global.addHandler(new org.bukkit.craftbukkit.v1_19_R2.util.ForwardLogHandler());
-+
-+    final org.apache.logging.log4j.core.Logger logger =
-+        ((org.apache.logging.log4j.core.Logger) LogManager.getRootLogger());
-+    for (org.apache.logging.log4j.core.Appender appender : logger.getAppenders().values()) {
-+      if (appender instanceof org.apache.logging.log4j.core.appender.ConsoleAppender) {
-+        logger.removeAppender(appender);
-+      }
-+    }
-+
-+
-+    new org.bukkit.craftbukkit.v1_19_R2.util.TerminalConsoleWriterThread(System.out, this.reader).start();
-+    System.setOut(IoBuilder.forLogger(logger).setLevel(org.apache.logging.log4j.Level.INFO).buildPrintStream());
-+    System.setErr(IoBuilder.forLogger(logger).setLevel(org.apache.logging.log4j.Level.WARN).buildPrintStream());
-+    // CraftBukkit end
-+
-+    thread.setDaemon(true);
-+    thread.setUncaughtExceptionHandler(new DefaultUncaughtExceptionHandler(f_139598_));
-+    thread.start();
-+    f_139598_.info("Starting minecraft server version {}", (Object) SharedConstants.m_183709_().getName());
-+    if (Runtime.getRuntime().maxMemory() / 1024L / 1024L < 512L) {
-+      f_139598_.warn(
-+          "To start the server with more ram, launch it as \"java -Xmx1024M -Xms1024M -jar minecraft_server.jar\"");
-+    }
-+
-+    f_139598_.info("Loading properties");
-+    DedicatedServerProperties dedicatedserverproperties = this.f_139604_.m_139777_();
-+    if (this.m_129792_()) {
-+      this.m_129913_("127.0.0.1");
-+    } else {
-+      this.m_129985_(dedicatedserverproperties.f_139728_);
-+      this.m_129993_(dedicatedserverproperties.f_139729_);
-+      this.m_129913_(dedicatedserverproperties.f_139730_);
-+    }
-+
-+    // Spigot start
-+    this.m_129823_(new DedicatedPlayerList(this, this.m_247573_(), this.f_129745_));
-+    org.spigotmc.SpigotConfig.init((java.io.File) options.valueOf("spigot-settings"));
-+    org.spigotmc.SpigotConfig.registerCommands();
-+    // Spigot end
-+
-+    // Magma start
-+    MagmaConfig.instance.registerCommands();
-+    // Magma end
-+
-+    this.m_129997_(dedicatedserverproperties.f_139733_);
-+    this.m_129999_(dedicatedserverproperties.f_139734_);
-+    this.m_129989_(dedicatedserverproperties.f_139736_);
-+    super.m_7196_(dedicatedserverproperties.f_139725_.get());
-+    this.m_130004_(dedicatedserverproperties.f_139738_);
-+    this.f_129749_.m_5458_(dedicatedserverproperties.f_139740_);
-+    f_139598_.info("Default game type: {}", (Object) dedicatedserverproperties.f_139740_);
-+    InetAddress inetaddress = null;
-+    if (!this.m_130009_().isEmpty()) {
-+      inetaddress = InetAddress.getByName(this.m_130009_());
-+    }
-+
-+    if (this.m_7010_() < 0) {
-+      this.m_129801_(dedicatedserverproperties.f_139742_);
-+    }
-+
-+    this.m_129793_();
-+    f_139598_.info("Starting Minecraft server on {}:{}", this.m_130009_().isEmpty() ? "*" : this.m_130009_(),
-+        this.m_7010_());
-+
-+    try {
-+      this.m_129919_().m_9711_(inetaddress, this.m_7010_());
-+    } catch (IOException ioexception) {
-+      f_139598_.warn("**** FAILED TO BIND TO PORT!");
-+      f_139598_.warn("The exception was: {}", (Object) ioexception.toString());
-+      f_139598_.warn("Perhaps a server is already running on that port?");
-+      return false;
-+    }
-+
-+    // CraftBukkit start
-+    // this.setPlayerList(new DedicatedPlayerList(this, this.registries(), this.playerDataStorage)); // Spigot - moved up
-+    server.loadPlugins();
-+    server.enablePlugins(org.bukkit.plugin.PluginLoadOrder.STARTUP);
-+    // CraftBukkit end
-+
-+    if (!this.m_129797_()) {
 +      f_139598_.warn("**** SERVER IS RUNNING IN OFFLINE/INSECURE MODE!");
 +      f_139598_.warn("The server will make no attempt to authenticate usernames. Beware.");
 +      // Spigot start
-+      if (org.spigotmc.SpigotConfig.bungee) {
-+        DedicatedServer.f_139598_.warn("Whilst this makes it possible to use BungeeCord, unless access to your server is properly restricted, it also opens up the ability for hackers to connect with any username they choose.");
-+        DedicatedServer.f_139598_.warn("Please see http://www.spigotmc.org/wiki/firewall-guide/ for further information.");
++      // Paper start
++      if (usingProxy) {
++          DedicatedServer.f_139598_.warn("Whilst this makes it possible to use " + proxyFlavor + ", unless access to your server is properly restricted, it also opens up the ability for hackers to connect with any username they choose.");
++          DedicatedServer.f_139598_.warn("Please see " + proxyLink + " for further information.");
++      // Paper end
 +      } else {
 +        DedicatedServer.f_139598_.warn("While this makes the game possible to play without internet access, it also opens up the ability for hackers to connect with any username they choose.");
 +      }
