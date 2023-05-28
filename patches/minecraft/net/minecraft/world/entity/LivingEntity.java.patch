@@ -561,7 +561,7 @@
              if (!p_21016_.m_19360_()) {
                 Entity entity = p_21016_.m_7640_();
                 if (entity instanceof LivingEntity) {
-@@ -1036,30 +_,51 @@
+@@ -1036,30 +_,60 @@
  
              flag = true;
           }
@@ -575,25 +575,35 @@
                 return false;
              }
  
-             this.m_6475_(p_21016_, p_21017_ - this.f_20898_);
-+            // CraftBukkit start
-+            if (!this.damageEntity0(p_21016_, f - this.f_20898_)) {
-+               return false;
+-            this.m_6475_(p_21016_, p_21017_ - this.f_20898_);
++            //Magma start - calculate player hurt damage in their class
++            if (this instanceof Player) {
++               this.m_6475_(p_21016_, p_21017_ - this.f_20898_);
++            } else {
++               // CraftBukkit start
++               if (!this.damageEntity0(p_21016_, f - this.f_20898_))
++                  return false;
++               // CraftBukkit end
 +            }
-+            // CraftBukkit end
++            //Magma end
              this.f_20898_ = p_21017_;
              flag1 = false;
           } else {
-+            // CraftBukkit start
-+            if (!this.damageEntity0(p_21016_, f)) {
-+               return false;
++
++            //Magma start - calculate player hurt damage in their class
++            if (this instanceof Player) {
++               this.m_6475_(p_21016_, f);
++            } else {
++               // CraftBukkit start
++               if (!this.damageEntity0(p_21016_, f))
++                  return false;
++               // CraftBukkit end
 +            }
++            //Magma end
              this.f_20898_ = p_21017_;
 -            this.f_19802_ = 20;
 -            this.m_6475_(p_21016_, p_21017_);
 +            this.f_19802_ = this.f_20926_; // CraftBukkit - restore use of maxNoDamageTicks
-+            // this.damageEntity0(damagesource, f);
-+            // CraftBukkit end
              this.f_20917_ = 10;
              this.f_20916_ = this.f_20917_;
           }
@@ -750,7 +760,7 @@
                 this.f_19853_.m_7967_(itementity);
              }
           }
-@@ -1307,32 +_,79 @@
+@@ -1307,32 +_,75 @@
        }
     }
  
@@ -831,11 +841,7 @@
 +         int i = this.expToDrop;
 +
 +         i = net.minecraftforge.event.ForgeEventFactory.getExperienceDrop(this, this.f_20888_, i);
-+         while(i > 0) {
-+            int j = ExperienceOrb.m_20782_(i);
-+            i -= j;
-+            this.f_19853_.m_7967_(new ExperienceOrb(this.f_19853_, this.m_20185_(), this.m_20186_(), this.m_20189_(), j));
-+         }
++         ExperienceOrb.m_147082_((ServerLevel)this.f_19853_, this.m_20182_(), i); //Magma - revert to award, fixes mixin inject
 +         this.expToDrop = 0;
 +      }
 +      // CraftBukkit end
@@ -985,7 +991,7 @@
                 }
              }
           }
-@@ -1554,24 +_,158 @@
+@@ -1554,24 +_,161 @@
     }
  
     protected void m_6475_(DamageSource p_21240_, float p_21241_) {
@@ -1012,6 +1018,9 @@
 +         p_21241_ = ForgeHooks.onLivingHurt(this, p_21240_, p_21241_);
 +         // If the damage is negative return true
 +         if (p_21241_ < 0) return true;
++         //Magma - Infinity check
++         if (Float.isInfinite(p_21241_))
++            p_21241_ = originalDamage; // Restore original damage to prevent issues with damage calculation
 +         // Thermos detect null damage
 +         final boolean nulldmg = p_21241_ == 0;
 +         // Cauldron end
