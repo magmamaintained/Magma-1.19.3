@@ -9,7 +9,7 @@
  import net.minecraft.Util;
  import net.minecraft.advancements.CriteriaTriggers;
  import net.minecraft.core.BlockPos;
-@@ -22,6 +_,15 @@
+@@ -22,20 +_,28 @@
  import net.minecraft.world.item.enchantment.EnchantmentInstance;
  import net.minecraft.world.level.block.Blocks;
  import net.minecraft.world.level.block.EnchantmentTableBlock;
@@ -24,22 +24,16 @@
 +import org.bukkit.event.enchantment.PrepareItemEnchantEvent;
  
  public class EnchantmentMenu extends AbstractContainerMenu {
-    private final Container f_39449_ = new SimpleContainer(2) {
-@@ -29,6 +_,13 @@
-          super.m_6596_();
-          EnchantmentMenu.this.m_6199_(this);
-       }
-+
-+      // CraftBukkit start
-+      @Override
-+      public Location getLocation() {
-+         return f_39449_.getLocation();
-+      }
-+      // CraftBukkit end
-    };
+-   private final Container f_39449_ = new SimpleContainer(2) {
+-      public void m_6596_() {
+-         super.m_6596_();
+-         EnchantmentMenu.this.m_6199_(this);
+-      }
+-   };
++   private final Container f_39449_;
     private final ContainerLevelAccess f_39450_;
     private final RandomSource f_39451_ = RandomSource.m_216327_();
-@@ -36,6 +_,10 @@
+    private final DataSlot f_39452_ = DataSlot.m_39401_();
     public final int[] f_39446_ = new int[3];
     public final int[] f_39447_ = new int[]{-1, -1, -1};
     public final int[] f_39448_ = new int[]{-1, -1, -1};
@@ -50,6 +44,30 @@
  
     public EnchantmentMenu(int p_39454_, Inventory p_39455_) {
        this(p_39454_, p_39455_, ContainerLevelAccess.f_39287_);
+@@ -43,6 +_,23 @@
+ 
+    public EnchantmentMenu(int p_39457_, Inventory p_39458_, ContainerLevelAccess p_39459_) {
+       super(MenuType.f_39969_, p_39457_);
++
++      //Magma start - add location
++      this.f_39449_ = new SimpleContainer(2) {
++         public void m_6596_() {
++            super.m_6596_();
++            EnchantmentMenu.this.m_6199_(this);
++         }
++
++         // CraftBukkit start
++         @Override
++         public Location getLocation() {
++            return p_39459_.getLocation();
++         }
++         // CraftBukkit end
++      };
++      //Magma end
++
+       this.f_39450_ = p_39459_;
+       this.m_38897_(new Slot(this.f_39449_, 0, 15, 47) {
+          public boolean m_5857_(ItemStack p_39508_) {
 @@ -55,7 +_,7 @@
        });
        this.m_38897_(new Slot(this.f_39449_, 1, 35, 47) {
@@ -105,7 +123,7 @@
 +               CraftItemStack item = CraftItemStack.asCraftMirror(itemstack);
 +               org.bukkit.enchantments.EnchantmentOffer[] offers = new EnchantmentOffer[3];
 +               for (int k = 0; k < 3; ++k) {
-+                  org.bukkit.enchantments.Enchantment enchantment = (this.f_39447_[j] >= 0) ? org.bukkit.enchantments.Enchantment.getByKey(CraftNamespacedKey.fromMinecraft(BuiltInRegistries.f_256876_.m_7981_(BuiltInRegistries.f_256876_.m_7942_(this.f_39447_[j])))) : null;
++                  org.bukkit.enchantments.Enchantment enchantment = (this.f_39447_[k] >= 0) ? org.bukkit.enchantments.Enchantment.getByKey(CraftNamespacedKey.fromMinecraft(BuiltInRegistries.f_256876_.m_7981_(BuiltInRegistries.f_256876_.m_7942_(this.f_39447_[k])))) : null;
 +                  offers[k] = (enchantment != null) ? new EnchantmentOffer(enchantment, this.f_39448_[k], this.f_39446_[k]) : null;
 +               }
 +               PrepareItemEnchantEvent event = new PrepareItemEnchantEvent(player, this.getBukkitView(), f_39450_.getLocation().getBlock(), item, offers, j);
@@ -123,7 +141,7 @@
 +                  EnchantmentOffer offer = event.getOffers()[k];
 +                  if (offer != null) {
 +                     this.f_39446_[k] = offer.getCost();
-+                     this.f_39447_[j] = BuiltInRegistries.f_256876_.m_7447_(BuiltInRegistries.f_256876_.m_7745_(CraftNamespacedKey.toMinecraft(offer.getEnchantment().getKey())));
++                     this.f_39447_[k] = BuiltInRegistries.f_256876_.m_7447_(BuiltInRegistries.f_256876_.m_7745_(CraftNamespacedKey.toMinecraft(offer.getEnchantment().getKey())));
 +                     this.f_39448_[k] = offer.getEnchantmentLevel();
 +                  } else {
 +                     this.f_39446_[k] = 0;
