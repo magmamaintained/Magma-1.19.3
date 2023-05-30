@@ -310,7 +310,8 @@ public class MagmaInstaller extends AbstractMagmaInstaller {
                 new InternalDependency("dev/vankka/dependencydownload-common/1.3.0/dependencydownload-common-1.3.0.jar", "b6d32a6d0c4d4407f54e601cfa3f0a5a"),
                 new InternalDependency("dev/vankka/dependencydownload-runtime/1.3.0/dependencydownload-runtime-1.3.0.jar", "ec35cf4906c6151111d9eabe4f4ea949"),
                 new InternalDependency("org/jline/jline/3.21.0/jline-3.21.0.jar", "859778f9cdd3bd42bbaaf0f6f7fe5e6a"),
-                new InternalDependency("me/tongfei/progressbar/0.9.3/progressbar-0.9.3.jar", "25d3101d2ca7f0847a804208d5411d78")
+                new InternalDependency("me/tongfei/progressbar/0.9.3/progressbar-0.9.3.jar", "25d3101d2ca7f0847a804208d5411d78"),
+                new InternalDependency("com/google/code/gson/gson/2.10.1/gson-2.10.1.jar", "df6097815738cb31fc56391553210843")
         };
         var urls = new ArrayList<URL>();
         for (var dependency : dependencies) {
