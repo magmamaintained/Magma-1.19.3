@@ -48,7 +48,7 @@ public class NetworkUtils {
             conn = new URL(URL).openConnection();
             conn.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:31.0) Gecko/20100101 Firefox/31.0");
 
-            int timeout = (int) TimeUnit.SECONDS.toMillis(20);
+            int timeout = (int) TimeUnit.MINUTES.toMillis(1);
             conn.setConnectTimeout(timeout);
             conn.setReadTimeout(timeout);
         } catch (IOException e) {
@@ -74,7 +74,7 @@ public class NetworkUtils {
                 e.printStackTrace();
             }
             return null;
-        }, downloadSrvc).get(20, TimeUnit.SECONDS);
+        }, downloadSrvc).get(1, TimeUnit.MINUTES);
         rbc.close();
         String MD5 = org.magmafoundation.magma.common.utils.MD5.getMd5(f);
         if(md5 != null && MD5 != null && !MD5.equals(md5.toLowerCase())) {

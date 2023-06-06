@@ -45,6 +45,7 @@ import java.nio.file.spi.FileSystemProvider;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.TimeoutException;
 
 /**
  * Project: Magma
@@ -449,8 +450,10 @@ public class MagmaInstaller extends AbstractMagmaInstaller {
                 // 1.19.4 = NetworkUtils.downloadFile("https://piston-data.mojang.com/v1/objects/8f3112a1049751cc472ec13e397eade5336ca7ae/server.jar", minecraft_server);
                 //TODO: Replace with 1.19.4 when updated
                 NetworkUtils.downloadFile("https://piston-data.mojang.com/v1/objects/c9df48efed58511cdd0213c56b9013a7b5c9ac1f/server.jar", minecraft_server);
+            } catch (TimeoutException to) {
+                System.err.println("Failed to download vanilla server jar, timeout exceeded");
             } catch (Exception e) {
-                System.out.println("Can't download minecraft_server");
+                System.out.println("Failed to download vanilla server jar");
                 e.printStackTrace();
             }
         }
