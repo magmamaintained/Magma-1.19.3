@@ -736,16 +736,8 @@
        } catch (Throwable throwable) {
           CrashReport crashreport = CrashReport.m_127521_(throwable, "Loading entity NBT");
           CrashReportCategory crashreportcategory = crashreport.m_127514_("Entity being loaded");
-@@ -1671,8 +_,23 @@
-       } else if (this.f_19853_.f_46443_) {
-          return null;
+@@ -1673,6 +_,15 @@
        } else {
-+         // CraftBukkit start - Capture drops for death event
-+         if (this instanceof LivingEntity && !((LivingEntity) this).forceDrops) {
-+            ((LivingEntity) this).drops.add(org.bukkit.craftbukkit.v1_19_R2.inventory.CraftItemStack.asBukkitCopy(p_19985_));
-+            return null;
-+         }
-+         // CraftBukkit end
           ItemEntity itementity = new ItemEntity(this.f_19853_, this.m_20185_(), this.m_20186_() + (double)p_19986_, this.m_20189_(), p_19985_);
           itementity.m_32060_();
 +         // CraftBukkit start
