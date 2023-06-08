@@ -150,12 +150,13 @@ subprojects {
     repositories {
         mavenLocal()
         mavenCentral()
+        maven { url 'https://nexus.c0d3m4513r.com/repository/Magma/' }
         maven {
             name = 'forge'
             url = 'https://maven.minecraftforge.net/'
         }
         maven { url 'https://hub.spigotmc.org/nexus/content/groups/public/' }
-        maven { url 'https://raw.github.com/Hexeption/Magma-Repo/master/' }
+        maven { url 'https://git.magmafoundation.org/magmafoundation/magma-maven-repo/-/raw/repository' }
         maven { url 'https://maven.izzel.io/releases' }
         maven {
             name = 'minecraft'
