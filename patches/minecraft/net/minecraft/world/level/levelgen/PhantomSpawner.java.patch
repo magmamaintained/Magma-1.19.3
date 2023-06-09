@@ -1,6 +1,14 @@
 --- a/net/minecraft/world/level/levelgen/PhantomSpawner.java
 +++ b/net/minecraft/world/level/levelgen/PhantomSpawner.java
-@@ -61,8 +_,12 @@
+@@ -19,6 +_,7 @@
+ import net.minecraft.world.level.NaturalSpawner;
+ import net.minecraft.world.level.block.state.BlockState;
+ import net.minecraft.world.level.material.FluidState;
++import org.bukkit.event.entity.CreatureSpawnEvent;
+ 
+ public class PhantomSpawner implements CustomSpawner {
+    private int f_64573_;
+@@ -61,7 +_,12 @@
                                      Phantom phantom = EntityType.f_20509_.m_20615_(p_64576_);
                                      if (phantom != null) {
                                         phantom.m_20035_(blockpos1, 0.0F, 0.0F);
@@ -9,8 +17,7 @@
 +                                          continue;
 +                                       }
                                         spawngroupdata = phantom.m_6518_(p_64576_, difficultyinstance, MobSpawnType.NATURAL, spawngroupdata, (CompoundTag)null);
--                                       p_64576_.m_47205_(phantom);
-+                                       p_64576_.addFreshEntityWithPassengers(phantom, org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason.NATURAL); // CraftBukkit
++                                       p_64576_.prepareEntity(phantom, CreatureSpawnEvent.SpawnReason.NATURAL); //Magma - add spawn reason
+                                        p_64576_.m_47205_(phantom);
                                         ++i;
                                      }
-                                  }
