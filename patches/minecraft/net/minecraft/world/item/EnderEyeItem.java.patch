@@ -26,10 +26,11 @@
              }
  
              return InteractionResult.CONSUME;
-@@ -80,6 +_,11 @@
+@@ -79,7 +_,11 @@
+                eyeofender.m_36972_(itemstack);
                 eyeofender.m_36967_(blockpos);
                 p_41184_.m_214171_(GameEvent.f_157778_, eyeofender.m_20182_(), GameEvent.Context.m_223717_(p_41185_));
-                p_41184_.m_7967_(eyeofender);
+-               p_41184_.m_7967_(eyeofender);
 +               // CraftBukkit start
 +               if (!p_41184_.m_7967_(eyeofender)) {
 +                  return new InteractionResultHolder(InteractionResult.FAIL, itemstack);
