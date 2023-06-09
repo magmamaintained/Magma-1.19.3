@@ -1,9 +1,10 @@
 --- a/net/minecraft/world/entity/animal/allay/Allay.java
 +++ b/net/minecraft/world/entity/animal/allay/Allay.java
-@@ -65,6 +_,7 @@
+@@ -65,6 +_,8 @@
  import net.minecraft.world.level.gameevent.PositionSource;
  import net.minecraft.world.level.gameevent.vibrations.VibrationListener;
  import net.minecraft.world.phys.Vec3;
++import org.bukkit.event.entity.CreatureSpawnEvent;
 +import org.bukkit.event.entity.EntityRegainHealthEvent;
  import org.jetbrains.annotations.Nullable;
  import org.slf4j.Logger;
@@ -77,7 +78,7 @@
        return this.f_238682_ == null || !this.f_238682_.m_203195_(this.m_20182_(), (double)GameEvent.f_238690_.m_157827_()) || !this.f_19853_.m_8055_(this.f_238682_).m_60713_(Blocks.f_50131_);
     }
  
-@@ -468,16 +_,18 @@
+@@ -468,16 +_,19 @@
        return f_238776_.test(p_239736_);
     }
  
@@ -90,8 +91,8 @@
           allay.m_21530_();
           allay.m_239811_();
           this.m_239811_();
--         this.f_19853_.m_7967_(allay);
-+         this.f_19853_.addFreshEntity(allay, org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason.DUPLICATION); // CraftBukkit - reason for duplicated allay
++         this.f_19853_.prepareEntity(allay, CreatureSpawnEvent.SpawnReason.DUPLICATION); //Magma - add spawn reason
+          this.f_19853_.m_7967_(allay);
        }
  
 +      return allay; // CraftBukkit

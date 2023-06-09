@@ -61,15 +61,14 @@
           areaeffectcloud.m_19712_(2.5F);
           areaeffectcloud.m_19732_(-0.5F);
           areaeffectcloud.m_19740_(10);
-@@ -242,7 +_,7 @@
+@@ -242,6 +_,7 @@
              areaeffectcloud.m_19716_(new MobEffectInstance(mobeffectinstance));
           }
  
--         this.f_19853_.m_7967_(areaeffectcloud);
-+         this.f_19853_.addFreshEntity(areaeffectcloud, CreatureSpawnEvent.SpawnReason.EXPLOSION); // CraftBukkit
++         this.f_19853_.prepareEntity(areaeffectcloud, CreatureSpawnEvent.SpawnReason.EXPLOSION); //Magma - add spawn reason
+          this.f_19853_.m_7967_(areaeffectcloud);
        }
  
-    }
 @@ -262,4 +_,5 @@
     public void m_32314_() {
        ++this.f_32273_;

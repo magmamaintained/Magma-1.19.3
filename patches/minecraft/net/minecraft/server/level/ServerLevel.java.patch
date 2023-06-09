@@ -251,15 +251,14 @@
           BlockPos blockpos = this.m_143288_(this.m_46496_(i, 0, j, 15));
           if (this.m_46758_(blockpos)) {
              DifficultyInstance difficultyinstance = this.m_6436_(blockpos);
-@@ -396,7 +_,7 @@
+@@ -396,6 +_,7 @@
                    skeletonhorse.m_30923_(true);
                    skeletonhorse.m_146762_(0);
                    skeletonhorse.m_6034_((double)blockpos.m_123341_(), (double)blockpos.m_123342_(), (double)blockpos.m_123343_());
--                  this.m_7967_(skeletonhorse);
-+                  this.addFreshEntity(skeletonhorse, org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason.LIGHTNING); // CraftBukkit
++                  this.prepareEntity(skeletonhorse, CreatureSpawnEvent.SpawnReason.LIGHTNING);
+                   this.m_7967_(skeletonhorse);
                 }
              }
- 
 @@ -404,7 +_,7 @@
              if (lightningbolt != null) {
                 lightningbolt.m_20219_(Vec3.m_82539_(blockpos));
@@ -450,28 +449,30 @@
        }
  
        this.m_7726_().m_8483_().m_78151_();
-@@ -782,15 +_,36 @@
+@@ -782,15 +_,39 @@
     }
  
     public boolean m_7967_(Entity p_8837_) {
 -      return this.m_8872_(p_8837_);
 +      // CraftBukkit start
-+      return this.addFreshEntity(p_8837_,CreatureSpawnEvent.SpawnReason.DEFAULT);
++      return this.addFreshEntity(p_8837_, p_8837_.spawnReason);
 +   }
 +
 +   public boolean addFreshEntity(Entity entity, CreatureSpawnEvent.SpawnReason reason) {
-+      return this.addEntity(entity, reason);
++      prepareAddEntity(reason);
++      return this.m_8872_(entity);
 +      // CraftBukkit end
     }
  
     public boolean m_8847_(Entity p_8848_) {
 -      return this.m_8872_(p_8848_);
 +      // CraftBukkit start
-+      return this.addWithUUID(p_8848_, CreatureSpawnEvent.SpawnReason.DEFAULT);
++      return this.addWithUUID(p_8848_, p_8848_.spawnReason);
 +   }
 +
 +   public boolean addWithUUID(Entity entity, CreatureSpawnEvent.SpawnReason reason) {
-+      return this.addEntity(entity, reason);
++      prepareAddEntity(reason);
++      return this.m_8872_(entity);
 +      // CraftBukkit end
     }
  
@@ -485,7 +486,8 @@
 +   }
 +
 +   public void addDuringTeleport(Entity entity, CreatureSpawnEvent.SpawnReason reason) {
-+      this.addEntity(entity, reason);
++      prepareAddEntity(reason);
++      this.m_8872_(entity);
 +      // CraftBukkit end
     }
  
@@ -498,21 +500,26 @@
        Entity entity = this.m_142646_().m_142694_(p_8854_.m_20148_());
        if (entity != null) {
           f_8566_.warn("Force-added player with duplicate UUID {}", (Object)p_8854_.m_20148_().toString());
-@@ -817,28 +_,59 @@
+@@ -817,28 +_,67 @@
           this.m_143261_((ServerPlayer)entity, Entity.RemovalReason.DISCARDED);
        }
  
 -      this.f_143244_.m_157533_(p_8854_);
+-   }
+-
+-   private boolean m_8872_(Entity p_8873_) {
 +      this.f_143244_.addNewEntityWithoutEvent(p_8854_);
 +      p_8854_.onAddedToWorld();
-    }
- 
-    private boolean m_8872_(Entity p_8873_) {
-+      return addEntity(p_8873_, CreatureSpawnEvent.SpawnReason.CUSTOM);
++   }
++
++   //Magma start - remove spawnReason from addEntity
++   private @Nullable CreatureSpawnEvent.SpawnReason addEntity_spawnReason;
++   private void prepareAddEntity(CreatureSpawnEvent.SpawnReason spawnReason) {
++      addEntity_spawnReason = spawnReason;
 +   }
 +
 +   // CraftBukkit start
-+   public boolean addEntity(Entity p_8873_, CreatureSpawnEvent.SpawnReason spawnReason) {
++   public boolean m_8872_(Entity p_8873_) {
 +      org.spigotmc.AsyncCatcher.catchOp("entity add"); // Spigot
        if (p_8873_.m_213877_()) {
 -         f_8566_.warn("Tried to add entity {} but it was marked as removed already", (Object)EntityType.m_20613_(p_8873_.m_6095_()));
@@ -520,9 +527,14 @@
           return false;
        } else {
 -         return this.f_143244_.m_157533_(p_8873_);
++         CreatureSpawnEvent.SpawnReason spawnReason = addEntity_spawnReason;
++         addEntity_spawnReason = null; //reset
++         //Magma end
++
 +         if (spawnReason != null && !CraftEventFactory.doEntityAddEventCalling(this, p_8873_, spawnReason)) {
 +            return false;
 +         }
++
 +         if (this.f_143244_.m_157533_(p_8873_)) {
 +            p_8873_.onAddedToWorld();
 +            return true;
@@ -535,7 +547,7 @@
  
     public boolean m_8860_(Entity p_8861_) {
 +      // CraftBukkit start
-+      return this.tryAddFreshEntityWithPassengers(p_8861_, org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason.DEFAULT);
++      return this.tryAddFreshEntityWithPassengers(p_8861_, p_8861_.spawnReason);
 +   }
 +
 +   public boolean tryAddFreshEntityWithPassengers(Entity p_8861_, org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason reason) {
@@ -543,8 +555,8 @@
        if (p_8861_.m_20199_().map(Entity::m_20148_).anyMatch(this.f_143244_::m_157550_)) {
           return false;
        } else {
--         this.m_47205_(p_8861_);
-+         this.addFreshEntityWithPassengers(p_8861_, reason);
++         this.prepareEntity(p_8861_, reason); //Magma - add spawn reason
+          this.m_47205_(p_8861_);
           return true;
        }
     }

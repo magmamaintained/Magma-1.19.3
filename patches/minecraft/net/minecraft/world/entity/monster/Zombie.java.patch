@@ -154,7 +154,7 @@
                 int i1 = i + Mth.m_216271_(this.f_19796_, 7, 40) * Mth.m_216271_(this.f_19796_, -1, 1);
                 int j1 = j + Mth.m_216271_(this.f_19796_, 7, 40) * Mth.m_216271_(this.f_19796_, -1, 1);
                 int k1 = k + Mth.m_216271_(this.f_19796_, 7, 40) * Mth.m_216271_(this.f_19796_, -1, 1);
-@@ -288,13 +_,14 @@
+@@ -288,13 +_,15 @@
                 EntityType<?> entitytype = zombie.m_6095_();
                 SpawnPlacements.Type spawnplacements$type = SpawnPlacements.m_21752_(entitytype);
                 if (NaturalSpawner.m_47051_(spawnplacements$type, this.f_19853_, blockpos, entitytype) && SpawnPlacements.m_217074_(entitytype, serverlevel, MobSpawnType.REINFORCEMENT, blockpos, this.f_19853_.f_46441_)) {
@@ -162,15 +162,15 @@
 -                  if (!this.f_19853_.m_45914_((double)i1, (double)j1, (double)k1, 7.0D) && this.f_19853_.m_45784_(zombie) && this.f_19853_.m_45786_(zombie) && !this.f_19853_.m_46855_(zombie.m_20191_())) {
 -                     zombie.m_6710_(livingentity);
 -                     zombie.m_6518_(serverlevel, this.f_19853_.m_6436_(zombie.m_20183_()), MobSpawnType.REINFORCEMENT, (SpawnGroupData)null, (CompoundTag)null);
--                     serverlevel.m_47205_(zombie);
--                     this.m_21051_(Attributes.f_22287_).m_22125_(new AttributeModifier("Zombie reinforcement caller charge", (double)-0.05F, AttributeModifier.Operation.ADDITION));
--                     zombie.m_21051_(Attributes.f_22287_).m_22125_(new AttributeModifier("Zombie reinforcement callee charge", (double)-0.05F, AttributeModifier.Operation.ADDITION));
 +                  zombie.m_6034_((double) i1, (double) j1, (double) k1);
 +                  if (!this.f_19853_.m_45914_((double) i1, (double) j1, (double) k1, 7.0D) && this.f_19853_.m_45784_(zombie) && this.f_19853_.m_45786_(zombie) && !this.f_19853_.m_46855_(zombie.m_20191_())) {
 +                     if (livingentity != null)
 +                        zombie.setTarget(livingentity, EntityTargetEvent.TargetReason.REINFORCEMENT_TARGET, true); // CraftBukkit
 +                     zombie.m_6518_(serverlevel, this.f_19853_.m_6436_(zombie.m_20183_()), MobSpawnType.REINFORCEMENT, (SpawnGroupData) null, (CompoundTag) null);
-+                     serverlevel.addFreshEntityWithPassengers(zombie, CreatureSpawnEvent.SpawnReason.REINFORCEMENTS); // CraftBukkit
++                     serverlevel.prepareEntity(zombie, CreatureSpawnEvent.SpawnReason.REINFORCEMENTS); //Magma - add spawn reason
+                      serverlevel.m_47205_(zombie);
+-                     this.m_21051_(Attributes.f_22287_).m_22125_(new AttributeModifier("Zombie reinforcement caller charge", (double)-0.05F, AttributeModifier.Operation.ADDITION));
+-                     zombie.m_21051_(Attributes.f_22287_).m_22125_(new AttributeModifier("Zombie reinforcement callee charge", (double)-0.05F, AttributeModifier.Operation.ADDITION));
 +                     this.m_21051_(Attributes.f_22287_).m_22125_(new AttributeModifier("Zombie reinforcement caller charge", (double) -0.05F, AttributeModifier.Operation.ADDITION));
 +                     zombie.m_21051_(Attributes.f_22287_).m_22125_(new AttributeModifier("Zombie reinforcement callee charge", (double) -0.05F, AttributeModifier.Operation.ADDITION));
                       break;
@@ -242,7 +242,7 @@
  
     protected float m_6431_(Pose p_34313_, EntityDimensions p_34314_) {
        return this.m_6162_() ? 0.93F : 1.74F;
-@@ -424,21 +_,21 @@
+@@ -424,20 +_,21 @@
           if (zombie$zombiegroupdata.f_34354_) {
              this.m_6863_(true);
              if (zombie$zombiegroupdata.f_34355_) {
@@ -263,11 +263,10 @@
 +                     chicken1.m_6518_(p_34297_, p_34298_, MobSpawnType.JOCKEY, (SpawnGroupData) null, (CompoundTag) null);
                       chicken1.m_28273_(true);
                       this.m_20329_(chicken1);
--                     p_34297_.m_7967_(chicken1);
-+                     p_34297_.addFreshEntity(chicken1, CreatureSpawnEvent.SpawnReason.MOUNT); // CraftBukkit
++                     p_34297_.prepareEntity(chicken1, CreatureSpawnEvent.SpawnReason.MOUNT); //Magma - add spawn reason
+                      p_34297_.m_7967_(chicken1);
                    }
                 }
-             }
 @@ -464,13 +_,13 @@
     }
  

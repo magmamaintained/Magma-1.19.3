@@ -1,5 +1,13 @@
 --- a/net/minecraft/world/level/BaseSpawner.java
 +++ b/net/minecraft/world/level/BaseSpawner.java
+@@ -23,6 +_,7 @@
+ import net.minecraft.world.entity.SpawnPlacements;
+ import net.minecraft.world.level.gameevent.GameEvent;
+ import net.minecraft.world.phys.AABB;
++import org.bukkit.event.entity.CreatureSpawnEvent;
+ import org.slf4j.Logger;
+ 
+ public abstract class BaseSpawner {
 @@ -46,6 +_,7 @@
  
     public void m_253197_(EntityType<?> p_253682_, @Nullable Level p_254041_, RandomSource p_254221_, BlockPos p_254050_) {
@@ -8,7 +16,7 @@
     }
  
     private boolean m_151343_(Level p_151344_, BlockPos p_151345_) {
-@@ -131,16 +_,38 @@
+@@ -131,15 +_,38 @@
                    entity.m_7678_(entity.m_20185_(), entity.m_20186_(), entity.m_20189_(), randomsource.m_188501_() * 360.0F, 0.0F);
                    if (entity instanceof Mob) {
                       Mob mob = (Mob)entity;
@@ -44,11 +52,10 @@
 +                  }
 +                  // Spigot End
  
--                  if (!p_151312_.m_8860_(entity)) {
-+                  if (!p_151312_.tryAddFreshEntityWithPassengers(entity, org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason.SPAWNER)) { // CraftBukkit
++                  p_151312_.prepareEntity(entity, CreatureSpawnEvent.SpawnReason.SPAWNER); //Magma - add spawn reason
+                   if (!p_151312_.m_8860_(entity)) {
                       this.m_151350_(p_151312_, p_151313_);
                       return;
-                   }
 @@ -283,4 +_,12 @@
     public double m_45474_() {
        return this.f_45446_;
