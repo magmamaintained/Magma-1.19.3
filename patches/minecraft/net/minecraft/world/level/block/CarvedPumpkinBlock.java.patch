@@ -8,14 +8,14 @@
  
  public class CarvedPumpkinBlock extends HorizontalDirectionalBlock implements Wearable {
     public static final DirectionProperty f_51367_ = HorizontalDirectionalBlock.f_54117_;
-@@ -75,9 +_,16 @@
+@@ -75,9 +_,15 @@
     }
  
     private static void m_245952_(Level p_249110_, BlockPattern.BlockPatternMatch p_251293_, Entity p_251251_, BlockPos p_251189_) {
 -      m_245585_(p_249110_, p_251293_);
 +      // clearPatternBlocks(p_249110_, p_251293_); // CraftBukkit - move down
        p_251251_.m_7678_((double)p_251189_.m_123341_() + 0.5D, (double)p_251189_.m_123342_() + 0.05D, (double)p_251189_.m_123343_() + 0.5D, 0.0F, 0.0F);
-       p_249110_.m_7967_(p_251251_);
+-      p_249110_.m_7967_(p_251251_);
 +
 +      // CraftBukkit start
 +      if (!p_249110_.addFreshEntity(p_251251_, CreatureSpawnEvent.SpawnReason.BUILD_IRONGOLEM)) {
