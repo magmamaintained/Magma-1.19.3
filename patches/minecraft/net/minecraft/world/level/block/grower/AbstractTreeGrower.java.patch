@@ -81,7 +81,7 @@
 +      } else if (worldgentreeabstract == TreeFeatures.f_236763_) {
 +         SaplingBlock.treeType = TreeType.TALL_MANGROVE;
 +      } else {
-+         throw new IllegalArgumentException("Unknown tree generator " + worldgentreeabstract);
++         SaplingBlock.treeType = TreeType.MODDED; //Magma - default to modded
 +      }
 +   }
 +   // CraftBukkit end
