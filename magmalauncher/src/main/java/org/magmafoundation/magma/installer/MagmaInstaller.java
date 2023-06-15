@@ -20,6 +20,7 @@ package org.magmafoundation.magma.installer;
 
 import dev.vankka.dependencydownload.DependencyManager;
 import dev.vankka.dependencydownload.dependency.Dependency;
+import dev.vankka.dependencydownload.dependency.StandardDependency;
 import dev.vankka.dependencydownload.path.CleanupPathProvider;
 import dev.vankka.dependencydownload.path.DependencyPathProvider;
 import dev.vankka.dependencydownload.repository.Repository;
@@ -424,18 +425,31 @@ public class MagmaInstaller extends AbstractMagmaInstaller {
                 }
             });
 
-            downloadMcp(mcVersion, mcpVersion);
+            downloadMcp(mcVersion, mcpVersion, standardRepositories, manager);
             downloadMinecraftServer(minecraft_server);
         }
 
-        public void downloadMcp(String mc_version, String mcp_version) {
+        public void downloadMcp(String mc_version, String mcp_version, List<Repository> standardRepositories, DependencyManager manager) {
             File mcp_config = new File(LIB_PATH + "de/oceanlabs/mcp/mcp_config/" + mc_version + "-" + mcp_version + "/mcp_config-" + mc_version + "-" + mcp_version + ".zip");
             if (Files.exists(mcp_config.toPath()))
                 return;
             mcp_config.getParentFile().mkdirs();
+            Dependency dep = new StandardDependency(
+                    "de.oceanlabs.mcp",
+                    "mcp_config",
+                    mc_version + "-" + mcp_version,
+                    "zip",
+                    "9dd9a0ebdc336ca66e561613fddb5a83703499661b8ef528ee3a01acbdf7b90d48ace13e4ad0b90b4d58f4555aec0ec1f106f2887cc8ac4735f4eaff825b7fde",
+                    "SHA-512"
+            ){
+                @Override
+                public String getFileName() {
+                    String classifier = getClassifier();
+                    return getArtifactId() + '-' + getVersion() + ".zip";
+                }
+            };
             try {
-                NetworkUtils.downloadFile("https://maven.minecraftforge.net/de/oceanlabs/mcp/mcp_config/"+ mc_version + "-"+ mcp_version + "/mcp_config-"+ mc_version + "-"+ mcp_version +".zip",
-                        mcp_config);
+                LibHelper.downloadDependency(manager, dep, standardRepositories);
             } catch (Exception e) {
                 System.out.println("Can't find mcp_config");
                 e.printStackTrace();
