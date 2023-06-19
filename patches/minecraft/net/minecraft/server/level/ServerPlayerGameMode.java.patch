@@ -194,7 +194,7 @@
           }
  
        }
-@@ -219,40 +_,150 @@
+@@ -219,40 +_,145 @@
  
     }
  
@@ -206,11 +206,12 @@
 -      BlockState blockstate = this.f_9244_.m_8055_(p_9281_);
 -      if (!this.f_9245_.m_21205_().m_41720_().m_6777_(blockstate, this.f_9244_, p_9281_, this.f_9245_)) {
 +      BlockState blockState = this.f_9244_.m_8055_(p_9281_);
++      int exp = net.minecraftforge.common.ForgeHooks.onBlockBreakEvent(f_9244_, f_9247_, f_9245_, p_9281_);
 +      // CraftBukkit start - fire BlockBreakEvent
 +      destroyBlock_bblock = CraftBlock.at(f_9244_, p_9281_);
 +      destroyBlock_event = isSwordNoBreak(p_9281_, blockState, destroyBlock_bblock);
 +
-+      if (destroyBlock_event.isEmpty())
++      if (exp == -1 || destroyBlock_event.isEmpty())
 +         return false;
 +      // CraftBukkit end
 +
@@ -302,12 +303,6 @@
 +         event = new BlockBreakEvent(bblock, this.f_9245_.getBukkitEntity());
 +
 +         //Magma start
-+         int exp = net.minecraftforge.common.ForgeHooks.onBlockBreakEvent(f_9244_, f_9247_, f_9245_, p_9281_);
-+
-+         if (exp == -1) {
-+            return Optional.empty();
-+         }
-+
 +         if(this.f_9245_.m_7500_() && ((Player) this.f_9245_.getBukkitEntity()).getInventory().getItemInMainHand().getType().toString().contains("SWORD") || ((Player) this.f_9245_.getBukkitEntity()).getInventory().getItemInMainHand().getType().toString().contains("TRIDENT")){
 +            event.setCancelled(true);
 +            isSwordNoBreak = true;
