@@ -34,7 +34,7 @@ You might be able to use the Waterfall fork called [Lightfall](https://github.co
 
 ### Installation
 
-1. Download the recommended builds from the [**Releases** section](https://git.magmafoundation.org/magmafoundation/Magma-1-19-x/-/releases) (**Download** the one that ends in installer) 
+1. Download the recommended builds from the [**Releases** section](https://git.magmafoundation.org/magmafoundation/Magma-1-19-x/-/releases) (**Download** the one that ends in server) 
    1. Or Download the latest jar from [Magma Site](https://magmafoundation.org/)
 2. Make a new directory(folder) for the server
 3. Move the jar that you downloaded into the new directory
