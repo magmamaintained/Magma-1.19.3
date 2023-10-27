@@ -72,7 +72,7 @@
  import net.minecraft.util.profiling.EmptyProfileResults;
  import net.minecraft.util.profiling.ProfileResults;
  import net.minecraft.util.profiling.ProfilerFiller;
-@@ -136,1624 +_,2190 @@
+@@ -136,1624 +_,2173 @@
  import net.minecraft.world.level.WorldDataConfiguration;
  import net.minecraft.world.level.biome.BiomeManager;
  import net.minecraft.world.level.block.Block;
@@ -445,10 +445,10 @@
 +    boolean flag = false;
 +    ProfiledDuration profiledduration = JvmProfiler.f_185340_.m_183494_();
 +    //this.worldData.setModdedInfo(this.getServerModName(), this.getModdedStatus().shouldReportAsModified());
-+    //ChunkProgressListener chunkprogresslistener = this.progressListenerFactory.create(11);
++    ChunkProgressListener chunkprogresslistener = this.f_129756_.m_9620_(11);
 +
-+    loadWorld0(s);
-+    //this.createLevels(chunkprogresslistener);
++    this.prepareCreateLevels(s);
++    this.m_129815_(chunkprogresslistener);
 +    //this.forceDifficulty();
 +    //this.prepareLevels(chunkprogresslistener);
 +    if (profiledduration != null) {
@@ -465,23 +465,15 @@
 +
 +  }
 +
++  // Magma start - Move String to different constructor.
++  private String s = null;
++  public void prepareCreateLevels(String s) {
++    this.s = s;
++  }
++  // Magma end
 +
-+  //   protected void createLevels(ChunkProgressListener p_129816_) {
-+//      ServerLevelData serverleveldata = this.worldData.overworldData();
-+//      boolean flag = this.worldData.isDebugWorld();
-+//      Registry<LevelStem> registry = this.registries.compositeAccess().registryOrThrow(Registries.LEVEL_STEM);
-+//      WorldOptions worldoptions = this.worldData.worldGenOptions();
-+//      long i = worldoptions.seed();
-+//      long j = BiomeManager.obfuscateSeed(i);
-+//      List<CustomSpawner> list = ImmutableList.of(new PhantomSpawner(), new PatrolSpawner(), new CatSpawner(), new VillageSiege(), new WanderingTraderSpawner(serverleveldata));
-+//      LevelStem levelstem = registry.get(LevelStem.OVERWORLD);
-+//      ServerLevel serverlevel = new ServerLevel(this, this.executor, this.storageSource, serverleveldata, Level.OVERWORLD, levelstem, p_129816_, flag, j, list, true);
-+//      this.levels.put(Level.OVERWORLD, serverlevel);
-+//      DimensionDataStorage dimensiondatastorage = serverlevel.getDataStorage();
-+//      this.readScoreboard(dimensiondatastorage);
-+//      this.commandStorage = new CommandStorage(dimensiondatastorage);
-+// CraftBukkit start
-+  private void loadWorld0(String s) {
++  // CraftBukkit start
++  protected void m_129815_(ChunkProgressListener p_129816_) {
 +    LevelStorageSource.LevelStorageAccess worldSession = this.f_129744_;
 +
 +    Registry<LevelStem> dimensions = this.f_244176_.m_247579_().m_175515_(Registries.f_256862_);
@@ -515,8 +507,7 @@
 +      if (dimension != 0) {
 +        File newWorld = DimensionType.getStorageFolder(new File(name).toPath(), dimensionKey).toFile();
 +        File oldWorld = DimensionType.getStorageFolder(new File(s).toPath(), dimensionKey).toFile();
-+        File oldLevelDat = new File(new File(s),
-+            "level.dat"); // The data folders exist on first run as they are created in the PersistentCollection constructor above, but the level.dat won't
++        File oldLevelDat = new File(new File(s), "level.dat"); // The data folders exist on first run as they are created in the PersistentCollection constructor above, but the level.dat won't
 +
 +        if (!newWorld.isDirectory() && oldWorld.isDirectory() && oldLevelDat.isFile()) {
 +          MinecraftServer.f_129750_.info("---- Migration of old " + worldType + " folder required ----");
@@ -654,8 +645,7 @@
 +
 +        worlddata = new PrimaryLevelData(worldsettings, worldoptions, LevelStems_b.f_244634_(), lifecycle);
 +      }
-+      worlddata.checkName(
-+          name); // CraftBukkit - Migration did not rewrite the level.dat; This forces 1.8 to take the last loaded world as respawn (in this case the end)
++      worlddata.checkName(name); // CraftBukkit - Migration did not rewrite the level.dat; This forces 1.8 to take the last loaded world as respawn (in this case the end)
 +      if (options.has("forceUpgrade")) {
 +        net.minecraft.server.Main.m_195488_(worldSession, DataFixers.m_14512_(), options.has("eraseCache"),
 +            () -> {
@@ -736,12 +726,8 @@
 +      if (dimensionKey == net.minecraft.world.level.dimension.LevelStem.f_63971_) {
 +        this.f_129749_ = worlddata;
 +        this.f_129749_.m_5458_(((DedicatedServer) this).m_7913_().f_139740_); // From DedicatedServer.init
-+
-+        ChunkProgressListener worldloadlistener = this.f_129756_.m_9620_(11);
-+
-+        world =
-+            new ServerLevel(this, this.f_129738_, worldSession, iworlddataserver, worldKey, levelStem, worldloadlistener,
-+                flag, j, list, true, org.bukkit.World.Environment.getEnvironment(dimension), gen, biomeProvider);
++        Level.craftWorldData(gen, org.bukkit.World.Environment.getEnvironment(dimension), biomeProvider);
++        world = new ServerLevel(this, this.f_129738_, worldSession, iworlddataserver, worldKey, levelStem, p_129816_, flag, j, list, true);
 +        DimensionDataStorage worldpersistentdata = world.m_8895_();
 +        this.m_129841_(worldpersistentdata);
 +        this.server.scoreboardManager =
@@ -812,11 +798,8 @@
 -      ServerChunkCache serverchunkcache = serverlevel.m_7726_();
 -      serverchunkcache.m_7827_().m_9310_(500);
 -      this.f_129726_ = Util.m_137550_();
-+        ChunkProgressListener worldloadlistener = this.f_129756_.m_9620_(11);
-+        world =
-+            new ServerLevel(this, this.f_129738_, worldSession, iworlddataserver, worldKey, lS, worldloadlistener,
-+                flag, j, ImmutableList.of(), true, org.bukkit.World.Environment.getEnvironment(dimension), gen,
-+                biomeProvider);
++        Level.craftWorldData(gen, org.bukkit.World.Environment.getEnvironment(dimension), biomeProvider);
++        world = new ServerLevel(this, this.f_129738_, worldSession, iworlddataserver, worldKey, lS, p_129816_, flag, j, ImmutableList.of(), true);
 +      }
 +
 +
