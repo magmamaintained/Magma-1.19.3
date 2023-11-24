@@ -251,10 +251,23 @@ def sharedDeps = {
     installer "net.minecraftforge:JarJarMetadata:${JARJAR_VERSION}"
 
     // Bukkit
+    installer "org.apache.maven:maven-artifact:${APACHE_MAVEN_ARTIFACT_VERSION}"
+    installer 'org.apache.maven:maven-builder-support:3.8.5'
+    installer 'org.apache.maven:maven-model:3.8.5'
+    installer 'org.apache.maven:maven-model-builder:3.8.5'
+    installer 'org.apache.maven:maven-repository-metadata:3.8.5'
     installer 'org.apache.maven:maven-resolver-provider:3.8.5'
+
+    installer 'org.apache.maven.resolver:maven-resolver-api:1.7.3'
     installer 'org.apache.maven.resolver:maven-resolver-connector-basic:1.7.3'
+    installer 'org.apache.maven.resolver:maven-resolver-impl:1.7.3'
+    installer 'org.apache.maven.resolver:maven-resolver-spi:1.7.3'
     installer 'org.apache.maven.resolver:maven-resolver-transport-http:1.7.3'
-    compileOnly 'org.jetbrains:annotations-java5:23.0.0'
+    installer 'org.apache.maven.resolver:maven-resolver-util:1.7.3'
+    installer 'org.eclipse.sisu:org.eclipse.sisu.inject:0.3.5'
+    installer 'org.joml:joml:1.10.5'
+    compileOnly 'org.jetbrains:annotations:21.0.1'
+
 
     // CraftBukkit
     installer 'org.fusesource.jansi:jansi:1.18'
@@ -267,7 +280,36 @@ def sharedDeps = {
     installer 'org.yaml:snakeyaml:1.33'
 
     // Spigot
-    installer 'net.md-5:bungeecord-chat:1.16-R0.4'
+    installer 'com.google.guava:failureaccess:1.0.1'
+    installer 'com.google.guava:guava:31.1-jre'
+    installer 'com.google.code.gson:gson:2.10'
+    installer 'com.mojang:authlib:3.18.38'
+    installer 'com.mojang:logging:1.1.1'
+    installer 'org.slf4j:slf4j-api:2.0.6'
+
+    installer 'org.apache.logging.log4j:log4j-core:2.20.0'
+    installer 'org.apache.logging.log4j:log4j-iostreams:2.20.0'
+    installer 'org.apache.logging.log4j:log4j-api:2.20.0'
+    installer 'org.apache.logging.log4j:log4j-slf4j2-impl:2.20.0'
+    installer 'org.apache.commons:commons-lang3:3.12.0'
+    installer 'net.sf.jopt-simple:jopt-simple:5.0.4'
+    installer 'net.java.dev.jna:jna-platform:5.13.0'
+    installer 'net.java.dev.jna:jna:5.13.0'
+    installer 'it.unimi.dsi:fastutil:8.5.12'
+    installer 'commons-io:commons-io:2.11.0'
+    installer 'com.mojang:javabridge:2.0.25'
+    installer 'com.mojang:datafixerupper:6.0.6'
+    installer 'com.github.oshi:oshi-core:6.4.0'
+
+
+    installer 'io.netty:netty-buffer:4.1.82.Final'
+    installer 'io.netty:netty-codec:4.1.82.Final'
+    installer 'io.netty:netty-common:4.1.82.Final'
+    installer 'io.netty:netty-handler:4.1.82.Final'
+    installer 'io.netty:netty-resolver:4.1.82.Final'
+    installer 'io.netty:netty-transport:4.1.82.Final'
+    installer 'io.netty:netty-transport-classes-epoll:4.1.82.Final'
+    installer 'io.netty:netty-transport-native-unix-common:4.1.82.Final'
 
     // Magma
     installer 'org.magma:magma-common:2.6'
