@@ -266,7 +266,7 @@ def sharedDeps = {
     installer 'org.apache.maven.resolver:maven-resolver-util:1.7.3'
     installer 'org.eclipse.sisu:org.eclipse.sisu.inject:0.3.5'
     installer 'org.joml:joml:1.10.5'
-    compileOnly 'org.jetbrains:annotations:21.0.1'
+    compileOnly 'org.jetbrains:annotations-java5:23.0.0'
 
 
     // CraftBukkit
@@ -280,6 +280,7 @@ def sharedDeps = {
     installer 'org.yaml:snakeyaml:1.33'
 
     // Spigot
+    installer 'net.md-5:bungeecord-chat:1.16-R0.4'
     installer 'com.google.guava:failureaccess:1.0.1'
     installer 'com.google.guava:guava:31.1-jre'
     installer 'com.google.code.gson:gson:2.10'
