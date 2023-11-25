@@ -254,7 +254,7 @@ def sharedDeps = {
     installer 'org.apache.maven:maven-resolver-provider:3.8.4'
     installer 'org.apache.maven.resolver:maven-resolver-connector-basic:1.7.2'
     installer 'org.apache.maven.resolver:maven-resolver-transport-http:1.7.2'
-    installer 'org.yaml:snakeyaml:1.30'
+    installer 'org.yaml:snakeyaml:1.33'
     compileOnly 'org.jetbrains:annotations-java5:23.0.0'
 
     // CraftBukkit
