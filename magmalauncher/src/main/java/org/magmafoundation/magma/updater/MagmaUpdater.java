@@ -50,7 +50,7 @@ public class MagmaUpdater {
     private String newSha;
     private String currentSha;
     private String versionURL = "https://api.github.com/repos/magmamaintained/Magma-1.19.3/releases/latest";
-    private String assetURL;;
+    private String assetURL;
 
     public boolean versionChecker() {
         try {

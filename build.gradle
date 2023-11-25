@@ -251,33 +251,19 @@ def sharedDeps = {
     installer "net.minecraftforge:JarJarMetadata:${JARJAR_VERSION}"
 
     // Bukkit
-    installer "org.apache.maven:maven-artifact:${APACHE_MAVEN_ARTIFACT_VERSION}"
-    installer 'org.apache.maven:maven-builder-support:3.8.5'
-    installer 'org.apache.maven:maven-model:3.8.5'
-    installer 'org.apache.maven:maven-model-builder:3.8.5'
-    installer 'org.apache.maven:maven-repository-metadata:3.8.5'
-    installer 'org.apache.maven:maven-resolver-provider:3.8.5'
-
-    installer 'org.apache.maven.resolver:maven-resolver-api:1.7.3'
-    installer 'org.apache.maven.resolver:maven-resolver-connector-basic:1.7.3'
-    installer 'org.apache.maven.resolver:maven-resolver-impl:1.7.3'
-    installer 'org.apache.maven.resolver:maven-resolver-spi:1.7.3'
-    installer 'org.apache.maven.resolver:maven-resolver-transport-http:1.7.3'
-    installer 'org.apache.maven.resolver:maven-resolver-util:1.7.3'
-    installer 'org.eclipse.sisu:org.eclipse.sisu.inject:0.3.5'
-    installer 'org.joml:joml:1.10.5'
+    installer 'org.apache.maven:maven-resolver-provider:3.8.4'
+    installer 'org.apache.maven.resolver:maven-resolver-connector-basic:1.7.2'
+    installer 'org.apache.maven.resolver:maven-resolver-transport-http:1.7.2'
+    installer 'org.yaml:snakeyaml:1.30'
     compileOnly 'org.jetbrains:annotations-java5:23.0.0'
-
 
     // CraftBukkit
     installer 'org.fusesource.jansi:jansi:1.18'
     installer 'jline:jline:2.13'
     installer 'com.googlecode.json-simple:json-simple:1.1.1'
     installer 'org.xerial:sqlite-jdbc:3.36.0.3'
-    installer 'mysql:mysql-connector-java:8.0.29'
-    installer 'org.apache.logging.log4j:log4j-iostreams:2.19.0'
-    installer 'net.md-5:SpecialSource:1.11.0'
-    installer 'org.yaml:snakeyaml:1.33'
+    installer 'mysql:mysql-connector-java:8.0.27'
+    installer 'net.md-5:SpecialSource:1.11.2'
 
     // Spigot
     installer 'net.md-5:bungeecord-chat:1.16-R0.4'
