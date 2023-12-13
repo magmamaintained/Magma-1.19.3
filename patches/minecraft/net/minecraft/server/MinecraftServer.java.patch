@@ -111,7 +111,7 @@
 +import org.bukkit.event.player.AsyncPlayerChatPreviewEvent;
 +import org.bukkit.event.server.ServerLoadEvent;
 +import org.magmafoundation.magma.Magma;
-+import org.magmafoundation.magma.Metrics;
++import org.magmafoundation.magma.metrics.Metrics;
 +import org.magmafoundation.magma.patcher.PatcherManager;
 +import org.magmafoundation.magma.protect.InjectProtect;
  import org.slf4j.Logger;
