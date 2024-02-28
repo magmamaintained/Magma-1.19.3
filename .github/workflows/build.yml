@@ -7,7 +7,7 @@ on:
     branches:
      - '*'
 permissions:
-  contents: write #nessesary for tag creation and release creation
+  contents: write
 
 jobs:
   build:
