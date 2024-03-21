@@ -150,18 +150,21 @@ subprojects {
     repositories {
         mavenLocal()
         mavenCentral()
-        maven { url 'https://nexus.c0d3m4513r.com/repository/Magma/' }
+        maven { url = 'https://nexus.c0d3m4513r.com/repository/Magma/' }
         maven {
             name = 'forge'
             url = 'https://maven.minecraftforge.net/'
         }
-        maven { url 'https://hub.spigotmc.org/nexus/content/groups/public/' }
-        maven { url 'https://git.magmafoundation.org/magmafoundation/magma-maven-repo/-/raw/repository' }
-        maven { url 'https://maven.izzel.io/releases' }
         maven {
-            name = 'minecraft'
-            url = 'https://libraries.minecraft.net/'
+            name = 'Fabric'
+            url = 'https://maven.fabricmc.net/'
         }
+        maven { url 'https://hub.spigotmc.org/nexus/content/groups/public/' }
+        maven {
+            url = "https://raw.github.com/Hexeption/Magma-Repo/master/"
+        }
+        maven { url 'https://maven.izzel.io/releases' }
+        maven { url = 'https://maven.mohistmc.com/' }
     }
 
     java.toolchain.languageVersion = JavaLanguageVersion.of(17)
@@ -302,6 +305,7 @@ def sharedDeps = {
     installer 'io.netty:netty-transport-native-unix-common:4.1.82.Final'
 
     installer 'org.magma:magma-common:2.6'
+    installer 'com.mohistmc:json:0.2'
     installer 'io.izzel:tools:1.3.0'
 
     autolibraries BIN_PATCHER
