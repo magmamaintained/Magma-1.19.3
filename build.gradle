@@ -150,7 +150,7 @@ subprojects {
     repositories {
         mavenLocal()
         mavenCentral()
-        maven { url = 'https://nexus.c0d3m4513r.com/repository/Magma/' }
+        maven { url = 'https://reposilite.c0d3m4513r.com/Magma/' }
         maven {
             name = 'forge'
             url = 'https://maven.minecraftforge.net/'
