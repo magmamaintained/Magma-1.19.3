@@ -15,6 +15,11 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
+#Ketting PR build fix start
+      - name: Rename Branch, if Pull_Request
+        if: ${{ github.event_name == 'pull_request' }}
+        run: git checkout -B 'branch'
+#Ketting PR build fix end
 
       - name: Setup java 17
         uses: actions/setup-java@v3
